@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="MSME Catalyst">
+  <rect width="64" height="64" rx="14" fill="#FFFFFF"/>
+  <rect x="2" y="2" width="60" height="60" rx="12" fill="none" stroke="#E7E5E0" stroke-width="1.5"/>
+  <text x="32" y="40" text-anchor="middle" font-family="Sora, Segoe UI, Arial, sans-serif" font-weight="800" font-style="italic" font-size="34" fill="#EE7A1A">M</text>
+  <rect x="14" y="48" width="36" height="4" rx="2" fill="#1B7A3C"/>
+</svg>

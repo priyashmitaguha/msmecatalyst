@@ -1,0 +1,23 @@
+{
+  "name": "msme-catalyst-backend",
+  "version": "1.0.0",
+  "description": "CMS + Membership CRM + ODR admin back-end for MSME Catalyst (Digital Growth Infrastructure Foundation, Section 8).",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "seed": "node db.js --seed",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^11.3.0",
+    "cookie-parser": "^1.4.6",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.5.1",
+    "helmet": "^8.1.0",
+    "multer": "^2.0.2",
+    "nanoid": "^3.3.7"
+  },
+  "license": "UNLICENSED"
+}

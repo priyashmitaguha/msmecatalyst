@@ -1,0 +1,12 @@
+node_modules/
+server/data/
+server/uploads/
+server/persistent/
+.env
+server/.env
+*.log
+shot*.py
+sec_*.png
+admin_*.png
+shot_*.png
+__pycache__/

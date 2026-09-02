@@ -1,0 +1,32 @@
+# Render deploy blueprint for MSME Catalyst (site + admin + CMS + CRM).
+# 1. Push this repo to GitHub.  2. On render.com → New → Blueprint → pick the repo.
+# Render reads this file and creates the service.
+services:
+  - type: web
+    name: msme-catalyst
+    runtime: node
+    rootDir: server
+    plan: starter            # "free" also works for testing (see note below)
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: NODE_ENV
+        value: production
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: DATA_DIR
+        value: /opt/render/project/src/server/persistent/data
+      - key: UPLOAD_DIR
+        value: /opt/render/project/src/server/persistent/uploads
+    # Persistent disk keeps the database + uploads across restarts/deploys.
+    # NOTE: disks require a paid plan. On the FREE plan the disk resets on each
+    # deploy/restart (data reseeds from db.js) — fine for testing, not production.
+    disk:
+      name: msme-data
+      mountPath: /opt/render/project/src/server/persistent
+      sizeGB: 1

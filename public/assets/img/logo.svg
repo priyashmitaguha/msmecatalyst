@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 200" role="img" aria-label="MSME Catalyst">
+  <defs>
+    <style>
+      .mark-msme { font-family: 'Sora', 'Segoe UI', Arial, sans-serif; font-weight: 800; font-style: italic; font-size: 92px; letter-spacing: -3px; fill: #EE7A1A; }
+      .mark-cat  { font-family: 'Sora', 'Segoe UI', Arial, sans-serif; font-weight: 800; font-style: italic; font-size: 68px; letter-spacing: 1px; fill: #1B7A3C; }
+    </style>
+  </defs>
+  <text x="8" y="90" class="mark-msme">MSME</text>
+  <!-- arrow accent replacing the final E stroke -->
+  <path d="M372 40 L410 40 L410 52 L388 52 L400 63 L388 74 L410 74 L410 86 L372 86 Z" fill="#EE7A1A"/>
+  <polygon points="404,20 432,48 404,48" fill="#1B7A3C"/>
+  <text x="8" y="168" class="mark-cat">CATALYST</text>
+</svg>

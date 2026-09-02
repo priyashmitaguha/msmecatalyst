@@ -1,0 +1,320 @@
+{
+  "about.heading": {
+    "default": "Industry-led, professionally run, accountable for outcomes.",
+    "label": "Hero heading",
+    "multiline": false,
+    "page": "about"
+  },
+  "about.kicker": {
+    "default": "About MSME Catalyst",
+    "label": "Hero kicker",
+    "multiline": false,
+    "page": "about"
+  },
+  "about.lead": {
+    "default": "MSME Catalyst is operated by Digital Growth Infrastructure Foundation, a Section 8 not-for-profit entity. We are built as a neutral convergence layer.",
+    "label": "Hero intro",
+    "multiline": true,
+    "page": "about"
+  },
+  "approach.heading": {
+    "default": "Start with demand. Build capability. Share evidence. Protect neutrality.",
+    "label": "Hero heading",
+    "multiline": false,
+    "page": "approach"
+  },
+  "approach.kicker": {
+    "default": "Our Approach",
+    "label": "Hero kicker",
+    "multiline": false,
+    "page": "approach"
+  },
+  "approach.lead": {
+    "default": "A working method for making support land on the ground — organised around real clusters, not isolated interventions.",
+    "label": "Hero intro",
+    "multiline": true,
+    "page": "approach"
+  },
+  "blogs.heading": {
+    "default": "Notes from the ground.",
+    "label": "Hero heading",
+    "multiline": false,
+    "page": "blogs"
+  },
+  "blogs.kicker": {
+    "default": "Blogs",
+    "label": "Hero kicker",
+    "multiline": false,
+    "page": "blogs"
+  },
+  "blogs.lead": {
+    "default": "Short, practical writing on convergence, receivables, capability, capital and cluster policy.",
+    "label": "Hero intro",
+    "multiline": true,
+    "page": "blogs"
+  },
+  "contact.heading": {
+    "default": "Let's find the right door.",
+    "label": "Hero heading",
+    "multiline": false,
+    "page": "contact"
+  },
+  "contact.kicker": {
+    "default": "Contact",
+    "label": "Hero kicker",
+    "multiline": false,
+    "page": "contact"
+  },
+  "contact.lead": {
+    "default": "Whether you're an MSME, an institution, a funder or a partner, there's a clear route to reach us.",
+    "label": "Hero intro",
+    "multiline": true,
+    "page": "contact"
+  },
+  "events.heading": {
+    "default": "Where the ecosystem does the work together.",
+    "label": "Hero heading",
+    "multiline": false,
+    "page": "events"
+  },
+  "events.kicker": {
+    "default": "Events &amp; Labs",
+    "label": "Hero kicker",
+    "multiline": false,
+    "page": "events"
+  },
+  "events.lead": {
+    "default": "Working labs, roundtables and convenings that turn shared intent into shared execution.",
+    "label": "Hero intro",
+    "multiline": true,
+    "page": "events"
+  },
+  "global.cta_heading": {
+    "default": "Support already exists. Let's make it work together.",
+    "label": "CTA band heading",
+    "multiline": false,
+    "page": "global"
+  },
+  "global.cta_kicker": {
+    "default": "Build the convergence layer",
+    "label": "CTA band kicker",
+    "multiline": false,
+    "page": "global"
+  },
+  "global.cta_text": {
+    "default": "Whether you are an MSME facing payment friction, an institution ready to pilot, or a funder backing execution infrastructure — there is a working role for you.",
+    "label": "CTA band text",
+    "multiline": true,
+    "page": "global"
+  },
+  "global.footer_disclaimer": {
+    "default": "<strong>What We Do Not Do.</strong> MSME Catalyst does not lend, underwrite, provide legal advice, adjudicate disputes, operate an ODR platform, guarantee recovery, or replace existing schemes, courts, arbitrators, universities or implementation partners. We facilitate structured access to relevant ecosystem pathways. Independent lenders, ODR providers and other institutions retain their own eligibility, commercial, legal and operational decisions.",
+    "label": "Footer legal disclaimer",
+    "multiline": true,
+    "page": "global"
+  },
+  "global.footer_tagline": {
+    "default": "India's neutral convergence layer for MSME growth. A not-for-profit platform operated by Digital Growth Infrastructure Foundation (Section 8).",
+    "label": "Footer tagline",
+    "multiline": true,
+    "page": "global"
+  },
+  "home.gap1_desc": {
+    "default": "Receivables and payment certainty.",
+    "label": "Gap1 Desc",
+    "multiline": false,
+    "page": "home"
+  },
+  "home.gap1_title": {
+    "default": "Cash-flow gap",
+    "label": "Gap1 Title",
+    "multiline": false,
+    "page": "home"
+  },
+  "home.gap2_desc": {
+    "default": "Demand-side linkage and buyer access.",
+    "label": "Gap2 Desc",
+    "multiline": false,
+    "page": "home"
+  },
+  "home.gap2_title": {
+    "default": "Market gap",
+    "label": "Gap2 Title",
+    "multiline": false,
+    "page": "home"
+  },
+  "home.gap3_desc": {
+    "default": "Technical, managerial, digital and legal handholding.",
+    "label": "Gap3 Desc",
+    "multiline": false,
+    "page": "home"
+  },
+  "home.gap3_title": {
+    "default": "Capability gap",
+    "label": "Gap3 Title",
+    "multiline": false,
+    "page": "home"
+  },
+  "home.gap4_desc": {
+    "default": "Preparation, documentation and access pathways.",
+    "label": "Gap4 Desc",
+    "multiline": false,
+    "page": "home"
+  },
+  "home.gap4_title": {
+    "default": "Growth-capital gap",
+    "label": "Gap4 Title",
+    "multiline": false,
+    "page": "home"
+  },
+  "home.hero_heading": {
+    "default": "India does not lack MSME support.<br><span style='color:var(--orange)'>It lacks convergence.</span>",
+    "label": "Hero heading (HTML allowed)",
+    "multiline": false,
+    "page": "home"
+  },
+  "home.hero_kicker": {
+    "default": "MSME Catalyst | The Convergence Layer",
+    "label": "Hero kicker",
+    "multiline": false,
+    "page": "home"
+  },
+  "home.hero_sub": {
+    "default": "MSME Catalyst makes existing support work together around real MSME clusters and business journeys — a neutral, not-for-profit platform that brings anchors, MSMEs, lenders, technology providers, capability institutions, legal and dispute-resolution partners and government into one accountable operating model.",
+    "label": "Hero sub-copy",
+    "multiline": true,
+    "page": "home"
+  },
+  "home.problem_body": {
+    "default": "Support exists. Schemes, lenders, universities, technology and legal routes are all available. But they often reach the enterprise <strong>separately</strong>, on different timelines, through different doors — so the enterprise carries the burden of stitching them together alone.",
+    "label": "Problem body",
+    "multiline": true,
+    "page": "home"
+  },
+  "home.problem_heading": {
+    "default": "An MSME rarely has one isolated problem.",
+    "label": "Problem Heading",
+    "multiline": false,
+    "page": "home"
+  },
+  "home.problem_kicker": {
+    "default": "The problem",
+    "label": "Problem Kicker",
+    "multiline": false,
+    "page": "home"
+  },
+  "home.problem_lead": {
+    "default": "A single enterprise may face delayed receivables, weak buyer visibility, limited documentation, poor access to capability support and unclear capital pathways — all at the same time.",
+    "label": "Problem lead",
+    "multiline": true,
+    "page": "home"
+  },
+  "knowledge.heading": {
+    "default": "Evidence, insight and convening — in one place.",
+    "label": "Hero heading",
+    "multiline": false,
+    "page": "knowledge"
+  },
+  "knowledge.kicker": {
+    "default": "Knowledge Hub",
+    "label": "Hero kicker",
+    "multiline": false,
+    "page": "knowledge"
+  },
+  "knowledge.lead": {
+    "default": "Reports and papers, writing, conversations and live convenings. The platform's aggregated execution insight, grouped for easy access.",
+    "label": "Hero intro",
+    "multiline": true,
+    "page": "knowledge"
+  },
+  "membership.heading": {
+    "default": "Membership is a working role inside cluster infrastructure.",
+    "label": "Hero heading",
+    "multiline": false,
+    "page": "membership"
+  },
+  "membership.kicker": {
+    "default": "Membership",
+    "label": "Hero kicker",
+    "multiline": false,
+    "page": "membership"
+  },
+  "membership.lead": {
+    "default": "Membership is institutional, invitation-led and outcome-oriented — not generic logo placement or event access.",
+    "label": "Hero intro",
+    "multiline": true,
+    "page": "membership"
+  },
+  "odr_support.heading": {
+    "default": "Resolve payment friction before it becomes business failure.",
+    "label": "Hero heading",
+    "multiline": false,
+    "page": "odr_support"
+  },
+  "odr_support.kicker": {
+    "default": "ODR Support",
+    "label": "Hero kicker",
+    "multiline": false,
+    "page": "odr_support"
+  },
+  "odr_support.lead": {
+    "default": "MSME Catalyst helps businesses facing payment-related commercial friction organise their documents, understand possible routes and connect with an appropriate independent provider.",
+    "label": "Hero intro",
+    "multiline": true,
+    "page": "odr_support"
+  },
+  "podcasts.heading": {
+    "default": "Conversations on convergence.",
+    "label": "Hero heading",
+    "multiline": false,
+    "page": "podcasts"
+  },
+  "podcasts.kicker": {
+    "default": "Podcasts",
+    "label": "Hero kicker",
+    "multiline": false,
+    "page": "podcasts"
+  },
+  "podcasts.lead": {
+    "default": "Practitioners, institutions and policymakers on what it takes to make MSME support work together.",
+    "label": "Hero intro",
+    "multiline": true,
+    "page": "podcasts"
+  },
+  "programmes.heading": {
+    "default": "Four pillars that carry the enterprise journey.",
+    "label": "Hero heading",
+    "multiline": false,
+    "page": "programmes"
+  },
+  "programmes.kicker": {
+    "default": "Programmes",
+    "label": "Hero kicker",
+    "multiline": false,
+    "page": "programmes"
+  },
+  "programmes.lead": {
+    "default": "From awareness and readiness to receivables, capital, market access and cluster intelligence — each pillar is a working programme, not a poster.",
+    "label": "Hero intro",
+    "multiline": true,
+    "page": "programmes"
+  },
+  "reports.heading": {
+    "default": "Shared evidence, published openly.",
+    "label": "Hero heading",
+    "multiline": false,
+    "page": "reports"
+  },
+  "reports.kicker": {
+    "default": "Reports &amp; Papers",
+    "label": "Hero kicker",
+    "multiline": false,
+    "page": "reports"
+  },
+  "reports.lead": {
+    "default": "Reports, white papers, cluster maps, scorecards and research — the platform's aggregated execution insight.",
+    "label": "Hero intro",
+    "multiline": true,
+    "page": "reports"
+  }
+}
