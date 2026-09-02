@@ -1,0 +1,27 @@
+# Render Blueprint for the MSME Catalyst website, CMS and CRM.
+services:
+  - type: web
+    name: msme-catalyst
+    runtime: node
+    rootDir: server
+    plan: starter
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: NODE_ENV
+        value: production
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: DATA_DIR
+        value: /opt/render/project/src/server/persistent/data
+      - key: UPLOAD_DIR
+        value: /opt/render/project/src/server/persistent/uploads
+    disk:
+      name: msme-data
+      mountPath: /opt/render/project/src/server/persistent
+      sizeGB: 1
