@@ -6,7 +6,7 @@ services:
     name: msme-catalyst
     runtime: node
     rootDir: server
-    plan: starter            # "free" also works for testing (see note below)
+    plan: 0.5c-512mb
     buildCommand: npm ci --omit=dev
     startCommand: npm start
     healthCheckPath: /api/health
