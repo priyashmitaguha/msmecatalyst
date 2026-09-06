@@ -12,14 +12,27 @@ const db = new Database(path.join(DATA_DIR, 'msme-catalyst.db'));
 db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');
 
-/* -------------------- Roles & permissions -------------------- */
+/* -------------------- Roles & permissions --------------------
+   Role flags (enforced server-side in server.js):
+     all        → full access to everything (Super Admin)
+     content    → all website content collections + page copy + visibility (no CRM, no user mgmt)
+     editorScoped → access ONLY the collections listed in that user's per-user `perms`
+     crm        → may read the CRM;  crmWrite (default true) → may modify the CRM
+     users      → may manage admin users (Super Admin only)
+     odr        → may manage ODR applications
+   Legacy roles are retained so existing accounts keep working. */
+const CONTENT_COLLECTIONS = ['council','advisory','secretariat','blogs','reports','events','podcasts','odr_providers','odr_resources','pages','media','social'];
 const ROLES = {
-  super_admin:      { label: 'Super Admin',      all: true },
-  content_admin:    { label: 'Content Admin',    collections: ['blogs','reports','events','podcasts','pages','media','social'] },
-  membership_admin: { label: 'Membership Admin', crm: true, collections: ['media'] },
-  governance_admin: { label: 'Governance Admin', collections: ['council','advisory','secretariat','media'] },
-  odr_admin:        { label: 'ODR Admin',        collections: ['odr_providers','odr_resources','media'], odr: true },
-  editor:           { label: 'Editor / Reviewer',collections: ['blogs','reports','podcasts','pages'], publish: false },
+  super_admin: { label: 'Super Admin', all: true, users: true, crm: true, crmWrite: true, odr: true },
+  cms_admin:   { label: 'CMS Admin',   content: true, odr: true, collections: CONTENT_COLLECTIONS },
+  editor:      { label: 'Editor (assigned sections)', editorScoped: true, publish: true, collections: [] },
+  crm_admin:   { label: 'CRM Admin',   crm: true, crmWrite: true },
+  crm_viewer:  { label: 'CRM Viewer (read-only)', crm: true, crmWrite: false },
+  // ---- legacy roles (kept for backward compatibility with existing accounts) ----
+  content_admin:    { label: 'Content Admin (legacy)',    content: true, collections: CONTENT_COLLECTIONS },
+  membership_admin: { label: 'Membership Admin (legacy)', crm: true, crmWrite: true, collections: ['media'] },
+  governance_admin: { label: 'Governance Admin (legacy)', collections: ['council','advisory','secretariat','media'] },
+  odr_admin:        { label: 'ODR Admin (legacy)',        collections: ['odr_providers','odr_resources','media'], odr: true },
 };
 
 /* -------------------- CMS collection definitions -------------------- */
@@ -125,6 +138,40 @@ CREATE TABLE IF NOT EXISTS settings(   -- key/value site settings (e.g. section 
   key TEXT PRIMARY KEY, value TEXT, updated_at TEXT, updated_by INTEGER);
 `);
 
+/* -------------------- Migrations (additive, non-destructive) --------------------
+   Safe to run on every boot: new tables use IF NOT EXISTS; new columns are only
+   added when missing. No existing row or column is ever dropped or modified. */
+function runMigrations() {
+  const cols = (t) => db.prepare(`PRAGMA table_info(${t})`).all().map(c => c.name);
+  const addColumn = (t, col, ddl) => { if (!cols(t).includes(col)) { db.exec(`ALTER TABLE ${t} ADD COLUMN ${ddl}`); } };
+
+  // users: activation, forced password change, per-user section permissions, audit stamps
+  addColumn('users', 'active', 'active INTEGER NOT NULL DEFAULT 1');
+  addColumn('users', 'must_change', 'must_change INTEGER NOT NULL DEFAULT 0');
+  addColumn('users', 'perms', 'perms TEXT');                 // JSON array of collection keys (editor role)
+  addColumn('users', 'updated_at', 'updated_at TEXT');
+  addColumn('users', 'created_by', 'created_by INTEGER');
+
+  // sessions: creation stamp (for "logout everywhere" auditing)
+  addColumn('sessions', 'created_at', 'created_at TEXT');
+
+  // single-use, expiring password-reset tokens (only a HASH of the token is stored)
+  db.exec(`CREATE TABLE IF NOT EXISTS password_resets(
+    id INTEGER PRIMARY KEY, user_id INTEGER, token_hash TEXT, expires INTEGER,
+    used INTEGER NOT NULL DEFAULT 0, created_at TEXT, ip TEXT);`);
+  db.exec('CREATE INDEX IF NOT EXISTS idx_pwreset_user ON password_resets(user_id)');
+
+  // audit trail — who did what, when
+  db.exec(`CREATE TABLE IF NOT EXISTS audit_log(
+    id INTEGER PRIMARY KEY, actor_id INTEGER, actor_email TEXT, action TEXT,
+    entity TEXT, entity_id TEXT, detail TEXT, ip TEXT, created_at TEXT);`);
+  db.exec('CREATE INDEX IF NOT EXISTS idx_audit_created ON audit_log(created_at)');
+
+  db.exec('CREATE INDEX IF NOT EXISTS idx_entries_collection ON entries(collection)');
+  console.log('Migrations applied (additive; existing data preserved).');
+}
+runMigrations();
+
 const nowISO = () => new Date().toISOString();
 
 /* -------------------- Seed -------------------- */
@@ -189,6 +236,10 @@ function seed() {
   console.log(`Seed complete. Super Admin: ${adminEmail}`);
 }
 
-module.exports = { db, ROLES, COLLECTIONS, seed, nowISO };
+module.exports = { db, ROLES, COLLECTIONS, CONTENT_COLLECTIONS, seed, nowISO, runMigrations };
 
-if (require.main === module && process.argv.includes('--seed')) seed();
+if (require.main === module) {
+  // `node db.js --migrate` runs migrations only; `node db.js --seed` also seeds.
+  if (process.argv.includes('--seed')) seed();
+  else console.log('Migrations complete.');
+}

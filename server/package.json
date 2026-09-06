@@ -7,7 +7,9 @@
   "scripts": {
     "start": "node server.js",
     "seed": "node db.js --seed",
-    "dev": "node server.js"
+    "migrate": "node db.js --migrate",
+    "dev": "node server.js",
+    "test": "node test/run-tests.mjs"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -17,7 +19,8 @@
     "express-rate-limit": "^7.5.1",
     "helmet": "^8.1.0",
     "multer": "^2.0.2",
-    "nanoid": "^3.3.7"
+    "nanoid": "^3.3.7",
+    "nodemailer": "^6.9.14"
   },
   "license": "UNLICENSED"
 }
