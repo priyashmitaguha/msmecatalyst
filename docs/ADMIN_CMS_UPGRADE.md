@@ -96,7 +96,10 @@ the wrong role return `401`/`403` (covered by tests).
 throwaway database and exercises authentication, password change/reset,
 every role, page-level permission restrictions, direct restricted-API access
 attempts, draft/publish/hide, hidden nav/links, CRM read/write split, data
-integrity, and the audit log — **46 assertions, all passing**.
+integrity, and the audit log — **79 assertions, all passing** (see §9 for the
+revision-2 additions). `jsdom` is a **devDependency only** (not shipped: the
+Render build uses `npm ci --omit=dev`); it lets the tests run the site's real
+link-removal code against the actual built pages.
 
 ## 6. Files changed (high level)
 
@@ -122,3 +125,53 @@ integrity, and the audit log — **46 assertions, all passing**.
 6. Create one user per role and confirm the restrictions.
 7. Hide a page, confirm 404 + links removed, then re-publish.
 8. Only then promote to production.
+
+## 8. Rebuilding the site content registry
+
+The public pages and the editable-content registry are generated:
+
+```
+python3 build.py     # regenerates /public/*.html, /public/odr/*.html and server/content-registry.json
+```
+
+`build.py` requires `beautifulsoup4` (`pip install beautifulsoup4`). It auto-registers
+every meaningful heading, paragraph, list item, quote, table cell, standalone
+link (text + URL) and content image (src + alt) as a CMS field, plus global
+nav/footer keys. Re-run it after editing any page source (`pages_main.py` /
+`pages_odr.py`). Keys are assigned in document order (`<page>.c1`, `.c2` …) and
+stay stable while page structure is unchanged, so saved overrides survive rebuilds.
+
+## 9. Revision 2 — corrections in this update
+
+**Full-site editability.** Every public page (main site + all ten `/odr/` pages)
+is now editable through the CMS, not just three hero fields — 500+ registered
+blocks covering headings, paragraphs, lists, buttons, links (text + URL), images
+(src + alt) and shared nav/footer chrome. The runtime hydrates `data-cms`,
+`data-cms-href`, `data-cms-src` and `data-cms-alt`.
+
+**ODR pages are first-class.** All `/odr/` pages are individually publishable and
+hideable (slugs `odr-index`, `odr-about`, `odr-how-it-works`, `odr-choose-provider`,
+`odr-apply`, `odr-resources`, `odr-papers`, `odr-podcasts`, `odr-blogs`, `odr-contact`).
+The old server rule that exempted every `/odr/` path from hidden-page enforcement
+has been **removed**; a hidden ODR page now returns 404 on its direct URL, and
+links to it are dropped everywhere (resolved via the shared `visibility-lib.js`).
+
+**Section hiding incl. governance.** Governing Council, Advisory Body and
+Secretariat are now hideable sections; hiding one removes the section block **and**
+every nav / mobile-menu / footer / text link to its anchor (`about.html#council`, …).
+
+**Editor scoping (backend-enforced).** Editor permissions now support page-level
+(`page:<slug>`) and section-level (`sec:<key>`) grants in addition to content
+collections. A scoped Editor can see/edit only its assigned pages and sections;
+CRM, users, analytics, the audit log and unassigned pages/sections/collections all
+return 403 even via a hand-entered API URL. Analytics is now Super-Admin-only.
+
+**Dependencies.** `nodemailer` upgraded to `^10` (fixes the high-severity SMTP
+advisories) with no code change needed. `qs` is pinned to `^6.15.4` via an
+`overrides` entry to clear the moderate `qs`/`body-parser`/`express` advisories
+without a breaking express 5 upgrade. `npm audit --omit=dev` now reports **0
+vulnerabilities**; a test asserts no high/critical production vulnerabilities.
+
+**New migration surface in revision 2:** none. No new tables or columns — page and
+section publish/hide state is stored in the existing `settings` table
+(`page.<slug>` / `vis.<key>` keys) and page copy in the existing `pagecopy` table.

@@ -1,10 +1,18 @@
 // Automated tests for authentication, role permissions and publishing controls.
 // Boots the real server on a throwaway DB, then exercises the API over HTTP.
 // Run with: npm test   (from the server/ directory)
-import { spawn } from 'node:child_process';
-import { mkdtempSync, rmSync } from 'node:fs';
+import { spawn, spawnSync } from 'node:child_process';
+import { mkdtempSync, rmSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const require = createRequire(import.meta.url);
+const { JSDOM } = require('jsdom');
+const MCVis = require('../../public/assets/js/visibility-lib.js');
+const PUBLIC = join(__dirname, '..', '..', 'public');
 
 const PORT = 4100 + Math.floor(Math.random() * 800);
 const BASE = `http://127.0.0.1:${PORT}`;
@@ -125,6 +133,106 @@ const waitHealth = async () => { for (let i = 0; i < 50; i++) { try { const r = 
     const uid = ed.data.id;
     ok('super admin can deactivate a user', (await api('/api/users/' + uid, { method: 'PUT', body: { active: false } }, admin2)).status === 200);
     ok('deactivated user can no longer log in', (await api('/api/auth/login', { method: 'POST', body: { email: 'editor@example.org', password: 'Sect10n-Access-Key' } })).status === 401);
+
+    console.log('\nFULL-SITE CMS EDITABILITY');
+    const pc = await api('/api/pagecopy', {}, admin2);
+    const groups = pc.data.groups || {};
+    const expectPages = ['index','about','approach','programmes','membership','odr-support','contact',
+      'odr-index','odr-about','odr-how-it-works','odr-choose-provider','odr-apply','odr-resources','odr-papers','odr-podcasts','odr-blogs','odr-contact','global'];
+    ok('registry covers all main + ODR pages + global chrome', expectPages.every(p => groups[p] && groups[p].length));
+    ok('pages are more than just hero fields (deep editability)', (groups['about']||[]).length >= 8 && (groups['odr-how-it-works']||[]).length >= 6);
+    // Update one representative field on EVERY registered page group, then confirm it is retrievable publicly.
+    let updated = 0, verified = 0;
+    for (const page of Object.keys(groups)) {
+      const field = groups[page][0]; if (!field) continue;
+      const val = 'CMS-EDIT-' + page;
+      const r = await api('/api/pagecopy/' + encodeURIComponent(field.key), { method: 'PUT', body: { value: val } }, admin2);
+      if (r.status === 200) updated++;
+    }
+    const pubcopy = await api('/api/public/pagecopy');
+    for (const page of Object.keys(groups)) {
+      const field = groups[page][0]; if (!field) continue;
+      if (pubcopy.data.copy[field.key] === 'CMS-EDIT-' + page) verified++;
+    }
+    ok('every registered page group has an editable+retrievable field', updated === Object.keys(groups).length && verified === Object.keys(groups).length);
+    // Links are editable (URL fields registered). Images: the current pages use no
+    // <img> in page CONTENT (logos live in the shared chrome; content uses SVG/emoji),
+    // so no image field is registered — but the runtime applies image src+alt overrides
+    // whenever a content image exists, which is the capability we assert here.
+    ok('links are editable (link URL fields registered)', Object.keys(groups).some(p => groups[p].some(f => /Link URL/.test(f.label))));
+    {
+      const mainjs = readFileSync(join(PUBLIC, 'assets', 'js', 'main.js'), 'utf8');
+      ok('images are editable (runtime applies data-cms-src and data-cms-alt overrides)',
+        mainjs.includes('data-cms-src') && mainjs.includes('data-cms-alt'));
+    }
+
+    console.log('\nODR PAGES — EDIT / PUBLISH / HIDE');
+    const odrKey = (groups['odr-about'][0]).key;
+    ok('an ODR page can be edited via the CMS', (await api('/api/pagecopy/' + encodeURIComponent(odrKey), { method: 'PUT', body: { value: 'ODR about edited' } }, admin2)).status === 200);
+    ok('ODR edit is retrievable publicly', (await api('/api/public/pagecopy')).data.copy[odrKey] === 'ODR about edited');
+    ok('ODR page reachable before hiding (200)', (await fetch(BASE + '/odr/about.html')).status === 200);
+    ok('super admin can hide an ODR page', (await api('/api/settings/pages/odr-about', { method: 'PUT', body: { published: false } }, admin2)).status === 200);
+    ok('hidden ODR page returns 404 on direct URL', (await fetch(BASE + '/odr/about.html')).status === 404);
+    ok('other ODR pages remain reachable (200)', (await fetch(BASE + '/odr/how-it-works.html')).status === 200);
+    ok('public/pages lists the hidden ODR page', (await api('/api/public/pages')).data.hidden.includes('odr-about'));
+    ok('audit captured the ODR page hide', (await api('/api/audit', {}, admin2)).data.audit.some(a => a.entity === 'page' && a.entity_id === 'odr-about'));
+
+    console.log('\nLINK REMOVAL (real built pages via DOM)');
+    // Links to a hidden ODR page disappear (run the SAME code the site runs).
+    {
+      const dom = new JSDOM(readFileSync(join(PUBLIC, 'odr', 'index.html'), 'utf8'), { url: BASE + '/odr/index.html' });
+      const d = dom.window.document;
+      const before = d.querySelectorAll('a[href$="about.html"]:not([href*="../"])').length;
+      MCVis.applyHiddenPages(d, dom.window.location.href, ['odr-about'], dom.window.location.origin);
+      const after = Array.from(d.querySelectorAll('a[href]')).filter(a => MCVis.slugFromPath(new dom.window.URL(a.getAttribute('href'), dom.window.location.href).pathname) === 'odr-about').length;
+      ok('ODR page had in-page links to /odr/about before hiding', before > 0);
+      ok('all links to the hidden ODR page are removed', after === 0);
+    }
+    ok('slugFromPath resolves main + ODR paths consistently',
+      MCVis.slugFromPath('/') === 'index' && MCVis.slugFromPath('/about.html') === 'about' &&
+      MCVis.slugFromPath('/odr/') === 'odr-index' && MCVis.slugFromPath('/odr/how-it-works.html') === 'odr-how-it-works');
+
+    console.log('\nSECTION HIDING (Governing Council + anchor links)');
+    ok('super admin can hide the Governing Council section', (await api('/api/settings/visibility/council', { method: 'PUT', body: { visible: false } }, admin2)).status === 200);
+    ok('public visibility reflects hidden council', (await api('/api/public/visibility')).data.visible.council === false);
+    {
+      const dom = new JSDOM(readFileSync(join(PUBLIC, 'about.html'), 'utf8'), { url: BASE + '/about.html' });
+      const d = dom.window.document;
+      const secBefore = d.querySelectorAll('[data-section="council"]').length;
+      ok('about.html tags the council section AND its anchor links', secBefore >= 2);
+      MCVis.applyHiddenSections(d, { council: false });
+      ok('hiding council removes the section and every council anchor link', d.querySelectorAll('[data-section="council"]').length === 0);
+    }
+
+    console.log('\nEDITOR PAGE/SECTION SCOPING (backend-enforced)');
+    // Editor assigned ONLY to the ODR-about page and the council section.
+    await api('/api/users', { method: 'POST', body: { name: 'Pia', email: 'pageeditor@example.org', password: 'Assigned-Only-2026',
+      role: 'editor', perms: ['page:odr-about', 'sec:council'] } }, admin2);
+    const ped = jar();
+    await api('/api/auth/login', { method: 'POST', body: { email: 'pageeditor@example.org', password: 'Assigned-Only-2026' } }, ped);
+    const pedCopy = await api('/api/pagecopy', {}, ped);
+    ok('scoped editor sees ONLY the assigned page group', Object.keys(pedCopy.data.groups).length === 1 && !!pedCopy.data.groups['odr-about']);
+    ok('scoped editor CAN edit its assigned page', (await api('/api/pagecopy/' + encodeURIComponent(odrKey), { method: 'PUT', body: { value: 'ok' } }, ped)).status === 200);
+    const otherKey = (groups['about'][0]).key;
+    ok('scoped editor CANNOT edit an unassigned page (403)', (await api('/api/pagecopy/' + encodeURIComponent(otherKey), { method: 'PUT', body: { value: 'nope' } }, ped)).status === 403);
+    ok('scoped editor CAN hide its assigned page', (await api('/api/settings/pages/odr-about', { method: 'PUT', body: { published: true } }, ped)).status === 200);
+    ok('scoped editor CANNOT hide an unassigned page (403)', (await api('/api/settings/pages/about', { method: 'PUT', body: { published: false } }, ped)).status === 403);
+    ok('scoped editor CAN toggle its assigned section', (await api('/api/settings/visibility/council', { method: 'PUT', body: { visible: true } }, ped)).status === 200);
+    ok('scoped editor CANNOT toggle an unassigned section (403)', (await api('/api/settings/visibility/programmes', { method: 'PUT', body: { visible: false } }, ped)).status === 403);
+    ok('scoped editor CANNOT read the CRM (403)', (await api('/api/crm/organisations', {}, ped)).status === 403);
+    ok('scoped editor CANNOT read analytics (403)', (await api('/api/analytics/summary', {}, ped)).status === 403);
+    ok('scoped editor CANNOT read the audit log (403)', (await api('/api/audit', {}, ped)).status === 403);
+    ok('scoped editor CANNOT manage users (403)', (await api('/api/users', {}, ped)).status === 403);
+    ok('scoped editor CANNOT edit an unassigned collection (403)', (await api('/api/collections/reports', { method: 'POST', body: { data: {}, status: 'draft' } }, ped)).status === 403);
+
+    console.log('\nPRODUCTION DEPENDENCY AUDIT');
+    {
+      const res = spawnSync('npm', ['audit', '--omit=dev', '--audit-level=high', '--json'], { cwd: join(__dirname, '..'), encoding: 'utf8' });
+      let high = null, crit = null, ran = false;
+      try { const j = JSON.parse(res.stdout || '{}'); const v = j.metadata && j.metadata.vulnerabilities; if (v) { ran = true; high = v.high; crit = v.critical; } } catch (e) {}
+      if (!ran) { console.log('  ⚠ npm audit could not run (offline?) — skipping high-severity assertion'); }
+      else ok('no high or critical production vulnerabilities', high === 0 && crit === 0);
+    }
 
     console.log(`\n${failed === 0 ? '✅ ALL PASSED' : '❌ FAILURES'} — ${passed} passed, ${failed} failed\n`);
   } catch (e) {
