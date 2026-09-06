@@ -12,7 +12,9 @@ const { rateLimit } = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
 const multer = require('multer');
 const bcrypt = require('bcryptjs');
-const { db, ROLES, COLLECTIONS, seed, nowISO } = require('./db');
+const { db, ROLES, COLLECTIONS, CONTENT_COLLECTIONS, seed, nowISO } = require('./db');
+const mailer = require('./mailer');
+const APP_BASE_URL = (process.env.APP_BASE_URL || '').replace(/\/$/, '');
 
 seed(); // idempotent
 
@@ -25,8 +27,9 @@ app.use(helmet({ contentSecurityPolicy: false, crossOriginResourcePolicy: { poli
 app.use(express.json({ limit: '2mb' }));
 app.use(cookieParser());
 
-const publicWriteLimit = rateLimit({ windowMs: 15 * 60 * 1000, limit: 60, standardHeaders: 'draft-7', legacyHeaders: false });
-const loginLimit = rateLimit({ windowMs: 15 * 60 * 1000, limit: 10, standardHeaders: 'draft-7', legacyHeaders: false });
+// Strict limits in production; relaxed off-production so local dev and the test suite aren't throttled.
+const publicWriteLimit = rateLimit({ windowMs: 15 * 60 * 1000, limit: PRODUCTION ? 60 : 100000, standardHeaders: 'draft-7', legacyHeaders: false });
+const loginLimit = rateLimit({ windowMs: 15 * 60 * 1000, limit: PRODUCTION ? 10 : 100000, standardHeaders: 'draft-7', legacyHeaders: false });
 
 const UP = process.env.UPLOAD_DIR || path.join(__dirname, 'uploads');
 if (!fs.existsSync(UP)) fs.mkdirSync(UP, { recursive: true });
@@ -42,73 +45,260 @@ const upload = multer({
   },
 });
 
-/* ---------------- auth ---------------- */
+/* ---------------- auth & permissions ---------------- */
+const SESSION_MS = 1000 * 60 * 60 * 12;
 function newToken() { return crypto.randomBytes(24).toString('hex'); }
+function sha256(s) { return crypto.createHash('sha256').update(s).digest('hex'); }
+function clientIp(req) { return (req.headers['cf-connecting-ip'] || req.ip || '').toString(); }
+function userPerms(u) { try { return u && u.perms ? JSON.parse(u.perms) : []; } catch (e) { return []; } }
+
 function currentUser(req) {
   const t = req.cookies.mc_session;
   if (!t) return null;
   const s = db.prepare('SELECT * FROM sessions WHERE token=?').get(t);
   if (!s || s.expires < Date.now()) return null;
-  return db.prepare('SELECT id,name,email,role FROM users WHERE id=?').get(s.user_id);
+  const u = db.prepare('SELECT id,name,email,role,active,must_change,perms FROM users WHERE id=?').get(s.user_id);
+  if (!u || u.active === 0) return null;                       // deactivated accounts cannot act
+  u._token = t;
+  return u;
 }
 function requireAuth(req, res, next) {
   const u = currentUser(req);
   if (!u) return res.status(401).json({ error: 'Not authenticated' });
   req.user = u; next();
 }
-function canManage(role, collection) {
-  const r = ROLES[role]; if (!r) return false;
-  if (r.all) return true;
+/* Permission model — enforced on every protected route (never only hidden in the UI). */
+function canManage(user, collection) {
+  const r = ROLES[user.role]; if (!r) return false;
+  if (r.all || r.content) return true;
+  if (r.editorScoped) return userPerms(user).includes(collection);
   return Array.isArray(r.collections) && r.collections.includes(collection);
 }
-function canPublish(role) { const r = ROLES[role]; return r && (r.all || r.publish !== false); }
-function canCRM(role) { const r = ROLES[role]; return r && (r.all || r.crm); }
+function canPublish(user, collection) {
+  const r = ROLES[user.role]; if (!r) return false;
+  if (!canManage(user, collection)) return false;
+  return r.all || r.content || r.publish === true;            // legacy 'editor' has no publish flag → cannot publish
+}
+function canCRMRead(user)  { const r = ROLES[user.role]; return !!(r && (r.all || r.crm)); }
+function canCRMWrite(user) { const r = ROLES[user.role]; return !!(r && (r.all || (r.crm && r.crmWrite !== false))); }
+function canODR(user)      { const r = ROLES[user.role]; return !!(r && (r.all || r.odr)); }
+function canUsers(user)    { const r = ROLES[user.role]; return !!(r && (r.all || r.users)); }
+function canSettings(user) { const r = ROLES[user.role]; return !!(r && (r.all || r.content)) || canManage(user, 'pages'); }
+const forbid = (res) => res.status(403).json({ error: 'Forbidden' });
+
+/* Anti-CSRF for cookie-authenticated state changes: require same-origin. */
+function sameOrigin(req) {
+  const o = req.headers.origin; if (!o) return true;
+  try { return new URL(o).host === req.headers.host; } catch (e) { return false; }
+}
+app.use((req, res, next) => {
+  if (['POST','PUT','DELETE','PATCH'].includes(req.method) && req.path.startsWith('/api/') && !sameOrigin(req))
+    return res.status(403).json({ error: 'Bad origin' });
+  next();
+});
+
+/* Audit trail */
+function audit(req, action, entity, entityId, detail) {
+  try {
+    db.prepare('INSERT INTO audit_log(actor_id,actor_email,action,entity,entity_id,detail,ip,created_at) VALUES(?,?,?,?,?,?,?,?)')
+      .run(req.user ? req.user.id : null, req.user ? req.user.email : null, action, entity || null,
+        entityId != null ? String(entityId) : null, detail || null, clientIp(req), nowISO());
+  } catch (e) { console.error('audit failed', e.message); }
+}
+
+/* Password strength — server-enforced (never trust the client). */
+function passwordProblem(pw, email) {
+  if (!pw || pw.length < 12) return 'Password must be at least 12 characters.';
+  if (!/[A-Za-z]/.test(pw) || !/[0-9]/.test(pw)) return 'Password must include at least one letter and one number.';
+  if (email && pw.toLowerCase().includes(email.split('@')[0].toLowerCase())) return 'Password must not contain your email name.';
+  return null;
+}
+function setSession(res, req, userId) {
+  const token = newToken();
+  db.prepare('INSERT INTO sessions(token,user_id,expires,created_at) VALUES(?,?,?,?)').run(token, userId, Date.now() + SESSION_MS, nowISO());
+  res.cookie('mc_session', token, { httpOnly: true, secure: PRODUCTION, sameSite: 'lax', maxAge: SESSION_MS });
+  return token;
+}
 
 app.post('/api/auth/login', loginLimit, (req, res) => {
   const { email, password } = req.body || {};
   const u = db.prepare('SELECT * FROM users WHERE email=?').get((email || '').toLowerCase().trim());
-  if (!u || !bcrypt.compareSync(password || '', u.password_hash))
+  if (!u || u.active === 0 || !u.password_hash || !bcrypt.compareSync(password || '', u.password_hash)) {
+    audit({ user: null, headers: req.headers, ip: req.ip }, 'login_failed', 'user', null, (email || '').slice(0, 120));
     return res.status(401).json({ error: 'Invalid credentials' });
-  const token = newToken();
-  db.prepare('INSERT INTO sessions(token,user_id,expires) VALUES(?,?,?)')
-    .run(token, u.id, Date.now() + 1000 * 60 * 60 * 12);
-  res.cookie('mc_session', token, { httpOnly: true, secure: PRODUCTION, sameSite: 'lax', maxAge: 1000 * 60 * 60 * 12 });
-  res.json({ user: { id: u.id, name: u.name, email: u.email, role: u.role } });
+  }
+  setSession(res, req, u.id);
+  req.user = u; audit(req, 'login', 'user', u.id, null);
+  res.json({ user: { id: u.id, name: u.name, email: u.email, role: u.role, must_change: u.must_change } });
 });
 app.post('/api/auth/logout', (req, res) => {
+  const u = currentUser(req);
   if (req.cookies.mc_session) db.prepare('DELETE FROM sessions WHERE token=?').run(req.cookies.mc_session);
+  if (u) { req.user = u; audit(req, 'logout', 'user', u.id, null); }
   res.clearCookie('mc_session'); res.json({ ok: true });
 });
 app.get('/api/auth/me', requireAuth, (req, res) => {
-  const r = ROLES[req.user.role];
-  res.json({ user: req.user, role: { key: req.user.role, ...r }, collections: COLLECTIONS, roles: ROLES });
+  const r = ROLES[req.user.role] || {};
+  res.json({
+    user: { id: req.user.id, name: req.user.name, email: req.user.email, role: req.user.role, must_change: req.user.must_change, perms: userPerms(req.user) },
+    role: { key: req.user.role, ...r }, collections: COLLECTIONS, roles: ROLES,
+    caps: { crmRead: canCRMRead(req.user), crmWrite: canCRMWrite(req.user), users: canUsers(req.user), odr: canODR(req.user), settings: canSettings(req.user) },
+  });
+});
+
+/* -------- Account & Security: change password -------- */
+app.post('/api/auth/change-password', requireAuth, (req, res) => {
+  const { current, next: nextPw, confirm } = req.body || {};
+  const full = db.prepare('SELECT * FROM users WHERE id=?').get(req.user.id);
+  if (!full || !bcrypt.compareSync(current || '', full.password_hash))
+    return res.status(400).json({ error: 'Your current password is incorrect.' });
+  if (nextPw !== confirm) return res.status(400).json({ error: 'New password and confirmation do not match.' });
+  const problem = passwordProblem(nextPw, full.email);
+  if (problem) return res.status(400).json({ error: problem });
+  db.prepare('UPDATE users SET password_hash=?, must_change=0, updated_at=? WHERE id=?').run(bcrypt.hashSync(nextPw, 12), nowISO(), full.id);
+  // Revoke all OTHER sessions; keep the current one.
+  db.prepare('DELETE FROM sessions WHERE user_id=? AND token<>?').run(full.id, req.user._token);
+  audit(req, 'password_changed', 'user', full.id, null);
+  res.json({ ok: true });
+});
+
+/* -------- Account & Security: forgot / reset (single-use, expiring link) -------- */
+app.post('/api/auth/forgot', loginLimit, async (req, res) => {
+  const email = (req.body && req.body.email || '').toLowerCase().trim();
+  const u = email ? db.prepare('SELECT * FROM users WHERE email=? AND active=1').get(email) : null;
+  let devToken = null;
+  if (u) {
+    const raw = crypto.randomBytes(32).toString('hex');
+    const expires = Date.now() + 1000 * 60 * 60;              // 1 hour
+    db.prepare('INSERT INTO password_resets(user_id,token_hash,expires,used,created_at,ip) VALUES(?,?,?,0,?,?)')
+      .run(u.id, sha256(raw), expires, nowISO(), clientIp(req));
+    const base = APP_BASE_URL || `${req.protocol}://${req.headers.host}`;
+    const link = `${base}/admin/reset.html?token=${raw}`;
+    const text = `A password reset was requested for your MSME Catalyst admin account.\n\nReset your password (valid 1 hour, one-time use):\n${link}\n\nIf you did not request this, you can ignore this email — your password will not change.`;
+    const sent = await mailer.sendMail({ to: u.email, subject: 'Reset your MSME Catalyst admin password', text });
+    if (!sent.ok) {
+      // No email service configured (or send failed): record in the outbox so an operator can act.
+      db.prepare('INSERT INTO emails(to_addr,subject,body,template,created_at) VALUES(?,?,?,?,?)')
+        .run(u.email, 'Password reset link (email not sent — SMTP not configured)', text, 'password_reset', nowISO());
+    }
+    audit({ user: u, headers: req.headers, ip: req.ip, cookies: {} }, 'password_reset_requested', 'user', u.id, sent.ok ? 'emailed' : 'outbox');
+    if (process.env.ALLOW_TEST_HOOKS === '1') devToken = raw;   // test-only; never enabled in production
+  }
+  // Always the same response — never reveal whether an account exists.
+  res.json({ ok: true, message: 'If that email is registered, a reset link has been sent.', ...(devToken ? { devToken } : {}) });
+});
+app.post('/api/auth/reset', loginLimit, (req, res) => {
+  const { token, password, confirm } = req.body || {};
+  if (!token) return res.status(400).json({ error: 'Missing reset token.' });
+  const row = db.prepare('SELECT * FROM password_resets WHERE token_hash=?').get(sha256(token));
+  if (!row || row.used || row.expires < Date.now()) return res.status(400).json({ error: 'This reset link is invalid or has expired. Please request a new one.' });
+  const u = db.prepare('SELECT * FROM users WHERE id=? AND active=1').get(row.user_id);
+  if (!u) return res.status(400).json({ error: 'Account not found.' });
+  if (password !== confirm) return res.status(400).json({ error: 'Password and confirmation do not match.' });
+  const problem = passwordProblem(password, u.email);
+  if (problem) return res.status(400).json({ error: problem });
+  db.prepare('UPDATE users SET password_hash=?, must_change=0, updated_at=? WHERE id=?').run(bcrypt.hashSync(password, 12), nowISO(), u.id);
+  db.prepare('UPDATE password_resets SET used=1 WHERE id=?').run(row.id);
+  db.prepare('DELETE FROM password_resets WHERE user_id=? AND used=0').run(u.id);   // invalidate other outstanding links
+  db.prepare('DELETE FROM sessions WHERE user_id=?').run(u.id);                     // log out ALL active sessions
+  audit({ user: u, headers: req.headers, ip: req.ip, cookies: {} }, 'password_reset_completed', 'user', u.id, null);
+  res.json({ ok: true });
+});
+
+/* -------- Super Admin: manage admin users -------- */
+app.get('/api/users', requireAuth, (req, res) => {
+  if (!canUsers(req.user)) return forbid(res);
+  const users = db.prepare('SELECT id,name,email,role,active,must_change,perms,created_at FROM users ORDER BY id').all()
+    .map(u => ({ ...u, perms: userPerms(u) }));
+  res.json({ users, roles: ROLES, collections: Object.keys(COLLECTIONS) });
+});
+app.post('/api/users', requireAuth, (req, res) => {
+  if (!canUsers(req.user)) return forbid(res);
+  const b = req.body || {};
+  const email = (b.email || '').toLowerCase().trim();
+  if (!email || !ROLES[b.role]) return res.status(400).json({ error: 'A valid email and role are required.' });
+  const problem = passwordProblem(b.password, email);
+  if (problem) return res.status(400).json({ error: problem });
+  if (db.prepare('SELECT 1 FROM users WHERE email=?').get(email)) return res.status(409).json({ error: 'A user with that email already exists.' });
+  const perms = Array.isArray(b.perms) ? JSON.stringify(b.perms.filter(p => COLLECTIONS[p])) : null;
+  const info = db.prepare('INSERT INTO users(name,email,password_hash,role,perms,active,must_change,created_by,created_at,updated_at) VALUES(?,?,?,?,?,1,1,?,?,?)')
+    .run(b.name || email, email, bcrypt.hashSync(b.password, 12), b.role, perms, req.user.id, nowISO(), nowISO());
+  audit(req, 'user_created', 'user', info.lastInsertRowid, `${email} (${b.role})`);
+  res.json({ id: info.lastInsertRowid });
+});
+app.put('/api/users/:id', requireAuth, (req, res) => {
+  if (!canUsers(req.user)) return forbid(res);
+  const cur = db.prepare('SELECT * FROM users WHERE id=?').get(req.params.id);
+  if (!cur) return res.status(404).json({ error: 'Not found' });
+  const b = req.body || {};
+  const name = b.name ?? cur.name;
+  const role = ROLES[b.role] ? b.role : cur.role;
+  const perms = Array.isArray(b.perms) ? JSON.stringify(b.perms.filter(p => COLLECTIONS[p])) : cur.perms;
+  let active = cur.active;
+  if (typeof b.active === 'boolean') {
+    if (Number(req.params.id) === req.user.id && b.active === false) return res.status(400).json({ error: 'You cannot deactivate your own account.' });
+    active = b.active ? 1 : 0;
+  }
+  if (b.password) {
+    const problem = passwordProblem(b.password, cur.email);
+    if (problem) return res.status(400).json({ error: problem });
+    db.prepare('UPDATE users SET name=?,role=?,perms=?,active=?,password_hash=?,must_change=1,updated_at=? WHERE id=?')
+      .run(name, role, perms, active, bcrypt.hashSync(b.password, 12), nowISO(), cur.id);
+    db.prepare('DELETE FROM sessions WHERE user_id=?').run(cur.id);               // password reset by admin logs them out
+    audit(req, 'user_password_reset', 'user', cur.id, cur.email);
+  } else {
+    db.prepare('UPDATE users SET name=?,role=?,perms=?,active=?,updated_at=? WHERE id=?').run(name, role, perms, active, nowISO(), cur.id);
+    if (active === 0) db.prepare('DELETE FROM sessions WHERE user_id=?').run(cur.id);  // deactivation ends their sessions
+  }
+  audit(req, active === 0 ? 'user_deactivated' : 'user_updated', 'user', cur.id, `${cur.email} (${role})`);
+  res.json({ ok: true });
+});
+app.delete('/api/users/:id', requireAuth, (req, res) => {
+  if (!canUsers(req.user)) return forbid(res);
+  if (Number(req.params.id) === req.user.id) return res.status(400).json({ error: 'You cannot delete your own account.' });
+  const cur = db.prepare('SELECT * FROM users WHERE id=?').get(req.params.id);
+  if (!cur) return res.status(404).json({ error: 'Not found' });
+  const supers = db.prepare("SELECT COUNT(*) c FROM users WHERE role='super_admin' AND active=1").get().c;
+  if (cur.role === 'super_admin' && supers <= 1) return res.status(400).json({ error: 'Cannot delete the last active Super Admin.' });
+  db.prepare('DELETE FROM sessions WHERE user_id=?').run(cur.id);
+  db.prepare('DELETE FROM users WHERE id=?').run(cur.id);
+  audit(req, 'user_deleted', 'user', cur.id, cur.email);
+  res.json({ ok: true });
+});
+
+/* Audit log (Super Admin / content admins) */
+app.get('/api/audit', requireAuth, (req, res) => {
+  if (!(canUsers(req.user) || ROLES[req.user.role]?.content)) return forbid(res);
+  const rows = db.prepare('SELECT id,actor_email,action,entity,entity_id,detail,created_at FROM audit_log ORDER BY id DESC LIMIT 200').all();
+  res.json({ audit: rows });
 });
 
 /* ---------------- generic CMS entries ---------------- */
 app.get('/api/collections/:name', requireAuth, (req, res) => {
   const { name } = req.params;
   if (!COLLECTIONS[name]) return res.status(404).json({ error: 'Unknown collection' });
-  if (!canManage(req.user.role, name)) return res.status(403).json({ error: 'Forbidden' });
+  if (!canManage(req.user, name)) return res.status(403).json({ error: 'Forbidden' });
   const rows = db.prepare('SELECT * FROM entries WHERE collection=? ORDER BY display_order, id').all(name)
     .map(r => ({ ...r, data: JSON.parse(r.data) }));
   res.json({ collection: name, def: COLLECTIONS[name], items: rows });
 });
 app.post('/api/collections/:name', requireAuth, (req, res) => {
   const { name } = req.params;
-  if (!COLLECTIONS[name] || !canManage(req.user.role, name)) return res.status(403).json({ error: 'Forbidden' });
+  if (!COLLECTIONS[name] || !canManage(req.user, name)) return res.status(403).json({ error: 'Forbidden' });
   const { data = {}, status = 'draft', display_order = 0 } = req.body || {};
   const info = db.prepare('INSERT INTO entries(collection,data,status,display_order,created_by,created_at,updated_at) VALUES(?,?,?,?,?,?,?)')
     .run(name, JSON.stringify(data), status, display_order, req.user.id, nowISO(), nowISO());
+  audit(req,'entry_created',name,info.lastInsertRowid,'status:'+status);
   res.json({ id: info.lastInsertRowid });
 });
 app.put('/api/collections/:name/:id', requireAuth, (req, res) => {
   const { name, id } = req.params;
-  if (!COLLECTIONS[name] || !canManage(req.user.role, name)) return res.status(403).json({ error: 'Forbidden' });
+  if (!COLLECTIONS[name] || !canManage(req.user, name)) return res.status(403).json({ error: 'Forbidden' });
   const cur = db.prepare('SELECT * FROM entries WHERE id=? AND collection=?').get(id, name);
   if (!cur) return res.status(404).json({ error: 'Not found' });
   let status = req.body.status ?? cur.status;
   // Editors cannot publish
-  if (['published', 'active'].includes(status) && !canPublish(req.user.role))
+  if (['published', 'active'].includes(status) && !canPublish(req.user, name))
     return res.status(403).json({ error: 'Your role cannot publish. Save as review/draft instead.' });
   db.prepare('INSERT INTO entry_versions(entry_id,data,status,saved_at,saved_by) VALUES(?,?,?,?,?)')
     .run(cur.id, cur.data, cur.status, nowISO(), req.user.id); // version history
@@ -116,12 +306,15 @@ app.put('/api/collections/:name/:id', requireAuth, (req, res) => {
   const display_order = req.body.display_order ?? cur.display_order;
   db.prepare('UPDATE entries SET data=?,status=?,display_order=?,updated_at=? WHERE id=?')
     .run(data, status, display_order, nowISO(), cur.id);
+  const act = status===cur.status ? 'entry_updated' : (['published','active'].includes(status)?'entry_published':(['hidden','archived','draft','review'].includes(status)?'entry_unpublished':'entry_updated'));
+  audit(req, act, name, cur.id, status!==cur.status?('status:'+cur.status+'\u2192'+status):null);
   res.json({ ok: true });
 });
 app.delete('/api/collections/:name/:id', requireAuth, (req, res) => {
   const { name, id } = req.params;
-  if (!COLLECTIONS[name] || !canManage(req.user.role, name)) return res.status(403).json({ error: 'Forbidden' });
+  if (!COLLECTIONS[name] || !canManage(req.user, name)) return res.status(403).json({ error: 'Forbidden' });
   db.prepare('DELETE FROM entries WHERE id=? AND collection=?').run(id, name);
+  audit(req,'entry_deleted',name,id,null);
   res.json({ ok: true });
 });
 app.get('/api/collections/:name/:id/versions', requireAuth, (req, res) => {
@@ -131,24 +324,25 @@ app.get('/api/collections/:name/:id/versions', requireAuth, (req, res) => {
 
 /* ---------------- Membership CRM ---------------- */
 app.get('/api/crm/organisations', requireAuth, (req, res) => {
-  if (!canCRM(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
+  if (!canCRMRead(req.user)) return forbid(res);
   const orgs = db.prepare('SELECT * FROM organisations ORDER BY id DESC').all();
   const contacts = db.prepare('SELECT * FROM contacts').all();
   orgs.forEach(o => o.contacts = contacts.filter(c => c.org_id === o.id));
   res.json({ organisations: orgs });
 });
 app.post('/api/crm/organisations', requireAuth, (req, res) => {
-  if (!canCRM(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
+  if (!canCRMWrite(req.user)) return forbid(res);
   const b = req.body || {};
   const cols = ['legal_name','brand_name','category','industry','website','address','gstin_pan','logo','logo_consent',
     'website_display_status','membership_status','fee','notes'];
   const vals = cols.map(c => b[c] ?? null);
   const info = db.prepare(`INSERT INTO organisations(${cols.join(',')},application_date,created_at,updated_at)
     VALUES(${cols.map(()=>'?').join(',')},?,?,?)`).run(...vals, b.application_date || nowISO().slice(0,10), nowISO(), nowISO());
+  audit(req,'org_created','organisation',info.lastInsertRowid,b.legal_name||b.brand_name||'');
   res.json({ id: info.lastInsertRowid });
 });
 app.put('/api/crm/organisations/:id', requireAuth, (req, res) => {
-  if (!canCRM(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
+  if (!canCRMWrite(req.user)) return forbid(res);
   const cur = db.prepare('SELECT * FROM organisations WHERE id=?').get(req.params.id);
   if (!cur) return res.status(404).json({ error: 'Not found' });
   const editable = ['legal_name','brand_name','category','industry','website','address','gstin_pan','logo','logo_consent',
@@ -159,10 +353,11 @@ app.put('/api/crm/organisations/:id', requireAuth, (req, res) => {
   applyMembershipRules(merged, cur); // automation on write
   db.prepare(`UPDATE organisations SET ${editable.map(k=>k+'=?').join(',')},updated_at=? WHERE id=?`)
     .run(...editable.map(k => merged[k]), nowISO(), cur.id);
+  audit(req,'org_updated','organisation',cur.id,merged.legal_name||merged.brand_name||'');
   res.json({ ok: true, organisation: merged });
 });
 app.post('/api/crm/organisations/:id/contacts', requireAuth, (req, res) => {
-  if (!canCRM(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
+  if (!canCRMWrite(req.user)) return forbid(res);
   const b = req.body || {};
   if (b.is_primary) db.prepare('UPDATE contacts SET is_primary=0 WHERE org_id=?').run(req.params.id);
   const info = db.prepare('INSERT INTO contacts(org_id,type,name,designation,email,phone,is_primary) VALUES(?,?,?,?,?,?,?)')
@@ -170,7 +365,7 @@ app.post('/api/crm/organisations/:id/contacts', requireAuth, (req, res) => {
   res.json({ id: info.lastInsertRowid });
 });
 app.delete('/api/crm/contacts/:id', requireAuth, (req, res) => {
-  if (!canCRM(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
+  if (!canCRMWrite(req.user)) return forbid(res);
   db.prepare('DELETE FROM contacts WHERE id=?').run(req.params.id); res.json({ ok: true });
 });
 
@@ -240,7 +435,7 @@ setInterval(runDailySweep, 1000 * 60 * 60 * 12); // twice daily
 
 /* CRM dashboard summary */
 app.get('/api/crm/dashboard', requireAuth, (req, res) => {
-  if (!canCRM(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
+  if (!canCRMRead(req.user)) return forbid(res);
   const q = s => db.prepare(s).get().c;
   res.json({
     active: q("SELECT COUNT(*) c FROM organisations WHERE membership_status='Active'"),
@@ -280,7 +475,7 @@ app.get('/api/public/pagecopy', (req, res) => {
 });
 // Admin: registry (labels + defaults) merged with current overrides, grouped by page.
 app.get('/api/pagecopy', requireAuth, (req, res) => {
-  if (!canManage(req.user.role, 'pages')) return res.status(403).json({ error: 'Forbidden' });
+  if (!canManage(req.user, 'pages')) return res.status(403).json({ error: 'Forbidden' });
   const overrides = {}; db.prepare('SELECT key,value FROM pagecopy').all().forEach(r => overrides[r.key] = r.value);
   const groups = {};
   Object.keys(REGISTRY).sort().forEach(key => {
@@ -292,11 +487,12 @@ app.get('/api/pagecopy', requireAuth, (req, res) => {
   res.json({ groups });
 });
 app.put('/api/pagecopy/:key', requireAuth, (req, res) => {
-  if (!canManage(req.user.role, 'pages')) return res.status(403).json({ error: 'Forbidden' });
+  if (!canManage(req.user, 'pages')) return res.status(403).json({ error: 'Forbidden' });
   const key = req.params.key; const value = (req.body && req.body.value) || '';
   if (value === '') db.prepare('DELETE FROM pagecopy WHERE key=?').run(key);        // empty ⇒ revert to default
   else db.prepare('INSERT INTO pagecopy(key,value,updated_at,updated_by) VALUES(?,?,?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at,updated_by=excluded.updated_by')
     .run(key, value, nowISO(), req.user.id);
+  audit(req, value===''?'pagecopy_reset':'pagecopy_set','pagecopy',key,null);
   res.json({ ok: true });
 });
 
@@ -314,18 +510,46 @@ function visibilityMap() {
 }
 app.get('/api/public/visibility', (req, res) => res.json({ visible: visibilityMap() }));
 app.get('/api/settings/visibility', requireAuth, (req, res) => {
-  if (!canManage(req.user.role, 'pages')) return res.status(403).json({ error: 'Forbidden' });
+  if (!canManage(req.user, 'pages')) return res.status(403).json({ error: 'Forbidden' });
   const vis = visibilityMap();
   res.json({ sections: SECTIONS.map(([key, label]) => ({ key, label, visible: vis[key] })) });
 });
 app.put('/api/settings/visibility/:key', requireAuth, (req, res) => {
-  if (!canManage(req.user.role, 'pages')) return res.status(403).json({ error: 'Forbidden' });
+  if (!canManage(req.user, 'pages')) return res.status(403).json({ error: 'Forbidden' });
   const key = 'vis.' + req.params.key;
   const val = req.body && req.body.visible === false ? 'hidden' : 'visible';
   db.prepare('INSERT INTO settings(key,value,updated_at,updated_by) VALUES(?,?,?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at')
     .run(key, val, nowISO(), req.user.id);
+  audit(req,'section_'+val,'visibility',req.params.key,null);
   res.json({ ok: true });
 });
+
+/* ---------------- Page-level publish / hide (server-enforced) ---------------- */
+const PAGES = [
+  ['index','Home'], ['about','About Us'], ['approach','Our Approach'], ['programmes','Programmes'],
+  ['membership','Membership'], ['odr-support','ODR Support'], ['knowledge','Knowledge Hub'],
+  ['reports','Reports & Papers'], ['blogs','Blogs'], ['podcasts','Podcasts'], ['events','Events & Labs'],
+  ['contact','Contact'], ['privacy','Privacy'], ['terms','Terms'],
+];
+function pageState() { const h = {}; db.prepare("SELECT key,value FROM settings WHERE key LIKE 'page.%'").all().forEach(r => h[r.key.slice(5)] = r.value); return h; }
+function pageHidden(slug) { return pageState()[slug] === 'hidden'; }
+app.get('/api/settings/pages', requireAuth, (req, res) => {
+  if (!canSettings(req.user)) return forbid(res);
+  const st = pageState();
+  res.json({ pages: PAGES.map(([slug, label]) => ({ slug, label, published: st[slug] !== 'hidden' })) });
+});
+app.put('/api/settings/pages/:slug', requireAuth, (req, res) => {
+  if (!canSettings(req.user)) return forbid(res);
+  const slug = req.params.slug;
+  if (!PAGES.find(p => p[0] === slug)) return res.status(404).json({ error: 'Unknown page' });
+  const val = req.body && req.body.published === false ? 'hidden' : 'published';
+  db.prepare('INSERT INTO settings(key,value,updated_at,updated_by) VALUES(?,?,?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at')
+    .run('page.' + slug, val, nowISO(), req.user.id);
+  audit(req, 'page_' + val, 'page', slug, null);
+  res.json({ ok: true });
+});
+// Public: which pages are hidden, so the site can drop nav links / buttons / text links to them.
+app.get('/api/public/pages', (req, res) => { const st = pageState(); res.json({ hidden: PAGES.filter(([s]) => st[s] === 'hidden').map(([s]) => s) }); });
 
 /* ---------------- Public read APIs (consumed by the static site) ---------------- */
 app.get('/api/public/members', (req, res) => {
@@ -395,16 +619,32 @@ app.get('/api/analytics/summary', requireAuth, (req, res) => {
 
 /* ---------------- uploads (admin) ---------------- */
 app.post('/api/upload', requireAuth, upload.single('file'), (req, res) => {
+  if (!canManage(req.user, 'media')) return forbid(res);
   if (!req.file) return res.status(400).json({ error: 'No file' });
-  db.prepare('INSERT INTO entries(collection,data,status,created_by,created_at,updated_at) VALUES(?,?,?,?,?,?)')
-    .run('media', JSON.stringify({ file: '/uploads/' + req.file.filename, filename: req.file.originalname, alt: '', caption: '', usage: '' }),
+  const info = db.prepare('INSERT INTO entries(collection,data,status,created_by,created_at,updated_at) VALUES(?,?,?,?,?,?)')
+    .run('media', JSON.stringify({ file: '/uploads/' + req.file.filename, filename: req.file.originalname, alt: '', caption: '', usage: '', size: req.file.size, mime: req.file.mimetype }),
       'active', req.user.id, nowISO(), nowISO());
-  res.json({ url: '/uploads/' + req.file.filename });
+  audit(req, 'media_uploaded', 'media', info.lastInsertRowid, req.file.originalname);
+  res.json({ url: '/uploads/' + req.file.filename, id: info.lastInsertRowid });
 });
 
 /* ---------------- static ---------------- */
 app.use('/uploads', express.static(UP));
 app.use('/admin', express.static(path.join(__dirname, 'admin')));
+
+// Server-side enforcement: a hidden page returns 404 even via a direct URL.
+app.get(/.*/, (req, res, next) => {
+  const p = req.path;
+  if (p.startsWith('/api') || p.startsWith('/assets') || p.startsWith('/admin') || p.startsWith('/uploads') || p.startsWith('/odr/')) return next();
+  let slug = null;
+  if (p === '/' || p === '/index.html' || p === '/index') slug = 'index';
+  else { const m = p.match(/^\/([a-z0-9\-]+)(?:\.html)?$/i); if (m) slug = m[1].toLowerCase(); }
+  if (slug && pageHidden(slug)) {
+    return res.status(404).type('html').send('<!doctype html><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Page not found</title><body style="font-family:system-ui,Segoe UI,Arial;max-width:640px;margin:14vh auto;padding:0 24px;text-align:center;color:#17211b"><h1 style="font-size:2rem;margin:0 0 8px">404 — Page not found</h1><p style="color:#5f6a62">This page is not currently available.</p><p><a href="/" style="color:#1b7a3c">Return to the homepage</a></p></body>');
+  }
+  next();
+});
+
 app.use('/', express.static(path.join(__dirname, '..', 'public'))); // serve the public site
 
 app.get('/api/health', (req, res) => res.json({ ok: true }));
