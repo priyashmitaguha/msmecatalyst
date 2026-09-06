@@ -16,10 +16,12 @@ ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "public")
 # element carrying data-cms="<key>" with the admin value when one exists.
 REG = {}  # key -> {default, label, page, multiline}
 
-def _reg(key, default, label=None, multiline=False, page=None):
-    """Register an editable block and return its default text (for custom markup)."""
+def _reg(key, default, label=None, multiline=False, page=None, kind="html"):
+    """Register an editable block and return its default text (for custom markup).
+    kind drives server-side sanitisation of admin input:
+      html → allowlist-sanitised rich text · url → validated link · text → plain text."""
     REG[key] = {"default": default, "label": label or key.split(".")[-1].replace("_", " ").title(),
-                "page": page or key.split(".")[0], "multiline": multiline}
+                "page": page or key.split(".")[0], "multiline": multiline, "kind": kind}
     return default
 
 def T(key, default, tag="span", cls="", label=None, multiline=False, page=None):
@@ -82,7 +84,7 @@ def annotate(body_html, page):
             inner = el.decode_contents().strip()
             el["data-cms"] = key
             REG[key] = {"default": inner, "label": _label_from(el.get_text(" ", strip=True), name),
-                        "page": page, "multiline": (name in _MULTILINE) or ("<" in inner)}
+                        "page": page, "multiline": (name in _MULTILINE) or ("<" in inner), "kind": "html"}
         elif name == "a":
             txt = el.get_text(" ", strip=True)
             if not txt:
@@ -91,21 +93,21 @@ def annotate(body_html, page):
             key = f"{page}.c{n}"
             el["data-cms"] = key
             REG[key] = {"default": el.decode_contents().strip(), "label": _label_from(txt, "a"),
-                        "page": page, "multiline": False}
+                        "page": page, "multiline": False, "kind": "html"}
             href = el.get("href", "")
             if href and not href.startswith("#") and not href.startswith("mailto:") and not href.startswith("tel:"):
                 el["data-cms-href"] = key + "_href"
                 REG[key + "_href"] = {"default": href, "label": f"Link URL: {txt[:34]}",
-                                      "page": page, "multiline": False}
+                                      "page": page, "multiline": False, "kind": "url"}
     for img in soup.find_all("img"):
         if img.has_attr("data-cms-src") or _blocked_ancestor(img):
             continue
         n += 1
         key = f"{page}.img{n}"
         img["data-cms-src"] = key
-        REG[key] = {"default": img.get("src", ""), "label": "Image source", "page": page, "multiline": False}
+        REG[key] = {"default": img.get("src", ""), "label": "Image source", "page": page, "multiline": False, "kind": "url"}
         img["data-cms-alt"] = key + "_alt"
-        REG[key + "_alt"] = {"default": img.get("alt", ""), "label": "Image alt text", "page": page, "multiline": False}
+        REG[key + "_alt"] = {"default": img.get("alt", ""), "label": "Image alt text", "page": page, "multiline": False, "kind": "text"}
     return soup.decode()
 
 def _slug_from_active(active, title):
@@ -317,9 +319,9 @@ def cta_band(prefix=""):
 def page_hero(kicker, h1, lead, crumb="", prefix="", key=None):
     cr = f'<div class="crumb"><a href="{prefix}index.html">Home</a> · {crumb}</div>' if crumb else ""
     if key:
-        REG[f"{key}.kicker"] = {"default": kicker, "label": "Hero kicker", "page": key, "multiline": False}
-        REG[f"{key}.heading"] = {"default": h1, "label": "Hero heading", "page": key, "multiline": False}
-        REG[f"{key}.lead"] = {"default": lead, "label": "Hero intro", "page": key, "multiline": True}
+        REG[f"{key}.kicker"] = {"default": kicker, "label": "Hero kicker", "page": key, "multiline": False, "kind": "html"}
+        REG[f"{key}.heading"] = {"default": h1, "label": "Hero heading", "page": key, "multiline": False, "kind": "html"}
+        REG[f"{key}.lead"] = {"default": lead, "label": "Hero intro", "page": key, "multiline": True, "kind": "html"}
         ka, kb, kc = f' data-cms="{key}.kicker"', f' data-cms="{key}.heading"', f' data-cms="{key}.lead"'
     else:
         ka = kb = kc = ""

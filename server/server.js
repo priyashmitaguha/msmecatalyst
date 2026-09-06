@@ -14,6 +14,7 @@ const multer = require('multer');
 const bcrypt = require('bcryptjs');
 const { db, ROLES, COLLECTIONS, CONTENT_COLLECTIONS, seed, nowISO } = require('./db');
 const mailer = require('./mailer');
+const { cleanHtml, safeUrl, stripText, cleanByKind } = require('./sanitize');
 const APP_BASE_URL = (process.env.APP_BASE_URL || '').replace(/\/$/, '');
 
 seed(); // idempotent
@@ -309,6 +310,30 @@ app.get('/api/audit', requireAuth, (req, res) => {
   res.json({ audit: rows });
 });
 
+/* Sanitise a collection entry's data by its field types before storing:
+   url/file → validated URL (reject dangerous); richtext + embed → allowlist HTML.
+   Other text is stored as-is and HTML-escaped on output by the public renderers. */
+function sanitizeCollectionData(name, data) {
+  const def = COLLECTIONS[name];
+  if (!def || !data || typeof data !== 'object') return { data };
+  const out = { ...data };
+  for (const [k, , type] of def.fields) {
+    if (out[k] == null || out[k] === '') continue;
+    if (type === 'url') {
+      const u = safeUrl(out[k], { schemes: ['http', 'https', 'mailto', 'tel'] });
+      if (u === null) return { error: `“${k}” is not a valid or safe URL.` };
+      out[k] = u;
+    } else if (type === 'file') {
+      const u = safeUrl(out[k], { schemes: ['http', 'https'] });
+      if (u === null) return { error: `“${k}” is not a valid or safe URL.` };
+      out[k] = u;
+    } else if (type === 'richtext' || k === 'embed') {
+      out[k] = cleanHtml(out[k]);
+    }
+  }
+  return { data: out };
+}
+
 /* ---------------- generic CMS entries ---------------- */
 app.get('/api/collections/:name', requireAuth, (req, res) => {
   const { name } = req.params;
@@ -322,8 +347,10 @@ app.post('/api/collections/:name', requireAuth, (req, res) => {
   const { name } = req.params;
   if (!COLLECTIONS[name] || !canManage(req.user, name)) return res.status(403).json({ error: 'Forbidden' });
   const { data = {}, status = 'draft', display_order = 0 } = req.body || {};
+  const s = sanitizeCollectionData(name, data);
+  if (s.error) return res.status(400).json({ error: s.error });
   const info = db.prepare('INSERT INTO entries(collection,data,status,display_order,created_by,created_at,updated_at) VALUES(?,?,?,?,?,?,?)')
-    .run(name, JSON.stringify(data), status, display_order, req.user.id, nowISO(), nowISO());
+    .run(name, JSON.stringify(s.data), status, display_order, req.user.id, nowISO(), nowISO());
   audit(req,'entry_created',name,info.lastInsertRowid,'status:'+status);
   res.json({ id: info.lastInsertRowid });
 });
@@ -338,7 +365,12 @@ app.put('/api/collections/:name/:id', requireAuth, (req, res) => {
     return res.status(403).json({ error: 'Your role cannot publish. Save as review/draft instead.' });
   db.prepare('INSERT INTO entry_versions(entry_id,data,status,saved_at,saved_by) VALUES(?,?,?,?,?)')
     .run(cur.id, cur.data, cur.status, nowISO(), req.user.id); // version history
-  const data = req.body.data ? JSON.stringify(req.body.data) : cur.data;
+  let data = cur.data;
+  if (req.body.data) {
+    const s = sanitizeCollectionData(name, req.body.data);
+    if (s.error) return res.status(400).json({ error: s.error });
+    data = JSON.stringify(s.data);
+  }
   const display_order = req.body.display_order ?? cur.display_order;
   db.prepare('UPDATE entries SET data=?,status=?,display_order=?,updated_at=? WHERE id=?')
     .run(data, status, display_order, nowISO(), cur.id);
@@ -366,9 +398,16 @@ app.get('/api/crm/organisations', requireAuth, (req, res) => {
   orgs.forEach(o => o.contacts = contacts.filter(c => c.org_id === o.id));
   res.json({ organisations: orgs });
 });
+// Validate the CRM URL/image fields (website link, member logo) on write.
+function crmUrlCheck(obj) {
+  if ('website' in obj && obj.website) { const u = safeUrl(obj.website, { schemes: ['http','https','mailto','tel'] }); if (u === null) return 'The website is not a valid or safe URL.'; obj.website = u; }
+  if ('logo' in obj && obj.logo) { const u = safeUrl(obj.logo, { schemes: ['http','https'] }); if (u === null) return 'The logo is not a valid or safe URL.'; obj.logo = u; }
+  return null;
+}
 app.post('/api/crm/organisations', requireAuth, (req, res) => {
   if (!canCRMWrite(req.user)) return forbid(res);
   const b = req.body || {};
+  const urlErr = crmUrlCheck(b); if (urlErr) return res.status(400).json({ error: urlErr });
   const cols = ['legal_name','brand_name','category','industry','website','address','gstin_pan','logo','logo_consent',
     'website_display_status','membership_status','fee','notes'];
   const vals = cols.map(c => b[c] ?? null);
@@ -386,6 +425,7 @@ app.put('/api/crm/organisations/:id', requireAuth, (req, res) => {
     'fee','invoice_number','invoice_date','payment_status','payment_date','renewal_invoice_status','notes','documents'];
   const merged = { ...cur };
   editable.forEach(k => { if (k in req.body) merged[k] = req.body[k]; });
+  const urlErr = crmUrlCheck(merged); if (urlErr) return res.status(400).json({ error: urlErr });
   applyMembershipRules(merged, cur); // automation on write
   db.prepare(`UPDATE organisations SET ${editable.map(k=>k+'=?').join(',')},updated_at=? WHERE id=?`)
     .run(...editable.map(k => merged[k]), nowISO(), cur.id);
@@ -527,7 +567,11 @@ app.put('/api/pagecopy/:key', requireAuth, (req, res) => {
   const key = req.params.key;
   if (!REGISTRY[key]) return res.status(404).json({ error: 'Unknown content key' });
   if (!canPage(req.user, pageOfKey(key))) return res.status(403).json({ error: 'Forbidden' });
-  const value = (req.body && req.body.value) || '';
+  const raw = (req.body && req.body.value) || '';
+  // Sanitise on the way in, by the field's declared kind. URL fields that fail
+  // validation are rejected outright; HTML is allowlist-cleaned; text is stripped.
+  let value = cleanByKind(REGISTRY[key].kind || 'html', raw);
+  if (value === null) return res.status(400).json({ error: 'That link is not a valid or safe URL.' });
   if (value === '') db.prepare('DELETE FROM pagecopy WHERE key=?').run(key);        // empty ⇒ revert to default
   else db.prepare('INSERT INTO pagecopy(key,value,updated_at,updated_by) VALUES(?,?,?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at,updated_by=excluded.updated_by')
     .run(key, value, nowISO(), req.user.id);
