@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MSME Catalyst — Reset password</title>
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/styles.css">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body class="js">
+<div id="login" class="login-wrap">
+  <div class="login-card">
+    <div class="brand" style="justify-content:center;margin-bottom:8px">
+      <img src="/assets/img/logo.png" alt="MSME Catalyst" style="height:52px">
+    </div>
+    <p class="center muted" style="margin-bottom:22px">Set a new password</p>
+
+    <form id="reset-form" class="form">
+      <div class="field"><label>New password</label><input class="input" id="rs-pass" type="password" autocomplete="new-password" required></div>
+      <div class="field"><label>Confirm new password</label><input class="input" id="rs-confirm" type="password" autocomplete="new-password" required></div>
+      <p class="notice">Minimum 12 characters, including at least one letter and one number, and not containing your email name.</p>
+      <button class="btn btn-primary btn-lg" type="submit">Set new password</button>
+      <p id="rs-msg" class="muted" style="display:none"></p>
+    </form>
+
+    <div id="rs-done" style="display:none;text-align:center">
+      <p style="color:var(--green,#15803d);font-weight:600">Your password has been reset.</p>
+      <p class="muted" style="font-size:.9rem">For your security, every active session has been signed out. Please sign in with your new password.</p>
+      <p style="margin-top:14px"><a class="btn btn-primary" href="/admin">Go to sign in</a></p>
+    </div>
+
+    <p style="text-align:center;margin-top:18px"><a href="/admin" style="font-size:.9rem;color:var(--green,#15803d)">← Back to sign in</a></p>
+  </div>
+</div>
+
+<script>
+(function () {
+  const params = new URLSearchParams(location.search);
+  const token = params.get('token');
+  const form = document.getElementById('reset-form');
+  const msg = document.getElementById('rs-msg');
+  if (!token) {
+    form.style.display = 'none';
+    msg.style.display = 'block'; msg.style.color = 'var(--danger,#b91c1c)';
+    msg.textContent = 'This reset link is missing its token. Please use the full link from your email, or request a new one.';
+    return;
+  }
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    msg.style.display = 'none';
+    const password = document.getElementById('rs-pass').value;
+    const confirm = document.getElementById('rs-confirm').value;
+    if (password !== confirm) { msg.style.display = 'block'; msg.style.color = 'var(--danger,#b91c1c)'; msg.textContent = 'Password and confirmation do not match.'; return; }
+    try {
+      const r = await fetch('/api/auth/reset', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token, password, confirm }) });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(j.error || 'Reset failed.');
+      form.style.display = 'none';
+      document.getElementById('rs-done').style.display = 'block';
+    } catch (ex) {
+      msg.style.display = 'block'; msg.style.color = 'var(--danger,#b91c1c)'; msg.textContent = ex.message;
+    }
+  });
+})();
+</script>
+</body>
+</html>

@@ -192,3 +192,27 @@
     });
   }).catch(function () { /* static hosting: show everything */ });
 })();
+
+/* ---------- Page publishing (drop nav/button/text links to hidden pages) ---------- */
+(function () {
+  fetch('/api/public/pages').then(function (r) { return r.json(); }).then(function (d) {
+    var hidden = (d && d.hidden) || [];
+    if (!hidden.length) return;
+    var map = {};
+    hidden.forEach(function (slug) { map[slug] = true; });
+    // Any link whose target resolves to a hidden slug is removed. If the removed
+    // link is the only content of its list item / button wrapper, drop the wrapper too.
+    var anchors = document.querySelectorAll('a[href]');
+    anchors.forEach(function (a) {
+      var href = a.getAttribute('href') || '';
+      if (/^(https?:)?\/\//i.test(href) || href.charAt(0) === '#' || href.indexOf('mailto:') === 0 || href.indexOf('tel:') === 0) return;
+      var m = href.replace(/^\//, '').replace(/[?#].*$/, '').match(/^([a-z0-9\-]+)(?:\.html)?$/i);
+      var slug = m ? m[1].toLowerCase() : (href === '/' || href === '' || href === 'index.html' ? 'index' : null);
+      if (slug && map[slug]) {
+        var li = a.closest('li');
+        if (li && li.querySelectorAll('a').length === 1) li.remove();
+        else a.remove();
+      }
+    });
+  }).catch(function () { /* static hosting: show everything */ });
+})();
