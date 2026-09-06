@@ -467,10 +467,15 @@ async function viewPages() {
 /* ---------------- Admin Users (Super Admin) ---------------- */
 async function viewUsers() {
   setTitle('Admin Users', 'Add, edit, deactivate or delete admin accounts and assign roles & page-level permissions');
-  const btn = el('button', 'btn btn-primary', '+ New admin user'); btn.onclick = () => editUser(null, null);
+  let META = null;
+  const btn = el('button', 'btn btn-primary', '+ New admin user'); btn.onclick = () => editUser(null, META);
   $('#top-actions').innerHTML = ''; $('#top-actions').appendChild(btn);
   const v = $('#view'); v.innerHTML = '<p class="muted">Loading…</p>';
-  const { users, roles, collections } = await api('/api/users');
+  const { users, roles, collections, pages, sections } = await api('/api/users');
+  const meta = { roles, collections, pages: pages || [], sections: sections || [] }; META = meta;
+  const pageLabel = {}; (pages || []).forEach(p => pageLabel['page:' + p.slug] = p.label);
+  const secLabel = {}; (sections || []).forEach(s => secLabel['sec:' + s.key] = s.label);
+  const permLabel = x => (DEF[x] && DEF[x].label) || pageLabel[x] || secLabel[x] || x;
   v.innerHTML = '';
   const p = panel('Admin accounts', users.length + ' user(s)');
   const table = el('div', 'table-wrap');
@@ -479,7 +484,7 @@ async function viewUsers() {
   users.forEach(u => {
     const roleLabel = (roles[u.role] && roles[u.role].label) || u.role;
     const scope = (roles[u.role] && roles[u.role].editorScoped)
-      ? ((u.perms && u.perms.length) ? u.perms.map(x => (DEF[x] && DEF[x].label) || x).join(', ') : 'none assigned')
+      ? ((u.perms && u.perms.length) ? u.perms.map(permLabel).join(', ') : 'none assigned')
       : '—';
     const tr = el('tr');
     tr.innerHTML = `<td><b>${esc(u.name)}</b>${u.id === ME.id ? ' <span class="muted">(you)</span>' : ''}</td>
@@ -487,7 +492,7 @@ async function viewUsers() {
       <td class="muted" style="font-size:.82rem">${esc(scope)}</td>
       <td>${u.active ? '<span class="st st-ok">Active</span>' : '<span class="st st-off">Deactivated</span>'}</td><td></td>`;
     const cell = tr.lastChild;
-    const ed = el('button', 'mini primary', 'Edit'); ed.onclick = () => editUser(u, { roles, collections });
+    const ed = el('button', 'mini primary', 'Edit'); ed.onclick = () => editUser(u, meta);
     cell.appendChild(ed);
     if (u.id !== ME.id) {
       const tog = el('button', 'mini', u.active ? 'Deactivate' : 'Reactivate');
@@ -526,16 +531,28 @@ function editUser(u, meta) {
   // Password
   const pw = fieldFor('password', isNew ? 'Temporary password' : 'Reset password (leave blank to keep)', 'password', '');
   const pwHelp = el('p', 'notice', 'Min 12 chars, a letter and a number, not containing the email name. The user is required to change it at next sign-in.');
-  // Per-section permissions (only meaningful for Editor / editorScoped)
-  const permsWrap = el('div', 'field');
-  permsWrap.innerHTML = '<label>Assigned sections <span class="muted" style="font-weight:400;font-size:.78rem">· for the Editor role only</span></label>';
-  const permsBox = el('div', ''); permsBox.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:6px';
+  // Per-item permissions (only meaningful for the Editor / editorScoped role).
+  const pages = (meta && meta.pages) || [];
+  const sections = (meta && meta.sections) || [];
   const curPerms = (u && u.perms) || [];
-  collections.forEach(c => {
-    const lab = el('label', ''); lab.style.cssText = 'display:flex;align-items:center;gap:6px;font-size:.85rem';
-    const cb = el('input', ''); cb.type = 'checkbox'; cb.value = c; cb.checked = curPerms.includes(c); cb.dataset.perm = c;
-    lab.append(cb, document.createTextNode((DEF[c] && DEF[c].label) || c)); permsBox.appendChild(lab);
-  });
+  const permsWrap = el('div', 'field');
+  permsWrap.innerHTML = '<label>Assigned access <span class="muted" style="font-weight:400;font-size:.78rem">· Editor role only — the backend enforces exactly these</span></label>';
+  const permsBox = el('div', '');
+  const group = (title, items, valueOf, labelOf) => {
+    if (!items.length) return;
+    permsBox.appendChild(el('div', 'muted', title)).style.cssText = 'font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;margin:10px 0 4px';
+    const grid = el('div', ''); grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:6px';
+    items.forEach(it => {
+      const val = valueOf(it);
+      const lab = el('label', ''); lab.style.cssText = 'display:flex;align-items:center;gap:6px;font-size:.85rem';
+      const cb = el('input', ''); cb.type = 'checkbox'; cb.value = val; cb.checked = curPerms.includes(val); cb.dataset.perm = val;
+      lab.append(cb, document.createTextNode(labelOf(it))); grid.appendChild(lab);
+    });
+    permsBox.appendChild(grid);
+  };
+  group('Content types', collections, c => c, c => (DEF[c] && DEF[c].label) || c);
+  group('Pages (content + publish/hide)', pages, p => 'page:' + p.slug, p => p.label);
+  group('Sections (visibility)', sections, s => 'sec:' + s.key, s => s.label);
   permsWrap.appendChild(permsBox);
   const syncPerms = () => { const scoped = roles[roleSel.value] && roles[roleSel.value].editorScoped; permsWrap.style.display = scoped ? '' : 'none'; };
   roleSel.onchange = syncPerms;
