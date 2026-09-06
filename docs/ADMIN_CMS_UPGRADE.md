@@ -175,3 +175,40 @@ vulnerabilities**; a test asserts no high/critical production vulnerabilities.
 **New migration surface in revision 2:** none. No new tables or columns — page and
 section publish/hide state is stored in the existing `settings` table
 (`page.<slug>` / `vis.<key>` keys) and page copy in the existing `pagecopy` table.
+
+## 10. Revision 3 — security hardening
+
+**Stored-XSS prevention (server-side, allowlist).** All admin-supplied content is
+sanitised on save in `server/sanitize.js` (built on `sanitize-html`):
+- Rich text (`kind: html`) is cleaned to a strict tag allowlist
+  (`a, b, strong, i, em, u, br, span, small, sup, sub, p, ul, ol, li, blockquote,
+  h2–h4, abbr, code, mark`) with only `a[href,title,target,rel]` / `abbr[title]`
+  attributes. Scripts, event handlers (`on*`), `iframe`/`object`/`embed`/`form`,
+  `style`/inline CSS and `class` hooks, and dangerous URL schemes are removed;
+  links get `rel="noopener noreferrer"`.
+- URL fields (`kind: url`, and collection `url`/`file` types, and CRM
+  `website`/`logo`) are validated by `safeUrl()`: only `http`, `https`, `mailto`,
+  `tel` and safe relative-site URLs pass. `javascript:`, `data:`, `vbscript:`,
+  protocol-relative (`//host`), protocol-obfuscated (`java\tscript:`) and
+  control-character URLs are rejected with HTTP 400.
+- Plain-text fields (`kind: text`, e.g. image alt) are stripped of all tags.
+
+This covers **page copy, collections/CMS entries, media and CRM** — not only
+page-copy fields. The public runtime still applies overrides, but the stored
+values are already safe (defence in depth).
+
+**Node version pinned.** `jsdom@30` (dev/test only) requires Node ≥ 22.22, so the
+whole project is pinned to **Node 22** (Active LTS): `render.yaml` +
+`server/render.yaml` (`NODE_VERSION: "22"`), `server/package.json`
+(`"engines": { "node": ">=22 <23" }`) and a repo-root `.nvmrc` (`22`). Local
+tests and Render now run the same major version.
+
+**Dependency added:** `sanitize-html@^2.17` (production). `npm audit --omit=dev`
+still reports **0 vulnerabilities**.
+
+**Tests:** expanded to **99 assertions**, adding a STORED-XSS & URL VALIDATION
+section that proves malicious HTML, event attributes, `iframe`s and dangerous URL
+schemes are rejected or stripped across page copy, collections and CRM, while
+ordinary formatting and valid `https`/relative links keep working.
+
+**New migration surface in revision 3:** none.

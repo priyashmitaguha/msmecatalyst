@@ -225,6 +225,42 @@ const waitHealth = async () => { for (let i = 0; i < 50; i++) { try { const r = 
     ok('scoped editor CANNOT manage users (403)', (await api('/api/users', {}, ped)).status === 403);
     ok('scoped editor CANNOT edit an unassigned collection (403)', (await api('/api/collections/reports', { method: 'POST', body: { data: {}, status: 'draft' } }, ped)).status === 403);
 
+    console.log('\nSTORED-XSS & URL VALIDATION');
+    // Page copy: rich text is allowlist-sanitised on save.
+    const htmlKey = groups['about'][0].key;
+    await api('/api/pagecopy/' + encodeURIComponent(htmlKey), { method: 'PUT', body: { value: '<strong>Safe</strong><script>alert(1)</script><img src=x onerror=alert(1)>' } }, admin2);
+    let storedHtml = (await api('/api/public/pagecopy')).data.copy[htmlKey];
+    ok('page-copy strips <script>', !/<script/i.test(storedHtml));
+    ok('page-copy strips inline event handlers', !/onerror/i.test(storedHtml));
+    ok('page-copy keeps ordinary formatting', /<strong>Safe<\/strong>/.test(storedHtml));
+    await api('/api/pagecopy/' + encodeURIComponent(htmlKey), { method: 'PUT', body: { value: '<a href="javascript:alert(1)">x</a>' } }, admin2);
+    ok('page-copy neutralises javascript: inside a link', !/javascript:/i.test((await api('/api/public/pagecopy')).data.copy[htmlKey] || ''));
+    await api('/api/pagecopy/' + encodeURIComponent(htmlKey), { method: 'PUT', body: { value: '<iframe src="https://evil.example"></iframe>keep' } }, admin2);
+    ok('page-copy strips <iframe>', !/<iframe/i.test((await api('/api/public/pagecopy')).data.copy[htmlKey] || ''));
+    // Page copy: dedicated URL fields are validated.
+    const urlField = Object.values(groups).flat().find(f => /Link URL/.test(f.label));
+    ok('a link-URL field exists to validate', !!urlField);
+    ok('page-copy rejects javascript: URL (400)', (await api('/api/pagecopy/' + encodeURIComponent(urlField.key), { method: 'PUT', body: { value: 'javascript:alert(1)' } }, admin2)).status === 400);
+    ok('page-copy rejects data: URL (400)', (await api('/api/pagecopy/' + encodeURIComponent(urlField.key), { method: 'PUT', body: { value: 'data:text/html,<script>1</script>' } }, admin2)).status === 400);
+    ok('page-copy rejects vbscript: URL (400)', (await api('/api/pagecopy/' + encodeURIComponent(urlField.key), { method: 'PUT', body: { value: 'vbscript:msgbox(1)' } }, admin2)).status === 400);
+    ok('page-copy rejects protocol-obfuscated URL (400)', (await api('/api/pagecopy/' + encodeURIComponent(urlField.key), { method: 'PUT', body: { value: 'java\tscript:alert(1)' } }, admin2)).status === 400);
+    ok('page-copy accepts a valid https URL', (await api('/api/pagecopy/' + encodeURIComponent(urlField.key), { method: 'PUT', body: { value: 'https://example.org/ok' } }, admin2)).status === 200);
+    ok('page-copy accepts a valid relative URL', (await api('/api/pagecopy/' + encodeURIComponent(urlField.key), { method: 'PUT', body: { value: 'reports.html' } }, admin2)).status === 200);
+
+    // Collections: richtext sanitised; url/file fields validated.
+    const blog = await api('/api/collections/blogs', { method: 'POST', body: { data: { title: 'T', body: '<script>alert(1)</script><em>keep</em>', cover: '/uploads/ok.png' }, status: 'draft' } }, admin2);
+    ok('collection accepts safe richtext content', blog.status === 200);
+    const savedBlog = (await api('/api/collections/blogs', {}, admin2)).data.items.find(i => i.id === blog.data.id);
+    ok('collection strips <script> from richtext but keeps formatting', !/<script/i.test(savedBlog.data.body) && /<em>keep<\/em>/.test(savedBlog.data.body));
+    ok('collection rejects javascript: in a URL field (400)', (await api('/api/collections/reports', { method: 'POST', body: { data: { title: 'R', link: 'javascript:alert(1)' }, status: 'draft' } }, admin2)).status === 400);
+    ok('collection rejects javascript: in a file field (400)', (await api('/api/collections/reports', { method: 'POST', body: { data: { title: 'R', file: 'javascript:alert(1)' }, status: 'draft' } }, admin2)).status === 400);
+    ok('collection accepts a valid file URL', (await api('/api/collections/reports', { method: 'POST', body: { data: { title: 'R', file: '/uploads/r.pdf' }, status: 'draft' } }, admin2)).status === 200);
+
+    // CRM: website + logo validated.
+    ok('CRM rejects javascript: website (400)', (await api('/api/crm/organisations', { method: 'POST', body: { legal_name: 'Evil', website: 'javascript:alert(1)' } }, admin2)).status === 400);
+    ok('CRM rejects unsafe logo URL (400)', (await api('/api/crm/organisations', { method: 'POST', body: { legal_name: 'Evil2', logo: 'vbscript:msgbox(1)' } }, admin2)).status === 400);
+    ok('CRM accepts a valid https website + relative logo', (await api('/api/crm/organisations', { method: 'POST', body: { legal_name: 'Good Co', website: 'https://good.example', logo: '/uploads/logo.png' } }, admin2)).status === 200);
+
     console.log('\nPRODUCTION DEPENDENCY AUDIT');
     {
       const res = spawnSync('npm', ['audit', '--omit=dev', '--audit-level=high', '--json'], { cwd: join(__dirname, '..'), encoding: 'utf8' });
