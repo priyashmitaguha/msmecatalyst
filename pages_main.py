@@ -11,9 +11,9 @@ def build(g):
   <div class="wrap hero-inner">
     <div class="two-col wide-left">
       <div class="reveal in">
-        <span class="kicker" data-cms="home.hero_kicker">{_reg("home.hero_kicker","MSME Catalyst | The Convergence Layer","Hero kicker")}</span>
-        <h1 class="h1" data-cms="home.hero_heading" style="margin-top:18px">{_reg("home.hero_heading","India does not lack MSME support.<br><span style='color:var(--orange)'>It lacks convergence.</span>","Hero heading (HTML allowed)")}</h1>
-        <p class="lead mt-m maxch" data-cms="home.hero_sub">{_reg("home.hero_sub","MSME Catalyst makes existing support work together around real MSME clusters and business journeys — a neutral, not-for-profit platform that brings anchors, MSMEs, lenders, technology providers, capability institutions, legal and dispute-resolution partners and government into one accountable operating model.","Hero sub-copy",True)}</p>
+        <span class="kicker" data-cms="index.hero_kicker">{_reg("index.hero_kicker","MSME Catalyst | The Convergence Layer","Hero kicker")}</span>
+        <h1 class="h1" data-cms="index.hero_heading" style="margin-top:18px">{_reg("index.hero_heading","India does not lack MSME support.<br><span style='color:var(--orange)'>It lacks convergence.</span>","Hero heading (HTML allowed)")}</h1>
+        <p class="lead mt-m maxch" data-cms="index.hero_sub">{_reg("index.hero_sub","MSME Catalyst makes existing support work together around real MSME clusters and business journeys — a neutral, not-for-profit platform that brings anchors, MSMEs, lenders, technology providers, capability institutions, legal and dispute-resolution partners and government into one accountable operating model.","Hero sub-copy",True)}</p>
         <div class="hero-ctas">
           <a class="btn btn-primary btn-lg btn-arrow" href="approach.html">Explore Our Approach</a>
           <a class="btn btn-dark btn-lg" href="membership.html">Join MSME Catalyst</a>
@@ -45,12 +45,12 @@ def build(g):
 <section class="section"><div class="wrap">
   <div class="two-col">
     <div class="reveal">
-      <span class="kicker" data-cms="home.problem_kicker">{_reg("home.problem_kicker","The problem")}</span>
-      <h2 class="h2 mt-s" data-cms="home.problem_heading">{_reg("home.problem_heading","An MSME rarely has one isolated problem.")}</h2>
+      <span class="kicker" data-cms="index.problem_kicker">{_reg("index.problem_kicker","The problem")}</span>
+      <h2 class="h2 mt-s" data-cms="index.problem_heading">{_reg("index.problem_heading","An MSME rarely has one isolated problem.")}</h2>
     </div>
     <div class="reveal">
-      <p class="lead" data-cms="home.problem_lead">{_reg("home.problem_lead","A single enterprise may face delayed receivables, weak buyer visibility, limited documentation, poor access to capability support and unclear capital pathways — all at the same time.","Problem lead",True)}</p>
-      <p class="muted" data-cms="home.problem_body">{_reg("home.problem_body","Support exists. Schemes, lenders, universities, technology and legal routes are all available. But they often reach the enterprise <strong>separately</strong>, on different timelines, through different doors — so the enterprise carries the burden of stitching them together alone.","Problem body",True)}</p>
+      <p class="lead" data-cms="index.problem_lead">{_reg("index.problem_lead","A single enterprise may face delayed receivables, weak buyer visibility, limited documentation, poor access to capability support and unclear capital pathways — all at the same time.","Problem lead",True)}</p>
+      <p class="muted" data-cms="index.problem_body">{_reg("index.problem_body","Support exists. Schemes, lenders, universities, technology and legal routes are all available. But they often reach the enterprise <strong>separately</strong>, on different timelines, through different doors — so the enterprise carries the burden of stitching them together alone.","Problem body",True)}</p>
     </div>
   </div>
 </div></section>
@@ -61,10 +61,10 @@ def build(g):
     <h2 class="h2 mt-s">MSME Catalyst helps enterprises close four gaps at once</h2>
   </div>
   <div class="grid g4 mt-l">
-    <div class="gap-card gap-1 reveal"><span class="n">1</span><h3 data-cms="home.gap1_title">{_reg("home.gap1_title","Cash-flow gap")}</h3><p data-cms="home.gap1_desc">{_reg("home.gap1_desc","Receivables and payment certainty.")}</p></div>
-    <div class="gap-card gap-2 reveal"><span class="n">2</span><h3 data-cms="home.gap2_title">{_reg("home.gap2_title","Market gap")}</h3><p data-cms="home.gap2_desc">{_reg("home.gap2_desc","Demand-side linkage and buyer access.")}</p></div>
-    <div class="gap-card gap-3 reveal"><span class="n">3</span><h3 data-cms="home.gap3_title">{_reg("home.gap3_title","Capability gap")}</h3><p data-cms="home.gap3_desc">{_reg("home.gap3_desc","Technical, managerial, digital and legal handholding.")}</p></div>
-    <div class="gap-card gap-4 reveal"><span class="n">4</span><h3 data-cms="home.gap4_title">{_reg("home.gap4_title","Growth-capital gap")}</h3><p data-cms="home.gap4_desc">{_reg("home.gap4_desc","Preparation, documentation and access pathways.")}</p></div>
+    <div class="gap-card gap-1 reveal"><span class="n">1</span><h3 data-cms="index.gap1_title">{_reg("index.gap1_title","Cash-flow gap")}</h3><p data-cms="index.gap1_desc">{_reg("index.gap1_desc","Receivables and payment certainty.")}</p></div>
+    <div class="gap-card gap-2 reveal"><span class="n">2</span><h3 data-cms="index.gap2_title">{_reg("index.gap2_title","Market gap")}</h3><p data-cms="index.gap2_desc">{_reg("index.gap2_desc","Demand-side linkage and buyer access.")}</p></div>
+    <div class="gap-card gap-3 reveal"><span class="n">3</span><h3 data-cms="index.gap3_title">{_reg("index.gap3_title","Capability gap")}</h3><p data-cms="index.gap3_desc">{_reg("index.gap3_desc","Technical, managerial, digital and legal handholding.")}</p></div>
+    <div class="gap-card gap-4 reveal"><span class="n">4</span><h3 data-cms="index.gap4_title">{_reg("index.gap4_title","Growth-capital gap")}</h3><p data-cms="index.gap4_desc">{_reg("index.gap4_desc","Preparation, documentation and access pathways.")}</p></div>
   </div>
 </div></section>
 
@@ -204,7 +204,7 @@ def build(g):
   </div>
 </div></section>
 
-<section class="section" id="council"><div class="wrap">
+<section class="section" id="council" data-section="council"><div class="wrap">
   <div class="center reveal" style="max-width:56ch;margin-inline:auto">
     <span class="kicker" style="justify-content:center">Governance</span>
     <h2 class="h2 mt-s">Governing Council</h2>
@@ -213,7 +213,7 @@ def build(g):
   <div class="grid g4 mt-l" data-cms-list="council" data-cms-render="profile">{council_cards}</div>
 </div></section>
 
-<section class="section bg-sand" id="advisory"><div class="wrap">
+<section class="section bg-sand" id="advisory" data-section="advisory"><div class="wrap">
   <div class="center reveal" style="max-width:60ch;margin-inline:auto">
     <span class="kicker" style="justify-content:center">Advisory Body · Non-executive</span>
     <h2 class="h2 mt-s">Strategic guidance, clearly bounded</h2>
@@ -222,7 +222,7 @@ def build(g):
   <div class="grid g3 mt-l" data-cms-list="advisory" data-cms-render="profile">{advisory_cards}</div>
 </div></section>
 
-<section class="section" id="secretariat"><div class="wrap">
+<section class="section" id="secretariat" data-section="secretariat"><div class="wrap">
   <div class="center reveal" style="max-width:56ch;margin-inline:auto">
     <span class="kicker" style="justify-content:center">The team</span>
     <h2 class="h2 mt-s">Secretariat</h2>
@@ -325,7 +325,7 @@ def build(g):
     # ===================== ODR SUPPORT (redirect page) =====================
     odr_support = f"""
 {page_hero("ODR Support", "Resolve payment friction before it becomes business failure.",
-  "MSME Catalyst helps businesses facing payment-related commercial friction organise their documents, understand possible routes and connect with an appropriate independent provider.", "ODR Support", key="odr_support")}
+  "MSME Catalyst helps businesses facing payment-related commercial friction organise their documents, understand possible routes and connect with an appropriate independent provider.", "ODR Support", key="odr-support")}
 <section class="section"><div class="wrap narrow center">
   <div class="callout orange reveal">
     <h3 style="margin-bottom:8px">ODR Support runs on a dedicated micro-site</h3>
@@ -680,7 +680,7 @@ def build(g):
         ("Contact","privacy@msmecatalyst.org"),
     ])
     write("privacy.html", doc("Privacy Policy | MSME Catalyst","Privacy policy for the MSME Catalyst platform.",
-        legal_body("Privacy Policy","How MSME Catalyst handles your data, consent and document uploads.",privacy_secs)))
+        legal_body("Privacy Policy","How MSME Catalyst handles your data, consent and document uploads.",privacy_secs), active="privacy.html"))
     terms_secs = "".join(f"<h3>{h}</h3><p class='muted'>{p}</p>" for h,p in [
         ("Nature of the platform","MSME Catalyst is a neutral convergence layer. It does not lend, underwrite, provide legal advice, adjudicate disputes or operate an ODR platform."),
         ("No professional relationship","Using this site or submitting a form does not create a lawyer-client relationship or any advisory relationship, and does not guarantee any outcome or recovery."),
@@ -690,4 +690,4 @@ def build(g):
         ("Contact","legal@msmecatalyst.org"),
     ])
     write("terms.html", doc("Terms | MSME Catalyst","Terms of use for the MSME Catalyst platform.",
-        legal_body("Terms of Use","The terms governing use of the MSME Catalyst platform.",terms_secs)))
+        legal_body("Terms of Use","The terms governing use of the MSME Catalyst platform.",terms_secs), active="terms.html"))

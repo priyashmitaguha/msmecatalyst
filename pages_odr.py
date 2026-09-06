@@ -9,6 +9,13 @@ ODR_NAV = [
 
 def build(g):
     write = g["write"]; brand = g["brand"]; footer_disc = None
+    annotate = g["annotate"]; REG = g["REG"]
+
+    def odr_slug(active):
+        s = (active or "").strip()
+        if s.endswith(".html"):
+            s = s[:-5]
+        return "odr-" + (s or "index")
     A = "../assets"  # asset prefix from /odr/
     BRAND = brand("../", 40)
     BRAND_FOOT = f'<span style="display:inline-block;background:#fff;padding:10px 14px;border-radius:12px">{brand("../", 44)}</span>'
@@ -58,6 +65,7 @@ def build(g):
 </footer>"""
 
     def doc(title, desc, body, active):
+        body = annotate(body, odr_slug(active))
         return f"""<!doctype html>
 <html lang="en"><head>
 <script>document.documentElement.className+=' js';</script>
@@ -72,6 +80,7 @@ def build(g):
 {header(active)}
 <main>{body}</main>
 {footer()}
+<script src="{A}/js/visibility-lib.js"></script>
 <script src="{A}/js/main.js"></script>
 </body></html>"""
 

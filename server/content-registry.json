@@ -1,4 +1,148 @@
 {
+  "about.c1": {
+    "default": "Home",
+    "label": "Link: Home",
+    "multiline": false,
+    "page": "about"
+  },
+  "about.c10": {
+    "default": "MSME Catalyst does not lend, underwrite, provide legal advice, adjudicate disputes, operate an ODR platform, guarantee recovery, or replace existing schemes, courts, arbitrators, universities or implementation partners.",
+    "label": "Paragraph: MSME Catalyst does not lend, underwrite, provi…",
+    "multiline": true,
+    "page": "about"
+  },
+  "about.c11": {
+    "default": "We facilitate structured access to relevant ecosystem pathways. Independent lenders, ODR providers and other institutions retain their own eligibility, commercial, legal and operational decisions.",
+    "label": "Paragraph: We facilitate structured access to relevant ec…",
+    "multiline": true,
+    "page": "about"
+  },
+  "about.c12": {
+    "default": "Governing Council",
+    "label": "Heading: Governing Council",
+    "multiline": false,
+    "page": "about"
+  },
+  "about.c13": {
+    "default": "Ten seats representing the ecosystem. Each profile is CMS-managed with photo, name, designation, organisation, biography, LinkedIn and display status.",
+    "label": "Paragraph: Ten seats representing the ecosystem. Each pro…",
+    "multiline": true,
+    "page": "about"
+  },
+  "about.c14": {
+    "default": "Strategic guidance, clearly bounded",
+    "label": "Heading: Strategic guidance, clearly bounded",
+    "multiline": false,
+    "page": "about"
+  },
+  "about.c15": {
+    "default": "The Advisory Body is non-executive. It provides strategic guidance and <strong>does not approve lending, select cases or control operations.</strong>",
+    "label": "Paragraph: The Advisory Body is non-executive. It provide…",
+    "multiline": true,
+    "page": "about"
+  },
+  "about.c16": {
+    "default": "Secretariat",
+    "label": "Heading: Secretariat",
+    "multiline": false,
+    "page": "about"
+  },
+  "about.c17": {
+    "default": "The professional team that runs the platform day to day.",
+    "label": "Paragraph: The professional team that runs the platform d…",
+    "multiline": true,
+    "page": "about"
+  },
+  "about.c18": {
+    "default": "Join MSME Catalyst",
+    "label": "Link: Join MSME Catalyst",
+    "multiline": false,
+    "page": "about"
+  },
+  "about.c18_href": {
+    "default": "membership.html",
+    "label": "Link URL: Join MSME Catalyst",
+    "multiline": false,
+    "page": "about"
+  },
+  "about.c19": {
+    "default": "Apply for ODR Support",
+    "label": "Link: Apply for ODR Support",
+    "multiline": false,
+    "page": "about"
+  },
+  "about.c19_href": {
+    "default": "odr-support.html",
+    "label": "Link URL: Apply for ODR Support",
+    "multiline": false,
+    "page": "about"
+  },
+  "about.c1_href": {
+    "default": "index.html",
+    "label": "Link URL: Home",
+    "multiline": false,
+    "page": "about"
+  },
+  "about.c2": {
+    "default": "A neutral convergence layer, held in trust",
+    "label": "Heading: A neutral convergence layer, held in trust",
+    "multiline": false,
+    "page": "about"
+  },
+  "about.c20": {
+    "default": "Fund the infrastructure",
+    "label": "Link: Fund the infrastructure",
+    "multiline": false,
+    "page": "about"
+  },
+  "about.c20_href": {
+    "default": "membership.html#donors",
+    "label": "Link URL: Fund the infrastructure",
+    "multiline": false,
+    "page": "about"
+  },
+  "about.c3": {
+    "default": "MSME Catalyst is operated by Digital Growth Infrastructure Foundation, a Section 8, not-for-profit entity. We are built as a neutral convergence layer: industry-led, professionally run and accountable for whether collaboration produces measurable MSME outcomes.",
+    "label": "Paragraph: MSME Catalyst is operated by Digital Growth In…",
+    "multiline": true,
+    "page": "about"
+  },
+  "about.c4": {
+    "default": "We do not own the decisions. We hold the framework.",
+    "label": "Heading: We do not own the decisions. We hold the frame…",
+    "multiline": false,
+    "page": "about"
+  },
+  "about.c5": {
+    "default": "What we do not own",
+    "label": "Subheading: What we do not own",
+    "multiline": false,
+    "page": "about"
+  },
+  "about.c6": {
+    "default": "MSME Catalyst does not own the lender decision, the legal outcome, the customer relationship or the participant's data.",
+    "label": "Paragraph: MSME Catalyst does not own the lender decision…",
+    "multiline": true,
+    "page": "about"
+  },
+  "about.c7": {
+    "default": "What we hold in trust",
+    "label": "Subheading: What we hold in trust",
+    "multiline": false,
+    "page": "about"
+  },
+  "about.c8": {
+    "default": "MSME Catalyst holds the shared operating framework and the aggregated evidence — on behalf of the whole ecosystem, not any one participant.",
+    "label": "Paragraph: MSME Catalyst holds the shared operating frame…",
+    "multiline": true,
+    "page": "about"
+  },
+  "about.c9": {
+    "default": "What We Do Not Do",
+    "label": "Subheading: What We Do Not Do",
+    "multiline": false,
+    "page": "about"
+  },
   "about.heading": {
     "default": "Industry-led, professionally run, accountable for outcomes.",
     "label": "Hero heading",
@@ -16,6 +160,198 @@
     "label": "Hero intro",
     "multiline": true,
     "page": "about"
+  },
+  "approach.c1": {
+    "default": "Home",
+    "label": "Link: Home",
+    "multiline": false,
+    "page": "approach"
+  },
+  "approach.c10": {
+    "default": "One door, five functions",
+    "label": "Heading: One door, five functions",
+    "multiline": false,
+    "page": "approach"
+  },
+  "approach.c11": {
+    "default": "The Capability Centre coordinates — it does not replace the institutions it connects to.",
+    "label": "Paragraph: The Capability Centre coordinates — it does no…",
+    "multiline": true,
+    "page": "approach"
+  },
+  "approach.c12": {
+    "default": "Academic &amp; apprenticeship-linked support",
+    "label": "Subheading: Academic & apprenticeship-linked support",
+    "multiline": false,
+    "page": "approach"
+  },
+  "approach.c13": {
+    "default": "Skilling and talent pathways connected to real cluster needs.",
+    "label": "Paragraph: Skilling and talent pathways connected to real…",
+    "multiline": true,
+    "page": "approach"
+  },
+  "approach.c14": {
+    "default": "Business &amp; growth handholding",
+    "label": "Subheading: Business & growth handholding",
+    "multiline": false,
+    "page": "approach"
+  },
+  "approach.c15": {
+    "default": "Managerial, digital and operational support for the enterprise journey.",
+    "label": "Paragraph: Managerial, digital and operational support fo…",
+    "multiline": true,
+    "page": "approach"
+  },
+  "approach.c16": {
+    "default": "Finance &amp; receivables support",
+    "label": "Subheading: Finance & receivables support",
+    "multiline": false,
+    "page": "approach"
+  },
+  "approach.c17": {
+    "default": "Readiness and documentation — not lending decisions, which stay with lenders.",
+    "label": "Paragraph: Readiness and documentation — not lending deci…",
+    "multiline": true,
+    "page": "approach"
+  },
+  "approach.c18": {
+    "default": "Legal, commercial-friction &amp; ODR referral",
+    "label": "Subheading: Legal, commercial-friction & ODR referral",
+    "multiline": false,
+    "page": "approach"
+  },
+  "approach.c19": {
+    "default": "Case preparation and neutral referral — not legal advice or adjudication.",
+    "label": "Paragraph: Case preparation and neutral referral — not le…",
+    "multiline": true,
+    "page": "approach"
+  },
+  "approach.c1_href": {
+    "default": "index.html",
+    "label": "Link URL: Home",
+    "multiline": false,
+    "page": "approach"
+  },
+  "approach.c2": {
+    "default": "Start with demand",
+    "label": "Subheading: Start with demand",
+    "multiline": false,
+    "page": "approach"
+  },
+  "approach.c20": {
+    "default": "Ecosystem coordination",
+    "label": "Subheading: Ecosystem coordination",
+    "multiline": false,
+    "page": "approach"
+  },
+  "approach.c21": {
+    "default": "Convening the right participants around a live need, then tracking outcomes.",
+    "label": "Paragraph: Convening the right participants around a live…",
+    "multiline": true,
+    "page": "approach"
+  },
+  "approach.c22": {
+    "default": "Evidence everyone can see",
+    "label": "Heading: Evidence everyone can see",
+    "multiline": false,
+    "page": "approach"
+  },
+  "approach.c23": {
+    "default": "Scorecards make a cluster legible — turning scattered signals into a shared picture that participants can act on together.",
+    "label": "Paragraph: Scorecards make a cluster legible — turning sc…",
+    "multiline": true,
+    "page": "approach"
+  },
+  "approach.c24": {
+    "default": "Enterprise and cluster <strong>readiness</strong>",
+    "label": "List item: Enterprise and cluster readiness",
+    "multiline": true,
+    "page": "approach"
+  },
+  "approach.c25": {
+    "default": "<strong>Payment friction</strong> and receivables health",
+    "label": "List item: Payment friction and receivables health",
+    "multiline": true,
+    "page": "approach"
+  },
+  "approach.c26": {
+    "default": "<strong>Capability needs</strong> — technical, managerial, digital, legal",
+    "label": "List item: Capability needs — technical, managerial, digi…",
+    "multiline": true,
+    "page": "approach"
+  },
+  "approach.c27": {
+    "default": "<strong>Market linkage</strong> and buyer access",
+    "label": "List item: Market linkage and buyer access",
+    "multiline": true,
+    "page": "approach"
+  },
+  "approach.c28": {
+    "default": "<strong>Capital pathways</strong> and documentation gaps",
+    "label": "List item: Capital pathways and documentation gaps",
+    "multiline": true,
+    "page": "approach"
+  },
+  "approach.c29": {
+    "default": "MSMEs remain free to choose. No exclusive tie-ins. Ever.",
+    "label": "Heading: MSMEs remain free to choose. No exclusive tie-…",
+    "multiline": false,
+    "page": "approach"
+  },
+  "approach.c3": {
+    "default": "We build ecosystems around real anchors, buyers, products, supply-chain needs and markets — rather than isolated supply-side interventions. Demand is the organising principle, because demand is what makes every other form of support worth using.",
+    "label": "Paragraph: We build ecosystems around real anchors, buyer…",
+    "multiline": true,
+    "page": "approach"
+  },
+  "approach.c30": {
+    "default": "See the programmes",
+    "label": "Link: See the programmes",
+    "multiline": false,
+    "page": "approach"
+  },
+  "approach.c30_href": {
+    "default": "programmes.html",
+    "label": "Link URL: See the programmes",
+    "multiline": false,
+    "page": "approach"
+  },
+  "approach.c4": {
+    "default": "Build a Cluster Capability Centre",
+    "label": "Subheading: Build a Cluster Capability Centre",
+    "multiline": false,
+    "page": "approach"
+  },
+  "approach.c5": {
+    "default": "The Capability Centre is one door into a working MSME support system. It is <strong>not</strong> a lender, college, ODR platform or legal service — it is the coordination point that makes those services reachable.",
+    "label": "Paragraph: The Capability Centre is one door into a worki…",
+    "multiline": true,
+    "page": "approach"
+  },
+  "approach.c6": {
+    "default": "Use shared evidence",
+    "label": "Subheading: Use shared evidence",
+    "multiline": false,
+    "page": "approach"
+  },
+  "approach.c7": {
+    "default": "Cluster scorecards track readiness, payment friction, capability needs, market linkage and capital pathways — so decisions are grounded in what is actually happening on the ground.",
+    "label": "Paragraph: Cluster scorecards track readiness, payment fr…",
+    "multiline": true,
+    "page": "approach"
+  },
+  "approach.c8": {
+    "default": "Protect neutrality",
+    "label": "Subheading: Protect neutrality",
+    "multiline": false,
+    "page": "approach"
+  },
+  "approach.c9": {
+    "default": "MSMEs remain free to choose providers. No participant gets exclusive access or preferred tie-ins. Neutrality is not a slogan here; it is an operating rule.",
+    "label": "Paragraph: MSMEs remain free to choose providers. No part…",
+    "multiline": true,
+    "page": "approach"
   },
   "approach.heading": {
     "default": "Start with demand. Build capability. Share evidence. Protect neutrality.",
@@ -35,6 +371,72 @@
     "multiline": true,
     "page": "approach"
   },
+  "blogs.c1": {
+    "default": "Home",
+    "label": "Link: Home",
+    "multiline": false,
+    "page": "blogs"
+  },
+  "blogs.c1_href": {
+    "default": "index.html",
+    "label": "Link URL: Home",
+    "multiline": false,
+    "page": "blogs"
+  },
+  "blogs.c2": {
+    "default": "← Back to Knowledge Hub",
+    "label": "Link: ← Back to Knowledge Hub",
+    "multiline": false,
+    "page": "blogs"
+  },
+  "blogs.c2_href": {
+    "default": "knowledge.html",
+    "label": "Link URL: ← Back to Knowledge Hub",
+    "multiline": false,
+    "page": "blogs"
+  },
+  "blogs.c3": {
+    "default": "The featured post headline appears here",
+    "label": "Subheading: The featured post headline appears here",
+    "multiline": false,
+    "page": "blogs"
+  },
+  "blogs.c4": {
+    "default": "Set any article as the featured piece in the CMS. Includes author details, related articles and social sharing.",
+    "label": "Paragraph: Set any article as the featured piece in the C…",
+    "multiline": true,
+    "page": "blogs"
+  },
+  "blogs.c5": {
+    "default": "Read article",
+    "label": "Link: Read article",
+    "multiline": false,
+    "page": "blogs"
+  },
+  "blogs.c6": {
+    "default": "Newsletter",
+    "label": "Subheading: Newsletter",
+    "multiline": false,
+    "page": "blogs"
+  },
+  "blogs.c7": {
+    "default": "Occasional, useful. No noise.",
+    "label": "Paragraph: Occasional, useful. No noise.",
+    "multiline": true,
+    "page": "blogs"
+  },
+  "blogs.c8": {
+    "default": "Editorial workflow",
+    "label": "Subheading: Editorial workflow",
+    "multiline": false,
+    "page": "blogs"
+  },
+  "blogs.c9": {
+    "default": "Draft → Review → Published → Archived, managed in the admin CMS with SEO fields and a social-share image.",
+    "label": "Paragraph: Draft → Review → Published → Archived, managed…",
+    "multiline": true,
+    "page": "blogs"
+  },
   "blogs.heading": {
     "default": "Notes from the ground.",
     "label": "Hero heading",
@@ -53,6 +455,144 @@
     "multiline": true,
     "page": "blogs"
   },
+  "contact.c1": {
+    "default": "Home",
+    "label": "Link: Home",
+    "multiline": false,
+    "page": "contact"
+  },
+  "contact.c10": {
+    "default": "Registered office",
+    "label": "Subheading: Registered office",
+    "multiline": false,
+    "page": "contact"
+  },
+  "contact.c11": {
+    "default": "Digital Growth Infrastructure Foundation (Section 8)<br/>CIN: U94990MH2026NPL468930<br/>WeWork 247 Park, 13th Floor, Vikhroli Corp, Mumbai, Mumbai, Mumbai – 400079, Maharashtra",
+    "label": "Paragraph: Digital Growth Infrastructure Foundation (Sect…",
+    "multiline": true,
+    "page": "contact"
+  },
+  "contact.c12": {
+    "default": "Follow",
+    "label": "Subheading: Follow",
+    "multiline": false,
+    "page": "contact"
+  },
+  "contact.c13": {
+    "default": "in",
+    "label": "Link: in",
+    "multiline": false,
+    "page": "contact"
+  },
+  "contact.c14": {
+    "default": "𝕏",
+    "label": "Link: 𝕏",
+    "multiline": false,
+    "page": "contact"
+  },
+  "contact.c15": {
+    "default": "◎",
+    "label": "Link: ◎",
+    "multiline": false,
+    "page": "contact"
+  },
+  "contact.c16": {
+    "default": "▶",
+    "label": "Link: ▶",
+    "multiline": false,
+    "page": "contact"
+  },
+  "contact.c17": {
+    "default": "f",
+    "label": "Link: f",
+    "multiline": false,
+    "page": "contact"
+  },
+  "contact.c18": {
+    "default": "♫",
+    "label": "Link: ♫",
+    "multiline": false,
+    "page": "contact"
+  },
+  "contact.c19": {
+    "default": "Statutory details",
+    "label": "Subheading: Statutory details",
+    "multiline": false,
+    "page": "contact"
+  },
+  "contact.c1_href": {
+    "default": "index.html",
+    "label": "Link URL: Home",
+    "multiline": false,
+    "page": "contact"
+  },
+  "contact.c2": {
+    "default": "General enquiries",
+    "label": "Subheading: General enquiries",
+    "multiline": false,
+    "page": "contact"
+  },
+  "contact.c20": {
+    "default": "<strong>Digital Growth Infrastructure Foundation</strong> · Section 8 not-for-profit company",
+    "label": "Paragraph: Digital Growth Infrastructure Foundation · Sec…",
+    "multiline": true,
+    "page": "contact"
+  },
+  "contact.c21": {
+    "default": "CIN: U94990MH2026NPL468930",
+    "label": "Paragraph: CIN: U94990MH2026NPL468930",
+    "multiline": true,
+    "page": "contact"
+  },
+  "contact.c22": {
+    "default": "Registered Office: WeWork 247 Park, 13th Floor, Vikhroli Corp, Mumbai, Mumbai, Mumbai – 400079, Maharashtra",
+    "label": "Paragraph: Registered Office: WeWork 247 Park, 13th Floor…",
+    "multiline": true,
+    "page": "contact"
+  },
+  "contact.c3": {
+    "default": "<a class=\"textlink\" href=\"mailto:info@msmecatalyst.org\">info@msmecatalyst.org</a>",
+    "label": "Paragraph: info@msmecatalyst.org",
+    "multiline": true,
+    "page": "contact"
+  },
+  "contact.c4": {
+    "default": "Membership",
+    "label": "Subheading: Membership",
+    "multiline": false,
+    "page": "contact"
+  },
+  "contact.c5": {
+    "default": "<a class=\"textlink\" href=\"mailto:membership@msmecatalyst.org\">membership@msmecatalyst.org</a>",
+    "label": "Paragraph: membership@msmecatalyst.org",
+    "multiline": true,
+    "page": "contact"
+  },
+  "contact.c6": {
+    "default": "Donors &amp; partnerships",
+    "label": "Subheading: Donors & partnerships",
+    "multiline": false,
+    "page": "contact"
+  },
+  "contact.c7": {
+    "default": "<a class=\"textlink\" href=\"mailto:partnerships@msmecatalyst.org\">partnerships@msmecatalyst.org</a>",
+    "label": "Paragraph: partnerships@msmecatalyst.org",
+    "multiline": true,
+    "page": "contact"
+  },
+  "contact.c8": {
+    "default": "ODR support",
+    "label": "Subheading: ODR support",
+    "multiline": false,
+    "page": "contact"
+  },
+  "contact.c9": {
+    "default": "<a class=\"textlink\" href=\"odr/apply.html\">Apply for ODR support →</a>",
+    "label": "Paragraph: Apply for ODR support →",
+    "multiline": true,
+    "page": "contact"
+  },
   "contact.heading": {
     "default": "Let's find the right door.",
     "label": "Hero heading",
@@ -70,6 +610,36 @@
     "label": "Hero intro",
     "multiline": true,
     "page": "contact"
+  },
+  "events.c1": {
+    "default": "Home",
+    "label": "Link: Home",
+    "multiline": false,
+    "page": "events"
+  },
+  "events.c1_href": {
+    "default": "index.html",
+    "label": "Link URL: Home",
+    "multiline": false,
+    "page": "events"
+  },
+  "events.c2": {
+    "default": "← Back to Knowledge Hub",
+    "label": "Link: ← Back to Knowledge Hub",
+    "multiline": false,
+    "page": "events"
+  },
+  "events.c2_href": {
+    "default": "knowledge.html",
+    "label": "Link URL: ← Back to Knowledge Hub",
+    "multiline": false,
+    "page": "events"
+  },
+  "events.c3": {
+    "default": "Each item is a CMS entry (Events &amp; Labs collection): title, summary, thumbnail, category, date, tags, external link and visibility status.",
+    "label": "Paragraph: Each item is a CMS entry (Events & Labs collec…",
+    "multiline": true,
+    "page": "events"
   },
   "events.heading": {
     "default": "Where the ecosystem does the work together.",
@@ -107,6 +677,24 @@
     "multiline": true,
     "page": "global"
   },
+  "global.foot_head_governance": {
+    "default": "Governance",
+    "label": "Footer heading: Governance",
+    "multiline": false,
+    "page": "global"
+  },
+  "global.foot_head_knowledge_hub": {
+    "default": "Knowledge Hub",
+    "label": "Footer heading: Knowledge Hub",
+    "multiline": false,
+    "page": "global"
+  },
+  "global.foot_head_platform": {
+    "default": "Platform",
+    "label": "Footer heading: Platform",
+    "multiline": false,
+    "page": "global"
+  },
   "global.footer_disclaimer": {
     "default": "<strong>What We Do Not Do.</strong> MSME Catalyst does not lend, underwrite, provide legal advice, adjudicate disputes, operate an ODR platform, guarantee recovery, or replace existing schemes, courts, arbitrators, universities or implementation partners. We facilitate structured access to relevant ecosystem pathways. Independent lenders, ODR providers and other institutions retain their own eligibility, commercial, legal and operational decisions.",
     "label": "Footer legal disclaimer",
@@ -119,95 +707,569 @@
     "multiline": true,
     "page": "global"
   },
-  "home.gap1_desc": {
+  "global.nav_about": {
+    "default": "About Us",
+    "label": "Nav: About Us",
+    "multiline": false,
+    "page": "global"
+  },
+  "global.nav_about_advisory": {
+    "default": "Advisory Body",
+    "label": "Nav: Advisory Body",
+    "multiline": false,
+    "page": "global"
+  },
+  "global.nav_about_council": {
+    "default": "Governing Council",
+    "label": "Nav: Governing Council",
+    "multiline": false,
+    "page": "global"
+  },
+  "global.nav_about_neutrality": {
+    "default": "Why Neutrality",
+    "label": "Nav: Why Neutrality",
+    "multiline": false,
+    "page": "global"
+  },
+  "global.nav_about_secretariat": {
+    "default": "Secretariat",
+    "label": "Nav: Secretariat",
+    "multiline": false,
+    "page": "global"
+  },
+  "global.nav_about_who": {
+    "default": "Who We Are",
+    "label": "Nav: Who We Are",
+    "multiline": false,
+    "page": "global"
+  },
+  "global.nav_approach": {
+    "default": "Our Approach",
+    "label": "Nav: Our Approach",
+    "multiline": false,
+    "page": "global"
+  },
+  "global.nav_approach_capability_centres": {
+    "default": "Cluster Capability Centres",
+    "label": "Nav: Cluster Capability Centres",
+    "multiline": false,
+    "page": "global"
+  },
+  "global.nav_approach_convergence": {
+    "default": "Convergence Model",
+    "label": "Nav: Convergence Model",
+    "multiline": false,
+    "page": "global"
+  },
+  "global.nav_blogs": {
+    "default": "Blogs",
+    "label": "Nav: Blogs",
+    "multiline": false,
+    "page": "global"
+  },
+  "global.nav_contact": {
+    "default": "Contact Us",
+    "label": "Nav: Contact Us",
+    "multiline": false,
+    "page": "global"
+  },
+  "global.nav_events": {
+    "default": "Events & Labs",
+    "label": "Nav: Events & Labs",
+    "multiline": false,
+    "page": "global"
+  },
+  "global.nav_index": {
+    "default": "Home",
+    "label": "Nav: Home",
+    "multiline": false,
+    "page": "global"
+  },
+  "global.nav_join": {
+    "default": "Join",
+    "label": "Nav: Join button",
+    "multiline": false,
+    "page": "global"
+  },
+  "global.nav_join_mobile": {
+    "default": "Join MSME Catalyst",
+    "label": "Nav: Join button (mobile)",
+    "multiline": false,
+    "page": "global"
+  },
+  "global.nav_knowledge": {
+    "default": "Knowledge Hub",
+    "label": "Nav: Knowledge Hub",
+    "multiline": false,
+    "page": "global"
+  },
+  "global.nav_membership": {
+    "default": "Membership",
+    "label": "Nav: Membership",
+    "multiline": false,
+    "page": "global"
+  },
+  "global.nav_membership_donors": {
+    "default": "Donors & Funding Partners",
+    "label": "Nav: Donors & Funding Partners",
+    "multiline": false,
+    "page": "global"
+  },
+  "global.nav_membership_membership": {
+    "default": "Membership",
+    "label": "Nav: Membership",
+    "multiline": false,
+    "page": "global"
+  },
+  "global.nav_odr_support": {
+    "default": "ODR Support",
+    "label": "Nav: ODR Support",
+    "multiline": false,
+    "page": "global"
+  },
+  "global.nav_podcasts": {
+    "default": "Podcasts",
+    "label": "Nav: Podcasts",
+    "multiline": false,
+    "page": "global"
+  },
+  "global.nav_programmes": {
+    "default": "Programmes",
+    "label": "Nav: Programmes",
+    "multiline": false,
+    "page": "global"
+  },
+  "global.nav_reports": {
+    "default": "Reports & Papers",
+    "label": "Nav: Reports & Papers",
+    "multiline": false,
+    "page": "global"
+  },
+  "index.c1": {
+    "default": "Explore Our Approach",
+    "label": "Link: Explore Our Approach",
+    "multiline": false,
+    "page": "index"
+  },
+  "index.c10": {
+    "default": "Practical local capability",
+    "label": "Subheading: Practical local capability",
+    "multiline": false,
+    "page": "index"
+  },
+  "index.c11": {
+    "default": "Technical, managerial, digital and legal handholding available through one working door.",
+    "label": "Paragraph: Technical, managerial, digital and legal handh…",
+    "multiline": true,
+    "page": "index"
+  },
+  "index.c12": {
+    "default": "Relevant capital &amp; market pathways",
+    "label": "Subheading: Relevant capital & market pathways",
+    "multiline": false,
+    "page": "index"
+  },
+  "index.c13": {
+    "default": "Readiness and documentation that connect enterprises to the routes that actually fit them.",
+    "label": "Paragraph: Readiness and documentation that connect enter…",
+    "multiline": true,
+    "page": "index"
+  },
+  "index.c14": {
+    "default": "Shared evidence &amp; accountability",
+    "label": "Subheading: Shared evidence & accountability",
+    "multiline": false,
+    "page": "index"
+  },
+  "index.c15": {
+    "default": "Cluster scorecards track readiness, friction and outcomes — so collaboration is measured, not assumed.",
+    "label": "Paragraph: Cluster scorecards track readiness, friction a…",
+    "multiline": true,
+    "page": "index"
+  },
+  "index.c16": {
+    "default": "We hold the shared operating framework — not the outcomes",
+    "label": "Heading: We hold the shared operating framework — not t…",
+    "multiline": false,
+    "page": "index"
+  },
+  "index.c17": {
+    "default": "MSME Catalyst is the neutral layer that convenes, prepares and tracks. It does not lend, underwrite or adjudicate — independent institutions retain their own eligibility, commercial and legal decisions.",
+    "label": "Paragraph: MSME Catalyst is the neutral layer that conven…",
+    "multiline": true,
+    "page": "index"
+  },
+  "index.c18": {
+    "default": "See how the model works",
+    "label": "Link: See how the model works",
+    "multiline": false,
+    "page": "index"
+  },
+  "index.c18_href": {
+    "default": "approach.html",
+    "label": "Link URL: See how the model works",
+    "multiline": false,
+    "page": "index"
+  },
+  "index.c19": {
+    "default": "Creates a shared cluster operating framework",
+    "label": "Subheading: Creates a shared cluster operating framework",
+    "multiline": false,
+    "page": "index"
+  },
+  "index.c1_href": {
+    "default": "approach.html",
+    "label": "Link URL: Explore Our Approach",
+    "multiline": false,
+    "page": "index"
+  },
+  "index.c2": {
+    "default": "Join MSME Catalyst",
+    "label": "Link: Join MSME Catalyst",
+    "multiline": false,
+    "page": "index"
+  },
+  "index.c20": {
+    "default": "One common way of working across every participant in a cluster.",
+    "label": "Paragraph: One common way of working across every partici…",
+    "multiline": true,
+    "page": "index"
+  },
+  "index.c21": {
+    "default": "Convenes relevant institutions",
+    "label": "Subheading: Convenes relevant institutions",
+    "multiline": false,
+    "page": "index"
+  },
+  "index.c22": {
+    "default": "The right anchors, lenders, capability and legal partners around a live need.",
+    "label": "Paragraph: The right anchors, lenders, capability and leg…",
+    "multiline": true,
+    "page": "index"
+  },
+  "index.c23": {
+    "default": "Prepares enterprises and cases",
+    "label": "Subheading: Prepares enterprises and cases",
+    "multiline": false,
+    "page": "index"
+  },
+  "index.c24": {
+    "default": "Readiness, documentation and case preparation so support can actually land.",
+    "label": "Paragraph: Readiness, documentation and case preparation…",
+    "multiline": true,
+    "page": "index"
+  },
+  "index.c25": {
+    "default": "Coordinates referrals &amp; tracks outcomes",
+    "label": "Subheading: Coordinates referrals & tracks outcomes",
+    "multiline": false,
+    "page": "index"
+  },
+  "index.c26": {
+    "default": "Neutral referral, then measurement of what happened.",
+    "label": "Paragraph: Neutral referral, then measurement of what hap…",
+    "multiline": true,
+    "page": "index"
+  },
+  "index.c27": {
+    "default": "Publishes aggregated execution insight",
+    "label": "Subheading: Publishes aggregated execution insight",
+    "multiline": false,
+    "page": "index"
+  },
+  "index.c28": {
+    "default": "Shared, de-identified learning that improves the whole system.",
+    "label": "Paragraph: Shared, de-identified learning that improves t…",
+    "multiline": true,
+    "page": "index"
+  },
+  "index.c29": {
+    "default": "Shared infrastructure, built by many hands",
+    "label": "Heading: Shared infrastructure, built by many hands",
+    "multiline": false,
+    "page": "index"
+  },
+  "index.c2_href": {
+    "default": "membership.html",
+    "label": "Link URL: Join MSME Catalyst",
+    "multiline": false,
+    "page": "index"
+  },
+  "index.c3": {
+    "default": "Apply for ODR Support",
+    "label": "Link: Apply for ODR Support",
+    "multiline": false,
+    "page": "index"
+  },
+  "index.c30": {
+    "default": "No single participant owns the cluster. Each holds a role; MSME Catalyst holds the framework and the evidence in trust.",
+    "label": "Paragraph: No single participant owns the cluster. Each h…",
+    "multiline": true,
+    "page": "index"
+  },
+  "index.c31": {
+    "default": "Join MSME Catalyst",
+    "label": "Link: Join MSME Catalyst",
+    "multiline": false,
+    "page": "index"
+  },
+  "index.c31_href": {
+    "default": "membership.html",
+    "label": "Link URL: Join MSME Catalyst",
+    "multiline": false,
+    "page": "index"
+  },
+  "index.c32": {
+    "default": "Apply for ODR Support",
+    "label": "Link: Apply for ODR Support",
+    "multiline": false,
+    "page": "index"
+  },
+  "index.c32_href": {
+    "default": "odr-support.html",
+    "label": "Link URL: Apply for ODR Support",
+    "multiline": false,
+    "page": "index"
+  },
+  "index.c33": {
+    "default": "Fund the infrastructure",
+    "label": "Link: Fund the infrastructure",
+    "multiline": false,
+    "page": "index"
+  },
+  "index.c33_href": {
+    "default": "membership.html#donors",
+    "label": "Link URL: Fund the infrastructure",
+    "multiline": false,
+    "page": "index"
+  },
+  "index.c3_href": {
+    "default": "odr-support.html",
+    "label": "Link URL: Apply for ODR Support",
+    "multiline": false,
+    "page": "index"
+  },
+  "index.c4": {
+    "default": "MSME Catalyst helps enterprises close four gaps at once",
+    "label": "Heading: MSME Catalyst helps enterprises close four gap…",
+    "multiline": false,
+    "page": "index"
+  },
+  "index.c5": {
+    "default": "When support works together, the enterprise feels the difference",
+    "label": "Heading: When support works together, the enterprise fe…",
+    "multiline": false,
+    "page": "index"
+  },
+  "index.c6": {
+    "default": "Clearer demand",
+    "label": "Subheading: Clearer demand",
+    "multiline": false,
+    "page": "index"
+  },
+  "index.c7": {
+    "default": "Ecosystems built around real anchors, buyers and markets — not isolated supply-side interventions.",
+    "label": "Paragraph: Ecosystems built around real anchors, buyers a…",
+    "multiline": true,
+    "page": "index"
+  },
+  "index.c8": {
+    "default": "More predictable cash flow",
+    "label": "Subheading: More predictable cash flow",
+    "multiline": false,
+    "page": "index"
+  },
+  "index.c9": {
+    "default": "Payment friction is surfaced early and routed to the right support before it becomes failure.",
+    "label": "Paragraph: Payment friction is surfaced early and routed…",
+    "multiline": true,
+    "page": "index"
+  },
+  "index.gap1_desc": {
     "default": "Receivables and payment certainty.",
     "label": "Gap1 Desc",
     "multiline": false,
-    "page": "home"
+    "page": "index"
   },
-  "home.gap1_title": {
+  "index.gap1_title": {
     "default": "Cash-flow gap",
     "label": "Gap1 Title",
     "multiline": false,
-    "page": "home"
+    "page": "index"
   },
-  "home.gap2_desc": {
+  "index.gap2_desc": {
     "default": "Demand-side linkage and buyer access.",
     "label": "Gap2 Desc",
     "multiline": false,
-    "page": "home"
+    "page": "index"
   },
-  "home.gap2_title": {
+  "index.gap2_title": {
     "default": "Market gap",
     "label": "Gap2 Title",
     "multiline": false,
-    "page": "home"
+    "page": "index"
   },
-  "home.gap3_desc": {
+  "index.gap3_desc": {
     "default": "Technical, managerial, digital and legal handholding.",
     "label": "Gap3 Desc",
     "multiline": false,
-    "page": "home"
+    "page": "index"
   },
-  "home.gap3_title": {
+  "index.gap3_title": {
     "default": "Capability gap",
     "label": "Gap3 Title",
     "multiline": false,
-    "page": "home"
+    "page": "index"
   },
-  "home.gap4_desc": {
+  "index.gap4_desc": {
     "default": "Preparation, documentation and access pathways.",
     "label": "Gap4 Desc",
     "multiline": false,
-    "page": "home"
+    "page": "index"
   },
-  "home.gap4_title": {
+  "index.gap4_title": {
     "default": "Growth-capital gap",
     "label": "Gap4 Title",
     "multiline": false,
-    "page": "home"
+    "page": "index"
   },
-  "home.hero_heading": {
+  "index.hero_heading": {
     "default": "India does not lack MSME support.<br><span style='color:var(--orange)'>It lacks convergence.</span>",
     "label": "Hero heading (HTML allowed)",
     "multiline": false,
-    "page": "home"
+    "page": "index"
   },
-  "home.hero_kicker": {
+  "index.hero_kicker": {
     "default": "MSME Catalyst | The Convergence Layer",
     "label": "Hero kicker",
     "multiline": false,
-    "page": "home"
+    "page": "index"
   },
-  "home.hero_sub": {
+  "index.hero_sub": {
     "default": "MSME Catalyst makes existing support work together around real MSME clusters and business journeys — a neutral, not-for-profit platform that brings anchors, MSMEs, lenders, technology providers, capability institutions, legal and dispute-resolution partners and government into one accountable operating model.",
     "label": "Hero sub-copy",
     "multiline": true,
-    "page": "home"
+    "page": "index"
   },
-  "home.problem_body": {
+  "index.problem_body": {
     "default": "Support exists. Schemes, lenders, universities, technology and legal routes are all available. But they often reach the enterprise <strong>separately</strong>, on different timelines, through different doors — so the enterprise carries the burden of stitching them together alone.",
     "label": "Problem body",
     "multiline": true,
-    "page": "home"
+    "page": "index"
   },
-  "home.problem_heading": {
+  "index.problem_heading": {
     "default": "An MSME rarely has one isolated problem.",
     "label": "Problem Heading",
     "multiline": false,
-    "page": "home"
+    "page": "index"
   },
-  "home.problem_kicker": {
+  "index.problem_kicker": {
     "default": "The problem",
     "label": "Problem Kicker",
     "multiline": false,
-    "page": "home"
+    "page": "index"
   },
-  "home.problem_lead": {
+  "index.problem_lead": {
     "default": "A single enterprise may face delayed receivables, weak buyer visibility, limited documentation, poor access to capability support and unclear capital pathways — all at the same time.",
     "label": "Problem lead",
     "multiline": true,
-    "page": "home"
+    "page": "index"
+  },
+  "knowledge.c1": {
+    "default": "Home",
+    "label": "Link: Home",
+    "multiline": false,
+    "page": "knowledge"
+  },
+  "knowledge.c1_href": {
+    "default": "index.html",
+    "label": "Link URL: Home",
+    "multiline": false,
+    "page": "knowledge"
+  },
+  "knowledge.c2": {
+    "default": "<div class=\"ico\">📊</div><h3>Reports &amp; Papers</h3><p>Reports, white papers, cluster maps, scorecards and research.</p><span class=\"textlink mt-s\" style=\"display:inline-block\">Browse →</span>",
+    "label": "Link: 📊 Reports & Papers Reports, white papers, clus…",
+    "multiline": false,
+    "page": "knowledge"
+  },
+  "knowledge.c2_href": {
+    "default": "reports.html",
+    "label": "Link URL: 📊 Reports & Papers Reports, white ",
+    "multiline": false,
+    "page": "knowledge"
+  },
+  "knowledge.c3": {
+    "default": "<div class=\"ico orange\">✍️</div><h3>Blogs</h3><p>Short, practical writing on convergence, receivables, capability and capital.</p><span class=\"textlink mt-s\" style=\"display:inline-block\">Read →</span>",
+    "label": "Link: ✍️ Blogs Short, practical writing on convergen…",
+    "multiline": false,
+    "page": "knowledge"
+  },
+  "knowledge.c3_href": {
+    "default": "blogs.html",
+    "label": "Link URL: ✍️ Blogs Short, practical writing ",
+    "multiline": false,
+    "page": "knowledge"
+  },
+  "knowledge.c4": {
+    "default": "<div class=\"ico\">🎙️</div><h3>Podcasts</h3><p>Conversations with practitioners, institutions and policymakers.</p><span class=\"textlink mt-s\" style=\"display:inline-block\">Listen →</span>",
+    "label": "Link: 🎙️ Podcasts Conversations with practitioners,…",
+    "multiline": false,
+    "page": "knowledge"
+  },
+  "knowledge.c4_href": {
+    "default": "podcasts.html",
+    "label": "Link URL: 🎙️ Podcasts Conversations with pra",
+    "multiline": false,
+    "page": "knowledge"
+  },
+  "knowledge.c5": {
+    "default": "<div class=\"ico orange\">🗓️</div><h3>Events &amp; Labs</h3><p>Working labs, roundtables and convenings.</p><span class=\"textlink mt-s\" style=\"display:inline-block\">Explore →</span>",
+    "label": "Link: 🗓️ Events & Labs Working labs, roundtables and…",
+    "multiline": false,
+    "page": "knowledge"
+  },
+  "knowledge.c5_href": {
+    "default": "events.html",
+    "label": "Link URL: 🗓️ Events & Labs Working labs, rou",
+    "multiline": false,
+    "page": "knowledge"
+  },
+  "knowledge.c6": {
+    "default": "Join MSME Catalyst",
+    "label": "Link: Join MSME Catalyst",
+    "multiline": false,
+    "page": "knowledge"
+  },
+  "knowledge.c6_href": {
+    "default": "membership.html",
+    "label": "Link URL: Join MSME Catalyst",
+    "multiline": false,
+    "page": "knowledge"
+  },
+  "knowledge.c7": {
+    "default": "Apply for ODR Support",
+    "label": "Link: Apply for ODR Support",
+    "multiline": false,
+    "page": "knowledge"
+  },
+  "knowledge.c7_href": {
+    "default": "odr-support.html",
+    "label": "Link URL: Apply for ODR Support",
+    "multiline": false,
+    "page": "knowledge"
+  },
+  "knowledge.c8": {
+    "default": "Fund the infrastructure",
+    "label": "Link: Fund the infrastructure",
+    "multiline": false,
+    "page": "knowledge"
+  },
+  "knowledge.c8_href": {
+    "default": "membership.html#donors",
+    "label": "Link URL: Fund the infrastructure",
+    "multiline": false,
+    "page": "knowledge"
   },
   "knowledge.heading": {
     "default": "Evidence, insight and convening — in one place.",
@@ -227,6 +1289,258 @@
     "multiline": true,
     "page": "knowledge"
   },
+  "membership.c1": {
+    "default": "Home",
+    "label": "Link: Home",
+    "multiline": false,
+    "page": "membership"
+  },
+  "membership.c10": {
+    "default": "Participate in real cluster pilots.",
+    "label": "Paragraph: Participate in real cluster pilots.",
+    "multiline": true,
+    "page": "membership"
+  },
+  "membership.c11": {
+    "default": "Partnership access",
+    "label": "Subheading: Partnership access",
+    "multiline": false,
+    "page": "membership"
+  },
+  "membership.c12": {
+    "default": "Structured routes to collaborate.",
+    "label": "Paragraph: Structured routes to collaborate.",
+    "multiline": true,
+    "page": "membership"
+  },
+  "membership.c13": {
+    "default": "Readiness &amp; friction intelligence",
+    "label": "Subheading: Readiness & friction intelligence",
+    "multiline": false,
+    "page": "membership"
+  },
+  "membership.c14": {
+    "default": "Aggregated cluster insight.",
+    "label": "Paragraph: Aggregated cluster insight.",
+    "multiline": true,
+    "page": "membership"
+  },
+  "membership.c15": {
+    "default": "Credible visibility",
+    "label": "Subheading: Credible visibility",
+    "multiline": false,
+    "page": "membership"
+  },
+  "membership.c16": {
+    "default": "Recognition tied to contribution.",
+    "label": "Paragraph: Recognition tied to contribution.",
+    "multiline": true,
+    "page": "membership"
+  },
+  "membership.c17": {
+    "default": "Plus participation in relevant working groups and ecosystem design.",
+    "label": "Paragraph: Plus participation in relevant working groups…",
+    "multiline": true,
+    "page": "membership"
+  },
+  "membership.c18": {
+    "default": "Membership application",
+    "label": "Heading: Membership application",
+    "multiline": false,
+    "page": "membership"
+  },
+  "membership.c19": {
+    "default": "Submissions are reviewed by the Secretariat and managed in the membership CRM.",
+    "label": "Paragraph: Submissions are reviewed by the Secretariat an…",
+    "multiline": true,
+    "page": "membership"
+  },
+  "membership.c1_href": {
+    "default": "index.html",
+    "label": "Link URL: Home",
+    "multiline": false,
+    "page": "membership"
+  },
+  "membership.c2": {
+    "default": "Institutions ready to do the work",
+    "label": "Heading: Institutions ready to do the work",
+    "multiline": false,
+    "page": "membership"
+  },
+  "membership.c20": {
+    "default": "Our members",
+    "label": "Heading: Our members",
+    "multiline": false,
+    "page": "membership"
+  },
+  "membership.c21": {
+    "default": "This wall is generated automatically from active, paid CRM records — only for organisations that have given logo-display consent. Logos are never manually uploaded to the page.",
+    "label": "Paragraph: This wall is generated automatically from acti…",
+    "multiline": true,
+    "page": "membership"
+  },
+  "membership.c22": {
+    "default": "In production these tiles are populated by the CRM API (<code>GET /api/members</code>) — see the back-end. A logo appears when status is <em>Active</em> and website display is <em>Paid and Live</em>, and disappears automatically on expiry, overdue payment or Secretariat override.",
+    "label": "Paragraph: In production these tiles are populated by the…",
+    "multiline": true,
+    "page": "membership"
+  },
+  "membership.c23": {
+    "default": "Fund the infrastructure that makes MSME growth support usable.",
+    "label": "Heading: Fund the infrastructure that makes MSME growth…",
+    "multiline": false,
+    "page": "membership"
+  },
+  "membership.c24": {
+    "default": "Donor and CSR funding supports cluster capability centres, enterprise readiness, local coordination, payment-friction support, monitoring, evaluation and reusable execution playbooks.",
+    "label": "Paragraph: Donor and CSR funding supports cluster capabil…",
+    "multiline": true,
+    "page": "membership"
+  },
+  "membership.c25": {
+    "default": "Cluster capability centres",
+    "label": "Subheading: Cluster capability centres",
+    "multiline": false,
+    "page": "membership"
+  },
+  "membership.c26": {
+    "default": "The physical and human infrastructure that makes support reachable.",
+    "label": "Paragraph: The physical and human infrastructure that mak…",
+    "multiline": true,
+    "page": "membership"
+  },
+  "membership.c27": {
+    "default": "Local coordination",
+    "label": "Subheading: Local coordination",
+    "multiline": false,
+    "page": "membership"
+  },
+  "membership.c28": {
+    "default": "The convening capacity that keeps participants aligned.",
+    "label": "Paragraph: The convening capacity that keeps participants…",
+    "multiline": true,
+    "page": "membership"
+  },
+  "membership.c29": {
+    "default": "Enterprise readiness",
+    "label": "Subheading: Enterprise readiness",
+    "multiline": false,
+    "page": "membership"
+  },
+  "membership.c3": {
+    "default": "Banks, NBFCs and regulated financial institutions",
+    "label": "List item: Banks, NBFCs and regulated financial instituti…",
+    "multiline": true,
+    "page": "membership"
+  },
+  "membership.c30": {
+    "default": "Preparation and documentation that let support land.",
+    "label": "Paragraph: Preparation and documentation that let support…",
+    "multiline": true,
+    "page": "membership"
+  },
+  "membership.c31": {
+    "default": "Payment-friction support",
+    "label": "Subheading: Payment-friction support",
+    "multiline": false,
+    "page": "membership"
+  },
+  "membership.c32": {
+    "default": "Case preparation and neutral referral for receivables.",
+    "label": "Paragraph: Case preparation and neutral referral for rece…",
+    "multiline": true,
+    "page": "membership"
+  },
+  "membership.c33": {
+    "default": "Monitoring &amp; evaluation",
+    "label": "Subheading: Monitoring & evaluation",
+    "multiline": false,
+    "page": "membership"
+  },
+  "membership.c34": {
+    "default": "Scorecards, dashboards and honest measurement of outcomes.",
+    "label": "Paragraph: Scorecards, dashboards and honest measurement…",
+    "multiline": true,
+    "page": "membership"
+  },
+  "membership.c35": {
+    "default": "Reusable execution playbooks",
+    "label": "Subheading: Reusable execution playbooks",
+    "multiline": false,
+    "page": "membership"
+  },
+  "membership.c36": {
+    "default": "Learning packaged so the next cluster starts ahead.",
+    "label": "Paragraph: Learning packaged so the next cluster starts a…",
+    "multiline": true,
+    "page": "membership"
+  },
+  "membership.c37": {
+    "default": "Safeguards",
+    "label": "Subheading: Safeguards",
+    "multiline": false,
+    "page": "membership"
+  },
+  "membership.c38": {
+    "default": "Funding does not buy influence over individual lending decisions, ODR referrals, policy positions or case outcomes",
+    "label": "List item: Funding does not buy influence over individual…",
+    "multiline": true,
+    "page": "membership"
+  },
+  "membership.c39": {
+    "default": "Donors receive outcome and learning reporting, not operational control",
+    "label": "List item: Donors receive outcome and learning reporting,…",
+    "multiline": true,
+    "page": "membership"
+  },
+  "membership.c4": {
+    "default": "Fintechs, TSPs, LSPs, data and infrastructure providers",
+    "label": "List item: Fintechs, TSPs, LSPs, data and infrastructure…",
+    "multiline": true,
+    "page": "membership"
+  },
+  "membership.c40": {
+    "default": "Talk to us about funding",
+    "label": "Link: Talk to us about funding",
+    "multiline": false,
+    "page": "membership"
+  },
+  "membership.c40_href": {
+    "default": "contact.html",
+    "label": "Link URL: Talk to us about funding",
+    "multiline": false,
+    "page": "membership"
+  },
+  "membership.c5": {
+    "default": "Rating and ecosystem institutions",
+    "label": "List item: Rating and ecosystem institutions",
+    "multiline": true,
+    "page": "membership"
+  },
+  "membership.c6": {
+    "default": "Anchor corporates and market-access organisations",
+    "label": "List item: Anchor corporates and market-access organisati…",
+    "multiline": true,
+    "page": "membership"
+  },
+  "membership.c7": {
+    "default": "Funders supporting execution infrastructure",
+    "label": "List item: Funders supporting execution infrastructure",
+    "multiline": true,
+    "page": "membership"
+  },
+  "membership.c8": {
+    "default": "What members get",
+    "label": "Heading: What members get",
+    "multiline": false,
+    "page": "membership"
+  },
+  "membership.c9": {
+    "default": "Live pilot access",
+    "label": "Subheading: Live pilot access",
+    "multiline": false,
+    "page": "membership"
+  },
   "membership.heading": {
     "default": "Membership is a working role inside cluster infrastructure.",
     "label": "Hero heading",
@@ -245,23 +1559,1037 @@
     "multiline": true,
     "page": "membership"
   },
-  "odr_support.heading": {
+  "odr-about.c1": {
+    "default": "ODR Home",
+    "label": "Link: ODR Home",
+    "multiline": false,
+    "page": "odr-about"
+  },
+  "odr-about.c1_href": {
+    "default": "index.html",
+    "label": "Link URL: ODR Home",
+    "multiline": false,
+    "page": "odr-about"
+  },
+  "odr-about.c2": {
+    "default": "A neutral bridge between payment friction and resolution.",
+    "label": "Heading: A neutral bridge between payment friction and…",
+    "multiline": false,
+    "page": "odr-about"
+  },
+  "odr-about.c3": {
+    "default": "The ODR programme prepares MSMEs and refers them, neutrally, to independent providers — it never decides the outcome.",
+    "label": "Paragraph: The ODR programme prepares MSMEs and refers th…",
+    "multiline": true,
+    "page": "odr-about"
+  },
+  "odr-about.c4": {
+    "default": "Late payments are one of the most common — and most damaging — sources of stress for a small business. Money that has been earned sits unpaid, cash flow tightens, and the enterprise is forced to choose between chasing the payment and running the business.",
+    "label": "Paragraph: Late payments are one of the most common — and…",
+    "multiline": true,
+    "page": "odr-about"
+  },
+  "odr-about.c5": {
+    "default": "The MSME Catalyst ODR programme exists to reduce that burden. We help you understand what is happening, organise the evidence you already have, and see the routes available — from direct resolution and mediation to arbitration and the statutory MSEFC pathway. When you are ready, we connect you, neutrally, to an appropriate independent provider.",
+    "label": "Paragraph: The MSME Catalyst ODR programme exists to redu…",
+    "multiline": true,
+    "page": "odr-about"
+  },
+  "odr-about.c6": {
+    "default": "Who it's for",
+    "label": "Subheading: Who it's for",
+    "multiline": false,
+    "page": "odr-about"
+  },
+  "odr-about.c7": {
+    "default": "Any MSME facing payment-related commercial friction — a delayed receivable, a disputed invoice, or a stalled settlement with a buyer or counterparty.",
+    "label": "Paragraph: Any MSME facing payment-related commercial fri…",
+    "multiline": true,
+    "page": "odr-about"
+  },
+  "odr-apply.c1": {
+    "default": "ODR Home",
+    "label": "Link: ODR Home",
+    "multiline": false,
+    "page": "odr-apply"
+  },
+  "odr-apply.c1_href": {
+    "default": "index.html",
+    "label": "Link URL: ODR Home",
+    "multiline": false,
+    "page": "odr-apply"
+  },
+  "odr-apply.c2": {
+    "default": "Start with a prepared case.",
+    "label": "Heading: Start with a prepared case.",
+    "multiline": false,
+    "page": "odr-apply"
+  },
+  "odr-apply.c3": {
+    "default": "Give us the details and upload what you have. The Cluster Recovery Cell will help you organise your case and understand your routes.",
+    "label": "Paragraph: Give us the details and upload what you have.…",
+    "multiline": true,
+    "page": "odr-apply"
+  },
+  "odr-blogs.c1": {
+    "default": "ODR Home",
+    "label": "Link: ODR Home",
+    "multiline": false,
+    "page": "odr-blogs"
+  },
+  "odr-blogs.c10": {
+    "default": "Article headline to be added",
+    "label": "Subheading: Article headline to be added",
+    "multiline": false,
+    "page": "odr-blogs"
+  },
+  "odr-blogs.c11": {
+    "default": "CMS-published with categories, author profile and social sharing.",
+    "label": "Paragraph: CMS-published with categories, author profile…",
+    "multiline": true,
+    "page": "odr-blogs"
+  },
+  "odr-blogs.c12": {
+    "default": "Article headline to be added",
+    "label": "Subheading: Article headline to be added",
+    "multiline": false,
+    "page": "odr-blogs"
+  },
+  "odr-blogs.c13": {
+    "default": "CMS-published with categories, author profile and social sharing.",
+    "label": "Paragraph: CMS-published with categories, author profile…",
+    "multiline": true,
+    "page": "odr-blogs"
+  },
+  "odr-blogs.c14": {
+    "default": "Article headline to be added",
+    "label": "Subheading: Article headline to be added",
+    "multiline": false,
+    "page": "odr-blogs"
+  },
+  "odr-blogs.c15": {
+    "default": "CMS-published with categories, author profile and social sharing.",
+    "label": "Paragraph: CMS-published with categories, author profile…",
+    "multiline": true,
+    "page": "odr-blogs"
+  },
+  "odr-blogs.c16": {
+    "default": "CMS publishing with categories, author profiles and social sharing.",
+    "label": "Paragraph: CMS publishing with categories, author profile…",
+    "multiline": true,
+    "page": "odr-blogs"
+  },
+  "odr-blogs.c1_href": {
+    "default": "index.html",
+    "label": "Link URL: ODR Home",
+    "multiline": false,
+    "page": "odr-blogs"
+  },
+  "odr-blogs.c2": {
+    "default": "Plain-language writing on getting paid.",
+    "label": "Heading: Plain-language writing on getting paid.",
+    "multiline": false,
+    "page": "odr-blogs"
+  },
+  "odr-blogs.c3": {
+    "default": "Practical articles that keep you engaged and informed while you work through a case.",
+    "label": "Paragraph: Practical articles that keep you engaged and i…",
+    "multiline": true,
+    "page": "odr-blogs"
+  },
+  "odr-blogs.c4": {
+    "default": "Article headline to be added",
+    "label": "Subheading: Article headline to be added",
+    "multiline": false,
+    "page": "odr-blogs"
+  },
+  "odr-blogs.c5": {
+    "default": "CMS-published with categories, author profile and social sharing.",
+    "label": "Paragraph: CMS-published with categories, author profile…",
+    "multiline": true,
+    "page": "odr-blogs"
+  },
+  "odr-blogs.c6": {
+    "default": "Article headline to be added",
+    "label": "Subheading: Article headline to be added",
+    "multiline": false,
+    "page": "odr-blogs"
+  },
+  "odr-blogs.c7": {
+    "default": "CMS-published with categories, author profile and social sharing.",
+    "label": "Paragraph: CMS-published with categories, author profile…",
+    "multiline": true,
+    "page": "odr-blogs"
+  },
+  "odr-blogs.c8": {
+    "default": "Article headline to be added",
+    "label": "Subheading: Article headline to be added",
+    "multiline": false,
+    "page": "odr-blogs"
+  },
+  "odr-blogs.c9": {
+    "default": "CMS-published with categories, author profile and social sharing.",
+    "label": "Paragraph: CMS-published with categories, author profile…",
+    "multiline": true,
+    "page": "odr-blogs"
+  },
+  "odr-choose-provider.c1": {
+    "default": "ODR Home",
+    "label": "Link: ODR Home",
+    "multiline": false,
+    "page": "odr-choose-provider"
+  },
+  "odr-choose-provider.c10": {
+    "default": "You are being redirected to <span id=\"redirect-name\">the provider</span>.",
+    "label": "Subheading: You are being redirected to the provider .",
+    "multiline": true,
+    "page": "odr-choose-provider"
+  },
+  "odr-choose-provider.c11": {
+    "default": "Redirecting in <strong id=\"redirect-count\">3</strong> seconds…",
+    "label": "Paragraph: Redirecting in 3 seconds…",
+    "multiline": true,
+    "page": "odr-choose-provider"
+  },
+  "odr-choose-provider.c12": {
+    "default": "Continue now →",
+    "label": "Link: Continue now →",
+    "multiline": false,
+    "page": "odr-choose-provider"
+  },
+  "odr-choose-provider.c13": {
+    "default": "The provider list is a CMS collection (“ODR Providers”): logo, name, description, areas of support, website URL, display order and status. Provider selection is tracked in analytics and the CRM. MSME Catalyst does not imply any recommendation, guarantee or control over the provider's outcome.",
+    "label": "Paragraph: The provider list is a CMS collection (“ODR Pr…",
+    "multiline": true,
+    "page": "odr-choose-provider"
+  },
+  "odr-choose-provider.c1_href": {
+    "default": "index.html",
+    "label": "Link URL: ODR Home",
+    "multiline": false,
+    "page": "odr-choose-provider"
+  },
+  "odr-choose-provider.c2": {
+    "default": "Three independent ODR providers. Your choice.",
+    "label": "Heading: Three independent ODR providers. Your choice.",
+    "multiline": false,
+    "page": "odr-choose-provider"
+  },
+  "odr-choose-provider.c3": {
+    "default": "Review the providers and select one. We will hand you over — we do not recommend, guarantee or control their outcome.",
+    "label": "Paragraph: Review the providers and select one. We will h…",
+    "multiline": true,
+    "page": "odr-choose-provider"
+  },
+  "odr-choose-provider.c4": {
+    "default": "Provider A",
+    "label": "Subheading: Provider A",
+    "multiline": false,
+    "page": "odr-choose-provider"
+  },
+  "odr-choose-provider.c5": {
+    "default": "Short description managed in the CMS (name, logo, areas of support, website, display order, status).",
+    "label": "Paragraph: Short description managed in the CMS (name, lo…",
+    "multiline": true,
+    "page": "odr-choose-provider"
+  },
+  "odr-choose-provider.c6": {
+    "default": "Provider B",
+    "label": "Subheading: Provider B",
+    "multiline": false,
+    "page": "odr-choose-provider"
+  },
+  "odr-choose-provider.c7": {
+    "default": "Short description managed in the CMS.",
+    "label": "Paragraph: Short description managed in the CMS.",
+    "multiline": true,
+    "page": "odr-choose-provider"
+  },
+  "odr-choose-provider.c8": {
+    "default": "Provider C",
+    "label": "Subheading: Provider C",
+    "multiline": false,
+    "page": "odr-choose-provider"
+  },
+  "odr-choose-provider.c9": {
+    "default": "Short description managed in the CMS.",
+    "label": "Paragraph: Short description managed in the CMS.",
+    "multiline": true,
+    "page": "odr-choose-provider"
+  },
+  "odr-contact.c1": {
+    "default": "ODR Home",
+    "label": "Link: ODR Home",
+    "multiline": false,
+    "page": "odr-contact"
+  },
+  "odr-contact.c1_href": {
+    "default": "index.html",
+    "label": "Link URL: ODR Home",
+    "multiline": false,
+    "page": "odr-contact"
+  },
+  "odr-contact.c2": {
+    "default": "Questions about the ODR programme?",
+    "label": "Heading: Questions about the ODR programme?",
+    "multiline": false,
+    "page": "odr-contact"
+  },
+  "odr-contact.c3": {
+    "default": "We're here to help you understand your options.",
+    "label": "Paragraph: We're here to help you understand your options…",
+    "multiline": true,
+    "page": "odr-contact"
+  },
+  "odr-contact.c4": {
+    "default": "ODR support",
+    "label": "Subheading: ODR support",
+    "multiline": false,
+    "page": "odr-contact"
+  },
+  "odr-contact.c5": {
+    "default": "<a class=\"textlink\" href=\"mailto:odr@msmecatalyst.org\">odr@msmecatalyst.org</a>",
+    "label": "Paragraph: odr@msmecatalyst.org",
+    "multiline": true,
+    "page": "odr-contact"
+  },
+  "odr-contact.c6": {
+    "default": "Ready to apply?",
+    "label": "Subheading: Ready to apply?",
+    "multiline": false,
+    "page": "odr-contact"
+  },
+  "odr-contact.c7": {
+    "default": "<a class=\"textlink\" href=\"apply.html\">Apply for ODR support →</a>",
+    "label": "Paragraph: Apply for ODR support →",
+    "multiline": true,
+    "page": "odr-contact"
+  },
+  "odr-contact.c8": {
+    "default": "Registered office",
+    "label": "Subheading: Registered office",
+    "multiline": false,
+    "page": "odr-contact"
+  },
+  "odr-contact.c9": {
+    "default": "Digital Growth Infrastructure Foundation (Section 8)<br/>CIN: U94990MH2026NPL468930<br/>WeWork 247 Park, 13th Floor, Vikhroli Corp, Mumbai, Mumbai, Mumbai – 400079, Maharashtra",
+    "label": "Paragraph: Digital Growth Infrastructure Foundation (Sect…",
+    "multiline": true,
+    "page": "odr-contact"
+  },
+  "odr-how-it-works.c1": {
+    "default": "ODR Home",
+    "label": "Link: ODR Home",
+    "multiline": false,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c10": {
+    "default": "Neutral referral",
+    "label": "Subheading: Neutral referral",
+    "multiline": false,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c11": {
+    "default": "We connect you to an appropriate independent provider. You choose which one.",
+    "label": "Paragraph: We connect you to an appropriate independent p…",
+    "multiline": true,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c12": {
+    "default": "Track &amp; learn",
+    "label": "Subheading: Track & learn",
+    "multiline": false,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c13": {
+    "default": "With your consent, the outcome feeds aggregate, de-identified learning that improves the whole system.",
+    "label": "Paragraph: With your consent, the outcome feeds aggregate…",
+    "multiline": true,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c14": {
+    "default": "Ways a case can resolve",
+    "label": "Heading: Ways a case can resolve",
+    "multiline": false,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c15": {
+    "default": "Direct resolution",
+    "label": "Subheading: Direct resolution",
+    "multiline": false,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c16": {
+    "default": "A well-prepared case often prompts payment without any formal process.",
+    "label": "Paragraph: A well-prepared case often prompts payment wit…",
+    "multiline": true,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c17": {
+    "default": "Mediation",
+    "label": "Subheading: Mediation",
+    "multiline": false,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c18": {
+    "default": "A neutral third party helps both sides reach a voluntary settlement.",
+    "label": "Paragraph: A neutral third party helps both sides reach a…",
+    "multiline": true,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c19": {
+    "default": "Conciliation",
+    "label": "Subheading: Conciliation",
+    "multiline": false,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c1_href": {
+    "default": "index.html",
+    "label": "Link URL: ODR Home",
+    "multiline": false,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c2": {
+    "default": "From a stuck payment to a prepared, referred case.",
+    "label": "Heading: From a stuck payment to a prepared, referred c…",
+    "multiline": false,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c20": {
+    "default": "Similar to mediation, with the conciliator able to suggest terms.",
+    "label": "Paragraph: Similar to mediation, with the conciliator abl…",
+    "multiline": true,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c21": {
+    "default": "Arbitration",
+    "label": "Subheading: Arbitration",
+    "multiline": false,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c22": {
+    "default": "A binding decision by an arbitrator, outside the court system.",
+    "label": "Paragraph: A binding decision by an arbitrator, outside t…",
+    "multiline": true,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c23": {
+    "default": "Always remember",
+    "label": "Subheading: Always remember",
+    "multiline": false,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c24": {
+    "default": "The statutory MSEFC pathway remains available and is not replaced",
+    "label": "List item: The statutory MSEFC pathway remains available…",
+    "multiline": true,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c25": {
+    "default": "MSME Catalyst does not adjudicate, advise or guarantee recovery",
+    "label": "List item: MSME Catalyst does not adjudicate, advise or g…",
+    "multiline": true,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c26": {
+    "default": "You retain choice of provider throughout",
+    "label": "List item: You retain choice of provider throughout",
+    "multiline": true,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c3": {
+    "default": "Five clear steps. You stay in control at every one of them.",
+    "label": "Paragraph: Five clear steps. You stay in control at every…",
+    "multiline": true,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c4": {
+    "default": "Apply",
+    "label": "Subheading: Apply",
+    "multiline": false,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c5": {
+    "default": "Tell us about the enterprise, the counterparty, the amount and the paperwork you have. Upload what you've got.",
+    "label": "Paragraph: Tell us about the enterprise, the counterparty…",
+    "multiline": true,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c6": {
+    "default": "Initial screening",
+    "label": "Subheading: Initial screening",
+    "multiline": false,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c7": {
+    "default": "We check the case for completeness and fit — is this payment friction, and is ODR a sensible route?",
+    "label": "Paragraph: We check the case for completeness and fit — i…",
+    "multiline": true,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c8": {
+    "default": "Case preparation through the Cluster Recovery Cell",
+    "label": "Subheading: Case preparation through the Cluster Recovery…",
+    "multiline": false,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c9": {
+    "default": "We help you organise invoices, POs, delivery proof, communications and a clear timeline, so your case stands on its own.",
+    "label": "Paragraph: We help you organise invoices, POs, delivery p…",
+    "multiline": true,
+    "page": "odr-how-it-works"
+  },
+  "odr-index.c1": {
+    "default": "Resolve payment friction before it becomes <span style=\"color:var(--orange)\">business failure</span>.",
+    "label": "Heading: Resolve payment friction before it becomes bus…",
+    "multiline": true,
+    "page": "odr-index"
+  },
+  "odr-index.c10": {
+    "default": "Track &amp; learn",
+    "label": "Subheading: Track & learn",
+    "multiline": false,
+    "page": "odr-index"
+  },
+  "odr-index.c11": {
+    "default": "Understand your options before you act",
+    "label": "Heading: Understand your options before you act",
+    "multiline": false,
+    "page": "odr-index"
+  },
+  "odr-index.c12": {
+    "default": "Evidence preparation",
+    "label": "Subheading: Evidence preparation",
+    "multiline": false,
+    "page": "odr-index"
+  },
+  "odr-index.c13": {
+    "default": "Get your invoices, POs, delivery proof and communications in order.",
+    "label": "Paragraph: Get your invoices, POs, delivery proof and com…",
+    "multiline": true,
+    "page": "odr-index"
+  },
+  "odr-index.c14": {
+    "default": "Mediation &amp; conciliation",
+    "label": "Subheading: Mediation & conciliation",
+    "multiline": false,
+    "page": "odr-index"
+  },
+  "odr-index.c15": {
+    "default": "Understand faster, less adversarial routes to resolution.",
+    "label": "Paragraph: Understand faster, less adversarial routes to…",
+    "multiline": true,
+    "page": "odr-index"
+  },
+  "odr-index.c16": {
+    "default": "Arbitration &amp; statutory routes",
+    "label": "Subheading: Arbitration & statutory routes",
+    "multiline": false,
+    "page": "odr-index"
+  },
+  "odr-index.c17": {
+    "default": "Know when MSEFC and formal routes are the right path.",
+    "label": "Paragraph: Know when MSEFC and formal routes are the righ…",
+    "multiline": true,
+    "page": "odr-index"
+  },
+  "odr-index.c18": {
+    "default": "What this programme is — and is not",
+    "label": "Subheading: What this programme is — and is not",
+    "multiline": false,
+    "page": "odr-index"
+  },
+  "odr-index.c19": {
+    "default": "MSME Catalyst is not an ODR platform, law firm, mediator, arbitrator or court",
+    "label": "List item: MSME Catalyst is not an ODR platform, law firm…",
+    "multiline": true,
+    "page": "odr-index"
+  },
+  "odr-index.c2": {
+    "default": "MSME Catalyst helps businesses facing payment-related commercial friction organise their documents, understand possible routes, and connect with an appropriate independent provider.",
+    "label": "Paragraph: MSME Catalyst helps businesses facing payment-…",
+    "multiline": true,
+    "page": "odr-index"
+  },
+  "odr-index.c20": {
+    "default": "It does not provide legal advice, compel participation, collect money or guarantee recovery",
+    "label": "List item: It does not provide legal advice, compel parti…",
+    "multiline": true,
+    "page": "odr-index"
+  },
+  "odr-index.c21": {
+    "default": "The statutory MSEFC pathway remains available and is not replaced",
+    "label": "List item: The statutory MSEFC pathway remains available…",
+    "multiline": true,
+    "page": "odr-index"
+  },
+  "odr-index.c22": {
+    "default": "Start with a prepared case.",
+    "label": "Heading: Start with a prepared case.",
+    "multiline": false,
+    "page": "odr-index"
+  },
+  "odr-index.c23": {
+    "default": "Apply and the Cluster Recovery Cell will help you organise your documents and understand your routes.",
+    "label": "Paragraph: Apply and the Cluster Recovery Cell will help…",
+    "multiline": true,
+    "page": "odr-index"
+  },
+  "odr-index.c24": {
+    "default": "Apply for Support",
+    "label": "Link: Apply for Support",
+    "multiline": false,
+    "page": "odr-index"
+  },
+  "odr-index.c24_href": {
+    "default": "apply.html",
+    "label": "Link URL: Apply for Support",
+    "multiline": false,
+    "page": "odr-index"
+  },
+  "odr-index.c3": {
+    "default": "Apply for Support",
+    "label": "Link: Apply for Support",
+    "multiline": false,
+    "page": "odr-index"
+  },
+  "odr-index.c3_href": {
+    "default": "apply.html",
+    "label": "Link URL: Apply for Support",
+    "multiline": false,
+    "page": "odr-index"
+  },
+  "odr-index.c4": {
+    "default": "How ODR Works",
+    "label": "Link: How ODR Works",
+    "multiline": false,
+    "page": "odr-index"
+  },
+  "odr-index.c4_href": {
+    "default": "how-it-works.html",
+    "label": "Link URL: How ODR Works",
+    "multiline": false,
+    "page": "odr-index"
+  },
+  "odr-index.c5": {
+    "default": "Choose a Provider",
+    "label": "Link: Choose a Provider",
+    "multiline": false,
+    "page": "odr-index"
+  },
+  "odr-index.c5_href": {
+    "default": "choose-provider.html",
+    "label": "Link URL: Choose a Provider",
+    "multiline": false,
+    "page": "odr-index"
+  },
+  "odr-index.c6": {
+    "default": "Apply",
+    "label": "Subheading: Apply",
+    "multiline": false,
+    "page": "odr-index"
+  },
+  "odr-index.c7": {
+    "default": "Initial screening",
+    "label": "Subheading: Initial screening",
+    "multiline": false,
+    "page": "odr-index"
+  },
+  "odr-index.c8": {
+    "default": "Case preparation",
+    "label": "Subheading: Case preparation",
+    "multiline": false,
+    "page": "odr-index"
+  },
+  "odr-index.c9": {
+    "default": "Neutral referral",
+    "label": "Subheading: Neutral referral",
+    "multiline": false,
+    "page": "odr-index"
+  },
+  "odr-papers.c1": {
+    "default": "ODR Home",
+    "label": "Link: ODR Home",
+    "multiline": false,
+    "page": "odr-papers"
+  },
+  "odr-papers.c10": {
+    "default": "Paper title to be added",
+    "label": "Subheading: Paper title to be added",
+    "multiline": false,
+    "page": "odr-papers"
+  },
+  "odr-papers.c11": {
+    "default": "Uploaded report, policy note or white paper with a downloadable document.",
+    "label": "Paragraph: Uploaded report, policy note or white paper wi…",
+    "multiline": true,
+    "page": "odr-papers"
+  },
+  "odr-papers.c12": {
+    "default": "Uploaded reports, policy notes and white papers — downloadable documents managed in the CMS.",
+    "label": "Paragraph: Uploaded reports, policy notes and white paper…",
+    "multiline": true,
+    "page": "odr-papers"
+  },
+  "odr-papers.c1_href": {
+    "default": "index.html",
+    "label": "Link URL: ODR Home",
+    "multiline": false,
+    "page": "odr-papers"
+  },
+  "odr-papers.c2": {
+    "default": "Evidence and policy, in depth.",
+    "label": "Heading: Evidence and policy, in depth.",
+    "multiline": false,
+    "page": "odr-papers"
+  },
+  "odr-papers.c3": {
+    "default": "Reports, policy notes and white papers on MSME receivables and dispute resolution.",
+    "label": "Paragraph: Reports, policy notes and white papers on MSME…",
+    "multiline": true,
+    "page": "odr-papers"
+  },
+  "odr-papers.c4": {
+    "default": "Paper title to be added",
+    "label": "Subheading: Paper title to be added",
+    "multiline": false,
+    "page": "odr-papers"
+  },
+  "odr-papers.c5": {
+    "default": "Uploaded report, policy note or white paper with a downloadable document.",
+    "label": "Paragraph: Uploaded report, policy note or white paper wi…",
+    "multiline": true,
+    "page": "odr-papers"
+  },
+  "odr-papers.c6": {
+    "default": "Paper title to be added",
+    "label": "Subheading: Paper title to be added",
+    "multiline": false,
+    "page": "odr-papers"
+  },
+  "odr-papers.c7": {
+    "default": "Uploaded report, policy note or white paper with a downloadable document.",
+    "label": "Paragraph: Uploaded report, policy note or white paper wi…",
+    "multiline": true,
+    "page": "odr-papers"
+  },
+  "odr-papers.c8": {
+    "default": "Paper title to be added",
+    "label": "Subheading: Paper title to be added",
+    "multiline": false,
+    "page": "odr-papers"
+  },
+  "odr-papers.c9": {
+    "default": "Uploaded report, policy note or white paper with a downloadable document.",
+    "label": "Paragraph: Uploaded report, policy note or white paper wi…",
+    "multiline": true,
+    "page": "odr-papers"
+  },
+  "odr-podcasts.c1": {
+    "default": "ODR Home",
+    "label": "Link: ODR Home",
+    "multiline": false,
+    "page": "odr-podcasts"
+  },
+  "odr-podcasts.c10": {
+    "default": "Episode title",
+    "label": "Subheading: Episode title",
+    "multiline": false,
+    "page": "odr-podcasts"
+  },
+  "odr-podcasts.c11": {
+    "default": "Guest · organisation. Summary in the CMS.",
+    "label": "Paragraph: Guest · organisation. Summary in the CMS.",
+    "multiline": true,
+    "page": "odr-podcasts"
+  },
+  "odr-podcasts.c12": {
+    "default": "Episode title, guest, summary, embedded Spotify/YouTube/Apple links, transcript, tags and share buttons — all CMS-managed.",
+    "label": "Paragraph: Episode title, guest, summary, embedded Spotif…",
+    "multiline": true,
+    "page": "odr-podcasts"
+  },
+  "odr-podcasts.c1_href": {
+    "default": "index.html",
+    "label": "Link URL: ODR Home",
+    "multiline": false,
+    "page": "odr-podcasts"
+  },
+  "odr-podcasts.c2": {
+    "default": "Listen while you prepare.",
+    "label": "Heading: Listen while you prepare.",
+    "multiline": false,
+    "page": "odr-podcasts"
+  },
+  "odr-podcasts.c3": {
+    "default": "Short conversations on getting paid, resolving disputes and the realities of MSME cash flow.",
+    "label": "Paragraph: Short conversations on getting paid, resolving…",
+    "multiline": true,
+    "page": "odr-podcasts"
+  },
+  "odr-podcasts.c4": {
+    "default": "Episode title",
+    "label": "Subheading: Episode title",
+    "multiline": false,
+    "page": "odr-podcasts"
+  },
+  "odr-podcasts.c5": {
+    "default": "Guest · organisation. Summary in the CMS.",
+    "label": "Paragraph: Guest · organisation. Summary in the CMS.",
+    "multiline": true,
+    "page": "odr-podcasts"
+  },
+  "odr-podcasts.c6": {
+    "default": "Episode title",
+    "label": "Subheading: Episode title",
+    "multiline": false,
+    "page": "odr-podcasts"
+  },
+  "odr-podcasts.c7": {
+    "default": "Guest · organisation. Summary in the CMS.",
+    "label": "Paragraph: Guest · organisation. Summary in the CMS.",
+    "multiline": true,
+    "page": "odr-podcasts"
+  },
+  "odr-podcasts.c8": {
+    "default": "Episode title",
+    "label": "Subheading: Episode title",
+    "multiline": false,
+    "page": "odr-podcasts"
+  },
+  "odr-podcasts.c9": {
+    "default": "Guest · organisation. Summary in the CMS.",
+    "label": "Paragraph: Guest · organisation. Summary in the CMS.",
+    "multiline": true,
+    "page": "odr-podcasts"
+  },
+  "odr-resources.c1": {
+    "default": "ODR Home",
+    "label": "Link: ODR Home",
+    "multiline": false,
+    "page": "odr-resources"
+  },
+  "odr-resources.c1_href": {
+    "default": "index.html",
+    "label": "Link URL: ODR Home",
+    "multiline": false,
+    "page": "odr-resources"
+  },
+  "odr-resources.c2": {
+    "default": "A library to help you prepare.",
+    "label": "Heading: A library to help you prepare.",
+    "multiline": false,
+    "page": "odr-resources"
+  },
+  "odr-resources.c3": {
+    "default": "Explainer articles, checklists, templates and FAQs — in simple language, free to download.",
+    "label": "Paragraph: Explainer articles, checklists, templates and…",
+    "multiline": true,
+    "page": "odr-resources"
+  },
+  "odr-resources.c4": {
+    "default": "Frequently asked questions",
+    "label": "Heading: Frequently asked questions",
+    "multiline": false,
+    "page": "odr-resources"
+  },
+  "odr-resources.c5": {
+    "default": "What counts as “payment friction”?",
+    "label": "Summary: What counts as “payment friction”?",
+    "multiline": false,
+    "page": "odr-resources"
+  },
+  "odr-resources.c6": {
+    "default": "Does MSME Catalyst take a cut of what I recover?",
+    "label": "Summary: Does MSME Catalyst take a cut of what I recove…",
+    "multiline": false,
+    "page": "odr-resources"
+  },
+  "odr-resources.c7": {
+    "default": "Will I still be able to go to MSEFC or court?",
+    "label": "Summary: Will I still be able to go to MSEFC or court?",
+    "multiline": false,
+    "page": "odr-resources"
+  },
+  "odr-resources.c8": {
+    "default": "Do you give legal advice?",
+    "label": "Summary: Do you give legal advice?",
+    "multiline": false,
+    "page": "odr-resources"
+  },
+  "odr-support.c1": {
+    "default": "Home",
+    "label": "Link: Home",
+    "multiline": false,
+    "page": "odr-support"
+  },
+  "odr-support.c10": {
+    "default": "Case preparation",
+    "label": "Subheading: Case preparation",
+    "multiline": false,
+    "page": "odr-support"
+  },
+  "odr-support.c11": {
+    "default": "The Cluster Recovery Cell helps you organise evidence.",
+    "label": "Paragraph: The Cluster Recovery Cell helps you organise e…",
+    "multiline": true,
+    "page": "odr-support"
+  },
+  "odr-support.c12": {
+    "default": "Neutral referral",
+    "label": "Subheading: Neutral referral",
+    "multiline": false,
+    "page": "odr-support"
+  },
+  "odr-support.c13": {
+    "default": "You are connected to an appropriate independent provider — your choice.",
+    "label": "Paragraph: You are connected to an appropriate independen…",
+    "multiline": true,
+    "page": "odr-support"
+  },
+  "odr-support.c14": {
+    "default": "Track &amp; learn",
+    "label": "Subheading: Track & learn",
+    "multiline": false,
+    "page": "odr-support"
+  },
+  "odr-support.c15": {
+    "default": "Outcomes feed aggregate, de-identified learning.",
+    "label": "Paragraph: Outcomes feed aggregate, de-identified learnin…",
+    "multiline": true,
+    "page": "odr-support"
+  },
+  "odr-support.c16": {
+    "default": "Important boundaries",
+    "label": "Subheading: Important boundaries",
+    "multiline": false,
+    "page": "odr-support"
+  },
+  "odr-support.c17": {
+    "default": "MSME Catalyst is not an ODR platform, law firm, mediator, arbitrator or court",
+    "label": "List item: MSME Catalyst is not an ODR platform, law firm…",
+    "multiline": true,
+    "page": "odr-support"
+  },
+  "odr-support.c18": {
+    "default": "It does not provide legal advice, compel participation, collect money or guarantee recovery",
+    "label": "List item: It does not provide legal advice, compel parti…",
+    "multiline": true,
+    "page": "odr-support"
+  },
+  "odr-support.c19": {
+    "default": "The statutory MSEFC pathway remains available and is not replaced",
+    "label": "List item: The statutory MSEFC pathway remains available…",
+    "multiline": true,
+    "page": "odr-support"
+  },
+  "odr-support.c1_href": {
+    "default": "index.html",
+    "label": "Link URL: Home",
+    "multiline": false,
+    "page": "odr-support"
+  },
+  "odr-support.c2": {
+    "default": "ODR Support runs on a dedicated micro-site",
+    "label": "Subheading: ODR Support runs on a dedicated micro-site",
+    "multiline": false,
+    "page": "odr-support"
+  },
+  "odr-support.c3": {
+    "default": "For clarity and focus, the ODR programme — how it works, choosing a provider, resources and the application — lives on a separate MSME Catalyst ODR site.",
+    "label": "Paragraph: For clarity and focus, the ODR programme — how…",
+    "multiline": true,
+    "page": "odr-support"
+  },
+  "odr-support.c4": {
+    "default": "Go to the ODR micro-site",
+    "label": "Link: Go to the ODR micro-site",
+    "multiline": false,
+    "page": "odr-support"
+  },
+  "odr-support.c4_href": {
+    "default": "odr/index.html",
+    "label": "Link URL: Go to the ODR micro-site",
+    "multiline": false,
+    "page": "odr-support"
+  },
+  "odr-support.c5": {
+    "default": "You are being taken to the MSME Catalyst ODR micro-site. This page auto-redirects in <span id=\"redir\">6</span> seconds.",
+    "label": "Paragraph: You are being taken to the MSME Catalyst ODR m…",
+    "multiline": true,
+    "page": "odr-support"
+  },
+  "odr-support.c6": {
+    "default": "Apply",
+    "label": "Subheading: Apply",
+    "multiline": false,
+    "page": "odr-support"
+  },
+  "odr-support.c7": {
+    "default": "Submit your case and documents.",
+    "label": "Paragraph: Submit your case and documents.",
+    "multiline": true,
+    "page": "odr-support"
+  },
+  "odr-support.c8": {
+    "default": "Initial screening",
+    "label": "Subheading: Initial screening",
+    "multiline": false,
+    "page": "odr-support"
+  },
+  "odr-support.c9": {
+    "default": "We check completeness and fit.",
+    "label": "Paragraph: We check completeness and fit.",
+    "multiline": true,
+    "page": "odr-support"
+  },
+  "odr-support.heading": {
     "default": "Resolve payment friction before it becomes business failure.",
     "label": "Hero heading",
     "multiline": false,
-    "page": "odr_support"
+    "page": "odr-support"
   },
-  "odr_support.kicker": {
+  "odr-support.kicker": {
     "default": "ODR Support",
     "label": "Hero kicker",
     "multiline": false,
-    "page": "odr_support"
+    "page": "odr-support"
   },
-  "odr_support.lead": {
+  "odr-support.lead": {
     "default": "MSME Catalyst helps businesses facing payment-related commercial friction organise their documents, understand possible routes and connect with an appropriate independent provider.",
     "label": "Hero intro",
     "multiline": true,
-    "page": "odr_support"
+    "page": "odr-support"
+  },
+  "podcasts.c1": {
+    "default": "Home",
+    "label": "Link: Home",
+    "multiline": false,
+    "page": "podcasts"
+  },
+  "podcasts.c1_href": {
+    "default": "index.html",
+    "label": "Link URL: Home",
+    "multiline": false,
+    "page": "podcasts"
+  },
+  "podcasts.c2": {
+    "default": "← Back to Knowledge Hub",
+    "label": "Link: ← Back to Knowledge Hub",
+    "multiline": false,
+    "page": "podcasts"
+  },
+  "podcasts.c2_href": {
+    "default": "knowledge.html",
+    "label": "Link URL: ← Back to Knowledge Hub",
+    "multiline": false,
+    "page": "podcasts"
+  },
+  "podcasts.c3": {
+    "default": "Each episode is a CMS entry: cover image, title, guest &amp; organisation, description, audio/video embed, Spotify / YouTube / Apple links, transcript, tags, related reports &amp; blogs and social-share links.",
+    "label": "Paragraph: Each episode is a CMS entry: cover image, titl…",
+    "multiline": true,
+    "page": "podcasts"
   },
   "podcasts.heading": {
     "default": "Conversations on convergence.",
@@ -281,6 +2609,270 @@
     "multiline": true,
     "page": "podcasts"
   },
+  "privacy.c1": {
+    "default": "Home",
+    "label": "Link: Home",
+    "multiline": false,
+    "page": "privacy"
+  },
+  "privacy.c10": {
+    "default": "Consent &amp; choice",
+    "label": "Subheading: Consent & choice",
+    "multiline": false,
+    "page": "privacy"
+  },
+  "privacy.c11": {
+    "default": "Forms capture explicit consent for contact and, where relevant, referral and logo display. You may withdraw consent at any time.",
+    "label": "Paragraph: Forms capture explicit consent for contact and…",
+    "multiline": true,
+    "page": "privacy"
+  },
+  "privacy.c12": {
+    "default": "Your rights",
+    "label": "Subheading: Your rights",
+    "multiline": false,
+    "page": "privacy"
+  },
+  "privacy.c13": {
+    "default": "You may request access to, correction of, or deletion of your personal data by contacting us.",
+    "label": "Paragraph: You may request access to, correction of, or d…",
+    "multiline": true,
+    "page": "privacy"
+  },
+  "privacy.c14": {
+    "default": "Contact",
+    "label": "Subheading: Contact",
+    "multiline": false,
+    "page": "privacy"
+  },
+  "privacy.c15": {
+    "default": "privacy@msmecatalyst.org",
+    "label": "Paragraph: privacy@msmecatalyst.org",
+    "multiline": true,
+    "page": "privacy"
+  },
+  "privacy.c1_href": {
+    "default": "index.html",
+    "label": "Link URL: Home",
+    "multiline": false,
+    "page": "privacy"
+  },
+  "privacy.c2": {
+    "default": "Privacy Policy",
+    "label": "Heading: Privacy Policy",
+    "multiline": false,
+    "page": "privacy"
+  },
+  "privacy.c3": {
+    "default": "How MSME Catalyst handles your data, consent and document uploads.",
+    "label": "Paragraph: How MSME Catalyst handles your data, consent a…",
+    "multiline": true,
+    "page": "privacy"
+  },
+  "privacy.c4": {
+    "default": "Who we are",
+    "label": "Subheading: Who we are",
+    "multiline": false,
+    "page": "privacy"
+  },
+  "privacy.c5": {
+    "default": "This site is operated by Digital Growth Infrastructure Foundation, a Section 8 not-for-profit, under the MSME Catalyst platform.",
+    "label": "Paragraph: This site is operated by Digital Growth Infras…",
+    "multiline": true,
+    "page": "privacy"
+  },
+  "privacy.c6": {
+    "default": "What we collect",
+    "label": "Subheading: What we collect",
+    "multiline": false,
+    "page": "privacy"
+  },
+  "privacy.c7": {
+    "default": "Information you provide through membership, ODR and contact forms, and standard analytics on site usage. Document uploads are stored securely and access-controlled.",
+    "label": "Paragraph: Information you provide through membership, OD…",
+    "multiline": true,
+    "page": "privacy"
+  },
+  "privacy.c8": {
+    "default": "How we use it",
+    "label": "Subheading: How we use it",
+    "multiline": false,
+    "page": "privacy"
+  },
+  "privacy.c9": {
+    "default": "To operate the platform, process applications, coordinate referrals and improve the service. We publish only aggregated, de-identified insight.",
+    "label": "Paragraph: To operate the platform, process applications,…",
+    "multiline": true,
+    "page": "privacy"
+  },
+  "programmes.c1": {
+    "default": "Home",
+    "label": "Link: Home",
+    "multiline": false,
+    "page": "programmes"
+  },
+  "programmes.c10": {
+    "default": "ODR referral pathway",
+    "label": "List item: ODR referral pathway",
+    "multiline": true,
+    "page": "programmes"
+  },
+  "programmes.c11": {
+    "default": "Aggregate outcome learning",
+    "label": "List item: Aggregate outcome learning",
+    "multiline": true,
+    "page": "programmes"
+  },
+  "programmes.c12": {
+    "default": "Capital &amp; Market Pathways",
+    "label": "Subheading: Capital & Market Pathways",
+    "multiline": false,
+    "page": "programmes"
+  },
+  "programmes.c13": {
+    "default": "Finance-readiness and documentation",
+    "label": "List item: Finance-readiness and documentation",
+    "multiline": true,
+    "page": "programmes"
+  },
+  "programmes.c14": {
+    "default": "Buyer and supply-chain context",
+    "label": "List item: Buyer and supply-chain context",
+    "multiline": true,
+    "page": "programmes"
+  },
+  "programmes.c15": {
+    "default": "Referral to relevant capital pathways",
+    "label": "List item: Referral to relevant capital pathways",
+    "multiline": true,
+    "page": "programmes"
+  },
+  "programmes.c16": {
+    "default": "Market access and growth pathways",
+    "label": "List item: Market access and growth pathways",
+    "multiline": true,
+    "page": "programmes"
+  },
+  "programmes.c17": {
+    "default": "Cluster Intelligence",
+    "label": "Subheading: Cluster Intelligence",
+    "multiline": false,
+    "page": "programmes"
+  },
+  "programmes.c18": {
+    "default": "Cluster mapping",
+    "label": "List item: Cluster mapping",
+    "multiline": true,
+    "page": "programmes"
+  },
+  "programmes.c19": {
+    "default": "Readiness and friction research",
+    "label": "List item: Readiness and friction research",
+    "multiline": true,
+    "page": "programmes"
+  },
+  "programmes.c1_href": {
+    "default": "index.html",
+    "label": "Link URL: Home",
+    "multiline": false,
+    "page": "programmes"
+  },
+  "programmes.c2": {
+    "default": "Awareness &amp; Readiness",
+    "label": "Subheading: Awareness & Readiness",
+    "multiline": false,
+    "page": "programmes"
+  },
+  "programmes.c20": {
+    "default": "Scorecards and dashboards",
+    "label": "List item: Scorecards and dashboards",
+    "multiline": true,
+    "page": "programmes"
+  },
+  "programmes.c21": {
+    "default": "Compliance and capability intelligence",
+    "label": "List item: Compliance and capability intelligence",
+    "multiline": true,
+    "page": "programmes"
+  },
+  "programmes.c22": {
+    "default": "Join MSME Catalyst",
+    "label": "Link: Join MSME Catalyst",
+    "multiline": false,
+    "page": "programmes"
+  },
+  "programmes.c22_href": {
+    "default": "membership.html",
+    "label": "Link URL: Join MSME Catalyst",
+    "multiline": false,
+    "page": "programmes"
+  },
+  "programmes.c23": {
+    "default": "Apply for ODR Support",
+    "label": "Link: Apply for ODR Support",
+    "multiline": false,
+    "page": "programmes"
+  },
+  "programmes.c23_href": {
+    "default": "odr-support.html",
+    "label": "Link URL: Apply for ODR Support",
+    "multiline": false,
+    "page": "programmes"
+  },
+  "programmes.c24": {
+    "default": "Fund the infrastructure",
+    "label": "Link: Fund the infrastructure",
+    "multiline": false,
+    "page": "programmes"
+  },
+  "programmes.c24_href": {
+    "default": "membership.html#donors",
+    "label": "Link URL: Fund the infrastructure",
+    "multiline": false,
+    "page": "programmes"
+  },
+  "programmes.c3": {
+    "default": "Credit Ki Kaksha",
+    "label": "List item: Credit Ki Kaksha",
+    "multiline": true,
+    "page": "programmes"
+  },
+  "programmes.c4": {
+    "default": "Rating Ki Kaksha",
+    "label": "List item: Rating Ki Kaksha",
+    "multiline": true,
+    "page": "programmes"
+  },
+  "programmes.c5": {
+    "default": "Digital Dost",
+    "label": "List item: Digital Dost",
+    "multiline": true,
+    "page": "programmes"
+  },
+  "programmes.c6": {
+    "default": "Policy &amp; Programme Readiness",
+    "label": "List item: Policy & Programme Readiness",
+    "multiline": true,
+    "page": "programmes"
+  },
+  "programmes.c7": {
+    "default": "Receivables &amp; ODR Support",
+    "label": "Subheading: Receivables & ODR Support",
+    "multiline": false,
+    "page": "programmes"
+  },
+  "programmes.c8": {
+    "default": "Cluster-led payment support",
+    "label": "List item: Cluster-led payment support",
+    "multiline": true,
+    "page": "programmes"
+  },
+  "programmes.c9": {
+    "default": "Recovery Cell case preparation",
+    "label": "List item: Recovery Cell case preparation",
+    "multiline": true,
+    "page": "programmes"
+  },
   "programmes.heading": {
     "default": "Four pillars that carry the enterprise journey.",
     "label": "Hero heading",
@@ -299,6 +2891,36 @@
     "multiline": true,
     "page": "programmes"
   },
+  "reports.c1": {
+    "default": "Home",
+    "label": "Link: Home",
+    "multiline": false,
+    "page": "reports"
+  },
+  "reports.c1_href": {
+    "default": "index.html",
+    "label": "Link URL: Home",
+    "multiline": false,
+    "page": "reports"
+  },
+  "reports.c2": {
+    "default": "← Back to Knowledge Hub",
+    "label": "Link: ← Back to Knowledge Hub",
+    "multiline": false,
+    "page": "reports"
+  },
+  "reports.c2_href": {
+    "default": "knowledge.html",
+    "label": "Link URL: ← Back to Knowledge Hub",
+    "multiline": false,
+    "page": "reports"
+  },
+  "reports.c3": {
+    "default": "Each item is a CMS entry: title, summary, thumbnail, category, tags, author, publication date, file upload, external link, SEO fields and visibility status.",
+    "label": "Paragraph: Each item is a CMS entry: title, summary, thum…",
+    "multiline": true,
+    "page": "reports"
+  },
   "reports.heading": {
     "default": "Shared evidence, published openly.",
     "label": "Hero heading",
@@ -316,5 +2938,101 @@
     "label": "Hero intro",
     "multiline": true,
     "page": "reports"
+  },
+  "terms.c1": {
+    "default": "Home",
+    "label": "Link: Home",
+    "multiline": false,
+    "page": "terms"
+  },
+  "terms.c10": {
+    "default": "Statutory routes",
+    "label": "Subheading: Statutory routes",
+    "multiline": false,
+    "page": "terms"
+  },
+  "terms.c11": {
+    "default": "The statutory MSEFC pathway and all court and arbitral routes remain available and are not replaced by MSME Catalyst.",
+    "label": "Paragraph: The statutory MSEFC pathway and all court and…",
+    "multiline": true,
+    "page": "terms"
+  },
+  "terms.c12": {
+    "default": "Content",
+    "label": "Subheading: Content",
+    "multiline": false,
+    "page": "terms"
+  },
+  "terms.c13": {
+    "default": "CMS-published content is provided for information. Reasonable care is taken but no warranty is given as to completeness or fitness for a particular purpose.",
+    "label": "Paragraph: CMS-published content is provided for informat…",
+    "multiline": true,
+    "page": "terms"
+  },
+  "terms.c14": {
+    "default": "Contact",
+    "label": "Subheading: Contact",
+    "multiline": false,
+    "page": "terms"
+  },
+  "terms.c15": {
+    "default": "legal@msmecatalyst.org",
+    "label": "Paragraph: legal@msmecatalyst.org",
+    "multiline": true,
+    "page": "terms"
+  },
+  "terms.c1_href": {
+    "default": "index.html",
+    "label": "Link URL: Home",
+    "multiline": false,
+    "page": "terms"
+  },
+  "terms.c2": {
+    "default": "Terms of Use",
+    "label": "Heading: Terms of Use",
+    "multiline": false,
+    "page": "terms"
+  },
+  "terms.c3": {
+    "default": "The terms governing use of the MSME Catalyst platform.",
+    "label": "Paragraph: The terms governing use of the MSME Catalyst p…",
+    "multiline": true,
+    "page": "terms"
+  },
+  "terms.c4": {
+    "default": "Nature of the platform",
+    "label": "Subheading: Nature of the platform",
+    "multiline": false,
+    "page": "terms"
+  },
+  "terms.c5": {
+    "default": "MSME Catalyst is a neutral convergence layer. It does not lend, underwrite, provide legal advice, adjudicate disputes or operate an ODR platform.",
+    "label": "Paragraph: MSME Catalyst is a neutral convergence layer.…",
+    "multiline": true,
+    "page": "terms"
+  },
+  "terms.c6": {
+    "default": "No professional relationship",
+    "label": "Subheading: No professional relationship",
+    "multiline": false,
+    "page": "terms"
+  },
+  "terms.c7": {
+    "default": "Using this site or submitting a form does not create a lawyer-client relationship or any advisory relationship, and does not guarantee any outcome or recovery.",
+    "label": "Paragraph: Using this site or submitting a form does not…",
+    "multiline": true,
+    "page": "terms"
+  },
+  "terms.c8": {
+    "default": "Referrals",
+    "label": "Subheading: Referrals",
+    "multiline": false,
+    "page": "terms"
+  },
+  "terms.c9": {
+    "default": "Any referral to a lender, capability institution or ODR provider is neutral. MSMEs retain choice of provider. Providers retain all their own decisions.",
+    "label": "Paragraph: Any referral to a lender, capability instituti…",
+    "multiline": true,
+    "page": "terms"
   }
 }
