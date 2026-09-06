@@ -81,9 +81,43 @@ function canPublish(user, collection) {
 }
 function canCRMRead(user)  { const r = ROLES[user.role]; return !!(r && (r.all || r.crm)); }
 function canCRMWrite(user) { const r = ROLES[user.role]; return !!(r && (r.all || (r.crm && r.crmWrite !== false))); }
+// Page-level (page copy + publish/hide) and section-level (visibility) scoping.
+// Editor perms may contain 'page:<slug>' and 'sec:<key>' entries, or the coarse
+// 'pages' collection which grants all pages/sections (legacy content roles).
+function canPage(user, slug) {
+  const r = ROLES[user.role]; if (!r) return false;
+  if (r.all || r.content) return true;
+  const p = userPerms(user);
+  if (p.includes('pages')) return true;
+  if (r.editorScoped) return p.includes('page:' + slug);
+  return Array.isArray(r.collections) && r.collections.includes('pages');
+}
+function canSection(user, key) {
+  const r = ROLES[user.role]; if (!r) return false;
+  if (r.all || r.content) return true;
+  const p = userPerms(user);
+  if (p.includes('pages')) return true;
+  if (r.editorScoped) return p.includes('sec:' + key);
+  return Array.isArray(r.collections) && r.collections.includes('pages');
+}
+function anyPageScope(user) {
+  const r = ROLES[user.role]; if (!r) return false;
+  if (r.all || r.content) return true;
+  const p = userPerms(user);
+  return p.includes('pages') || p.some(x => x.startsWith('page:') || x.startsWith('sec:'));
+}
+function pageOfKey(key) { const r = REGISTRY[key]; return r ? r.page : String(key).split('.')[0]; }
+// A permission entry is valid if it names a known collection, page (page:<slug>) or section (sec:<key>).
+function validPerm(p) {
+  if (typeof p !== 'string') return false;
+  if (COLLECTIONS[p] || p === 'pages') return true;
+  if (p.startsWith('page:')) return PAGES.some(x => x[0] === p.slice(5));
+  if (p.startsWith('sec:')) return SECTIONS.some(x => x[0] === p.slice(4));
+  return false;
+}
 function canODR(user)      { const r = ROLES[user.role]; return !!(r && (r.all || r.odr)); }
 function canUsers(user)    { const r = ROLES[user.role]; return !!(r && (r.all || r.users)); }
-function canSettings(user) { const r = ROLES[user.role]; return !!(r && (r.all || r.content)) || canManage(user, 'pages'); }
+function canSettings(user) { return anyPageScope(user); }
 const forbid = (res) => res.status(403).json({ error: 'Forbidden' });
 
 /* Anti-CSRF for cookie-authenticated state changes: require same-origin. */
@@ -210,7 +244,9 @@ app.get('/api/users', requireAuth, (req, res) => {
   if (!canUsers(req.user)) return forbid(res);
   const users = db.prepare('SELECT id,name,email,role,active,must_change,perms,created_at FROM users ORDER BY id').all()
     .map(u => ({ ...u, perms: userPerms(u) }));
-  res.json({ users, roles: ROLES, collections: Object.keys(COLLECTIONS) });
+  res.json({ users, roles: ROLES, collections: Object.keys(COLLECTIONS),
+    pages: PAGES.map(([slug, label]) => ({ slug, label })),
+    sections: SECTIONS.map(([key, label]) => ({ key, label })) });
 });
 app.post('/api/users', requireAuth, (req, res) => {
   if (!canUsers(req.user)) return forbid(res);
@@ -220,7 +256,7 @@ app.post('/api/users', requireAuth, (req, res) => {
   const problem = passwordProblem(b.password, email);
   if (problem) return res.status(400).json({ error: problem });
   if (db.prepare('SELECT 1 FROM users WHERE email=?').get(email)) return res.status(409).json({ error: 'A user with that email already exists.' });
-  const perms = Array.isArray(b.perms) ? JSON.stringify(b.perms.filter(p => COLLECTIONS[p])) : null;
+  const perms = Array.isArray(b.perms) ? JSON.stringify(b.perms.filter(validPerm)) : null;
   const info = db.prepare('INSERT INTO users(name,email,password_hash,role,perms,active,must_change,created_by,created_at,updated_at) VALUES(?,?,?,?,?,1,1,?,?,?)')
     .run(b.name || email, email, bcrypt.hashSync(b.password, 12), b.role, perms, req.user.id, nowISO(), nowISO());
   audit(req, 'user_created', 'user', info.lastInsertRowid, `${email} (${b.role})`);
@@ -233,7 +269,7 @@ app.put('/api/users/:id', requireAuth, (req, res) => {
   const b = req.body || {};
   const name = b.name ?? cur.name;
   const role = ROLES[b.role] ? b.role : cur.role;
-  const perms = Array.isArray(b.perms) ? JSON.stringify(b.perms.filter(p => COLLECTIONS[p])) : cur.perms;
+  const perms = Array.isArray(b.perms) ? JSON.stringify(b.perms.filter(validPerm)) : cur.perms;
   let active = cur.active;
   if (typeof b.active === 'boolean') {
     if (Number(req.params.id) === req.user.id && b.active === false) return res.status(400).json({ error: 'You cannot deactivate your own account.' });
@@ -475,11 +511,12 @@ app.get('/api/public/pagecopy', (req, res) => {
 });
 // Admin: registry (labels + defaults) merged with current overrides, grouped by page.
 app.get('/api/pagecopy', requireAuth, (req, res) => {
-  if (!canManage(req.user, 'pages')) return res.status(403).json({ error: 'Forbidden' });
+  if (!anyPageScope(req.user)) return res.status(403).json({ error: 'Forbidden' });
   const overrides = {}; db.prepare('SELECT key,value FROM pagecopy').all().forEach(r => overrides[r.key] = r.value);
   const groups = {};
   Object.keys(REGISTRY).sort().forEach(key => {
     const r = REGISTRY[key];
+    if (!canPage(req.user, r.page)) return;                 // only pages this user may edit
     (groups[r.page] = groups[r.page] || []).push({
       key, label: r.label, multiline: !!r.multiline, default: r.default,
       value: overrides[key] != null ? overrides[key] : '' });
@@ -487,8 +524,10 @@ app.get('/api/pagecopy', requireAuth, (req, res) => {
   res.json({ groups });
 });
 app.put('/api/pagecopy/:key', requireAuth, (req, res) => {
-  if (!canManage(req.user, 'pages')) return res.status(403).json({ error: 'Forbidden' });
-  const key = req.params.key; const value = (req.body && req.body.value) || '';
+  const key = req.params.key;
+  if (!REGISTRY[key]) return res.status(404).json({ error: 'Unknown content key' });
+  if (!canPage(req.user, pageOfKey(key))) return res.status(403).json({ error: 'Forbidden' });
+  const value = (req.body && req.body.value) || '';
   if (value === '') db.prepare('DELETE FROM pagecopy WHERE key=?').run(key);        // empty ⇒ revert to default
   else db.prepare('INSERT INTO pagecopy(key,value,updated_at,updated_by) VALUES(?,?,?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at,updated_by=excluded.updated_by')
     .run(key, value, nowISO(), req.user.id);
@@ -498,6 +537,7 @@ app.put('/api/pagecopy/:key', requireAuth, (req, res) => {
 
 /* ---------------- Section visibility (hide links for sections not yet live) ---------------- */
 const SECTIONS = [
+  ['council', 'Governing Council (About)'], ['advisory', 'Advisory Body (About)'], ['secretariat', 'Secretariat (About)'],
   ['programmes', 'Programmes'], ['odr', 'ODR Support'], ['reports', 'Reports & Papers'],
   ['blogs', 'Blogs'], ['podcasts', 'Podcasts'], ['events', 'Events & Labs'],
   ['donors', 'Donors & Funding Partners'], ['membership', 'Membership'], ['funding_partners_wall', 'Members logo wall'],
@@ -510,12 +550,13 @@ function visibilityMap() {
 }
 app.get('/api/public/visibility', (req, res) => res.json({ visible: visibilityMap() }));
 app.get('/api/settings/visibility', requireAuth, (req, res) => {
-  if (!canManage(req.user, 'pages')) return res.status(403).json({ error: 'Forbidden' });
+  if (!anyPageScope(req.user)) return res.status(403).json({ error: 'Forbidden' });
   const vis = visibilityMap();
-  res.json({ sections: SECTIONS.map(([key, label]) => ({ key, label, visible: vis[key] })) });
+  res.json({ sections: SECTIONS.filter(([key]) => canSection(req.user, key)).map(([key, label]) => ({ key, label, visible: vis[key] })) });
 });
 app.put('/api/settings/visibility/:key', requireAuth, (req, res) => {
-  if (!canManage(req.user, 'pages')) return res.status(403).json({ error: 'Forbidden' });
+  if (!SECTIONS.find(s => s[0] === req.params.key)) return res.status(404).json({ error: 'Unknown section' });
+  if (!canSection(req.user, req.params.key)) return res.status(403).json({ error: 'Forbidden' });
   const key = 'vis.' + req.params.key;
   const val = req.body && req.body.visible === false ? 'hidden' : 'visible';
   db.prepare('INSERT INTO settings(key,value,updated_at,updated_by) VALUES(?,?,?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at')
@@ -530,18 +571,32 @@ const PAGES = [
   ['membership','Membership'], ['odr-support','ODR Support'], ['knowledge','Knowledge Hub'],
   ['reports','Reports & Papers'], ['blogs','Blogs'], ['podcasts','Podcasts'], ['events','Events & Labs'],
   ['contact','Contact'], ['privacy','Privacy'], ['terms','Terms'],
+  // ODR micro-site pages (served under /odr/). Each is independently publishable/hideable.
+  ['odr-index','ODR · Home'], ['odr-about','ODR · About the Programme'], ['odr-how-it-works','ODR · How It Works'],
+  ['odr-choose-provider','ODR · Choose a Provider'], ['odr-apply','ODR · Apply'], ['odr-resources','ODR · Resources'],
+  ['odr-papers','ODR · Papers'], ['odr-podcasts','ODR · Podcasts'], ['odr-blogs','ODR · Blogs'], ['odr-contact','ODR · Contact'],
 ];
+// Map a request path to its page slug — the SAME rule the public site uses (main.js slugFromPath).
+function slugForPath(p) {
+  p = (p || '').replace(/\/+$/, '');
+  if (p === '') return 'index';
+  let m = p.match(/^\/odr(?:\/([a-z0-9\-]+?)(?:\.html)?)?$/i);
+  if (m) return 'odr-' + (m[1] ? m[1].toLowerCase() : 'index');
+  m = p.match(/^\/([a-z0-9\-]+?)(?:\.html)?$/i);
+  if (m) return m[1].toLowerCase();
+  return null;
+}
 function pageState() { const h = {}; db.prepare("SELECT key,value FROM settings WHERE key LIKE 'page.%'").all().forEach(r => h[r.key.slice(5)] = r.value); return h; }
 function pageHidden(slug) { return pageState()[slug] === 'hidden'; }
 app.get('/api/settings/pages', requireAuth, (req, res) => {
-  if (!canSettings(req.user)) return forbid(res);
+  if (!anyPageScope(req.user)) return forbid(res);
   const st = pageState();
-  res.json({ pages: PAGES.map(([slug, label]) => ({ slug, label, published: st[slug] !== 'hidden' })) });
+  res.json({ pages: PAGES.filter(([slug]) => canPage(req.user, slug)).map(([slug, label]) => ({ slug, label, published: st[slug] !== 'hidden' })) });
 });
 app.put('/api/settings/pages/:slug', requireAuth, (req, res) => {
-  if (!canSettings(req.user)) return forbid(res);
   const slug = req.params.slug;
   if (!PAGES.find(p => p[0] === slug)) return res.status(404).json({ error: 'Unknown page' });
+  if (!canPage(req.user, slug)) return forbid(res);
   const val = req.body && req.body.published === false ? 'hidden' : 'published';
   db.prepare('INSERT INTO settings(key,value,updated_at,updated_by) VALUES(?,?,?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at')
     .run('page.' + slug, val, nowISO(), req.user.id);
@@ -611,6 +666,7 @@ function logEvent(event, meta) {
 }
 app.post('/api/public/analytics', publicWriteLimit, (req, res) => { logEvent(req.body.event || 'event', req.body.meta); res.json({ ok: true }); });
 app.get('/api/analytics/summary', requireAuth, (req, res) => {
+  if (!ROLES[req.user.role]?.all) return forbid(res);       // analytics: Super Admin only
   const rows = db.prepare('SELECT event, COUNT(*) c FROM analytics GROUP BY event ORDER BY c DESC').all();
   res.json({ events: rows,
     newsletter: db.prepare('SELECT COUNT(*) c FROM newsletter').get().c,
@@ -633,12 +689,11 @@ app.use('/uploads', express.static(UP));
 app.use('/admin', express.static(path.join(__dirname, 'admin')));
 
 // Server-side enforcement: a hidden page returns 404 even via a direct URL.
+// (ODR pages are NOT exempt — each /odr/* page can be hidden individually.)
 app.get(/.*/, (req, res, next) => {
   const p = req.path;
-  if (p.startsWith('/api') || p.startsWith('/assets') || p.startsWith('/admin') || p.startsWith('/uploads') || p.startsWith('/odr/')) return next();
-  let slug = null;
-  if (p === '/' || p === '/index.html' || p === '/index') slug = 'index';
-  else { const m = p.match(/^\/([a-z0-9\-]+)(?:\.html)?$/i); if (m) slug = m[1].toLowerCase(); }
+  if (p.startsWith('/api') || p.startsWith('/assets') || p.startsWith('/admin') || p.startsWith('/uploads')) return next();
+  const slug = slugForPath(p);
   if (slug && pageHidden(slug)) {
     return res.status(404).type('html').send('<!doctype html><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Page not found</title><body style="font-family:system-ui,Segoe UI,Arial;max-width:640px;margin:14vh auto;padding:0 24px;text-align:center;color:#17211b"><h1 style="font-size:2rem;margin:0 0 8px">404 — Page not found</h1><p style="color:#5f6a62">This page is not currently available.</p><p><a href="/" style="color:#1b7a3c">Return to the homepage</a></p></body>');
   }
