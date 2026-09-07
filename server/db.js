@@ -5,6 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const Database = require('better-sqlite3');
 const bcrypt = require('bcryptjs');
+const { normEmail, normPhone, domainFromWebsite, domainFromEmail } = require('./normalize');
 
 const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -193,26 +194,88 @@ function runMigrations() {
   db.exec('CREATE INDEX IF NOT EXISTS idx_contacts_emailnorm ON contacts(email_norm)');
   db.exec('CREATE INDEX IF NOT EXISTS idx_contacts_phonenorm ON contacts(phone_norm)');
 
-  // Email outbox: queue / retry / status tracking (existing rows keep `sent`).
-  addColumn('emails', 'status', "status TEXT DEFAULT 'queued'");
+  // Email outbox: queue / retry / status tracking.
+  // IMPORTANT (one-time, guarded): introducing `status` must NOT make historical
+  // rows eligible for an accidental resend. We detect whether the column existed
+  // BEFORE this migration and, only on its first introduction, map from the legacy
+  // `sent` field: sent=1 → 'sent'; every other historical row → 'legacy_unsent',
+  // a terminal status that the retry/send logic never picks up. Later boots see the
+  // column already present and never rewrite statuses (idempotent).
+  const hadEmailStatus = cols('emails').includes('status');
+  addColumn('emails', 'status', "status TEXT DEFAULT 'queued'");   // default only affects genuinely NEW rows
   addColumn('emails', 'attempts', 'attempts INTEGER DEFAULT 0');
   addColumn('emails', 'last_error', 'last_error TEXT');
   addColumn('emails', 'contact_id', 'contact_id INTEGER');
   addColumn('emails', 'event_source', 'event_source TEXT');
   addColumn('emails', 'sent_at', 'sent_at TEXT');
+  addColumn('emails', 'idem_key', 'idem_key TEXT');                // thank-you idempotency key
+  if (!hadEmailStatus) {
+    // First introduction only. ADD COLUMN set every existing row to 'queued';
+    // immediately correct that from the legacy `sent` flag. No live rows exist yet
+    // (this runs at boot before requests are served), so updating all rows is safe.
+    const n = db.prepare("UPDATE emails SET status = CASE WHEN sent=1 THEN 'sent' ELSE 'legacy_unsent' END").run().changes;
+    if (n) console.log(`  emails.status introduced: mapped ${n} historical row(s) from 'sent' (sent→sent, else→legacy_unsent).`);
+  }
+  // Idempotency: at most one thank-you record per (recipient/contact + event).
+  db.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_emails_idem ON emails(idem_key) WHERE idem_key IS NOT NULL');
+  db.exec('CREATE INDEX IF NOT EXISTS idx_emails_status ON emails(status)');
+
+  // Follow-up ownership as a stable reference (not just free text in the title).
+  addColumn('tasks', 'owner_id', 'owner_id INTEGER');
+  addColumn('tasks', 'owner_name', 'owner_name TEXT');
+  addColumn('tasks', 'event_source', 'event_source TEXT');
 
   // One row per captured card — attribution, email status and review audit.
   db.exec(`CREATE TABLE IF NOT EXISTS card_scans(
     id INTEGER PRIMARY KEY, submitter_id INTEGER, submitter_email TEXT, submitter_name TEXT,
-    org_id INTEGER, contact_id INTEGER, event_source TEXT, follow_up_owner TEXT, follow_up_date TEXT,
+    org_id INTEGER, contact_id INTEGER, event_source TEXT, follow_up_owner TEXT, follow_up_owner_id INTEGER, follow_up_date TEXT,
     consent INTEGER DEFAULT 0, is_duplicate INTEGER DEFAULT 0,
-    email_status TEXT, email_attempts INTEGER DEFAULT 0, email_last_error TEXT, email_sent_at TEXT,
+    email_status TEXT, email_id INTEGER, email_attempts INTEGER DEFAULT 0, email_last_error TEXT, email_sent_at TEXT,
     raw_json TEXT, ip TEXT, created_at TEXT);`);
+  addColumn('card_scans', 'follow_up_owner_id', 'follow_up_owner_id INTEGER');   // for DBs created before this column
+  addColumn('card_scans', 'email_id', 'email_id INTEGER');
   db.exec('CREATE INDEX IF NOT EXISTS idx_scans_event ON card_scans(event_source)');
   db.exec('CREATE INDEX IF NOT EXISTS idx_scans_submitter ON card_scans(submitter_id)');
   db.exec('CREATE INDEX IF NOT EXISTS idx_scans_created ON card_scans(created_at)');
 
+  // ---- One-time, idempotent backfill of the new de-duplication columns ----
+  // Existing production contacts/organisations have blank email_norm/phone_norm/
+  // domain. Fill ONLY blanks (so re-running never rewrites corrected values).
+  backfillNormalisation();
+
   console.log('Migrations applied (additive; existing data preserved).');
+}
+
+// Idempotent backfill: fills ONLY blank normalisation columns, so it is safe to
+// run on every boot and never rewrites a value that already exists.
+function backfillNormalisation() {
+  const cols = (t) => db.prepare(`PRAGMA table_info(${t})`).all().map(c => c.name);
+  if (!cols('contacts').includes('email_norm')) return;
+  const cRows = db.prepare("SELECT id,email,phone,email_norm,phone_norm FROM contacts WHERE email_norm IS NULL OR email_norm='' OR phone_norm IS NULL OR phone_norm=''").all();
+  const setC = db.prepare('UPDATE contacts SET email_norm=?, phone_norm=? WHERE id=?');
+  const tx = db.transaction(rows => {
+    for (const r of rows) {
+      const en = (r.email_norm && r.email_norm !== '') ? r.email_norm : normEmail(r.email);
+      const pn = (r.phone_norm && r.phone_norm !== '') ? r.phone_norm : normPhone(r.phone);
+      setC.run(en, pn, r.id);
+    }
+  });
+  if (cRows.length) tx(cRows);
+
+  // Organisation domain: website first; else a BUSINESS email of one of its
+  // contacts (never a free consumer mailbox). Blanks only.
+  const oRows = db.prepare("SELECT id,website,domain FROM organisations WHERE domain IS NULL OR domain=''").all();
+  const setO = db.prepare('UPDATE organisations SET domain=? WHERE id=?');
+  const oneContactEmail = db.prepare("SELECT email FROM contacts WHERE org_id=? AND email IS NOT NULL AND email<>'' ");
+  const txo = db.transaction(rows => {
+    for (const o of rows) {
+      let d = domainFromWebsite(o.website);
+      if (!d) { for (const c of oneContactEmail.all(o.id)) { d = domainFromEmail(c.email); if (d) break; } }
+      if (d) setO.run(d, o.id);
+    }
+  });
+  if (oRows.length) txo(oRows);
+  if (cRows.length || oRows.length) console.log(`  backfilled normalisation: ${cRows.length} contact(s), ${oRows.length} organisation(s).`);
 }
 runMigrations();
 
