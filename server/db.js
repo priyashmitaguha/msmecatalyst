@@ -28,6 +28,9 @@ const ROLES = {
   editor:      { label: 'Editor (assigned sections)', editorScoped: true, publish: true, collections: [] },
   crm_admin:   { label: 'CRM Admin',   crm: true, crmWrite: true },
   crm_viewer:  { label: 'CRM Viewer (read-only)', crm: true, crmWrite: false },
+  // Event Scanner: capture visiting cards at events ONLY. No dashboard, CRM
+  // browsing, analytics, users, audit, CMS or settings — enforced server-side.
+  event_scanner: { label: 'Event Scanner (card capture)', scanner: true },
   // ---- legacy roles (kept for backward compatibility with existing accounts) ----
   content_admin:    { label: 'Content Admin (legacy)',    content: true, collections: CONTENT_COLLECTIONS },
   membership_admin: { label: 'Membership Admin (legacy)', crm: true, crmWrite: true, collections: ['media'] },
@@ -168,6 +171,47 @@ function runMigrations() {
   db.exec('CREATE INDEX IF NOT EXISTS idx_audit_created ON audit_log(created_at)');
 
   db.exec('CREATE INDEX IF NOT EXISTS idx_entries_collection ON entries(collection)');
+
+  // ---- Event card scanner (GFF) — all additive, existing data preserved ----
+  // Extra organisation locality fields (website/address already exist).
+  addColumn('organisations', 'city', 'city TEXT');
+  addColumn('organisations', 'state', 'state TEXT');
+  addColumn('organisations', 'country', 'country TEXT');
+  addColumn('organisations', 'domain', 'domain TEXT');            // normalised, for de-duplication
+  // Extra contact fields captured from a visiting card.
+  addColumn('contacts', 'phone_alt', 'phone_alt TEXT');
+  addColumn('contacts', 'linkedin', 'linkedin TEXT');
+  addColumn('contacts', 'notes', 'notes TEXT');
+  addColumn('contacts', 'areas_of_interest', 'areas_of_interest TEXT');
+  addColumn('contacts', 'email_norm', 'email_norm TEXT');         // normalised, for de-duplication
+  addColumn('contacts', 'phone_norm', 'phone_norm TEXT');         // normalised, for de-duplication
+  addColumn('contacts', 'source', 'source TEXT');
+  addColumn('contacts', 'event_source', 'event_source TEXT');
+  addColumn('contacts', 'submitted_by', 'submitted_by INTEGER');
+  addColumn('contacts', 'created_at', 'created_at TEXT');
+  addColumn('contacts', 'updated_at', 'updated_at TEXT');
+  db.exec('CREATE INDEX IF NOT EXISTS idx_contacts_emailnorm ON contacts(email_norm)');
+  db.exec('CREATE INDEX IF NOT EXISTS idx_contacts_phonenorm ON contacts(phone_norm)');
+
+  // Email outbox: queue / retry / status tracking (existing rows keep `sent`).
+  addColumn('emails', 'status', "status TEXT DEFAULT 'queued'");
+  addColumn('emails', 'attempts', 'attempts INTEGER DEFAULT 0');
+  addColumn('emails', 'last_error', 'last_error TEXT');
+  addColumn('emails', 'contact_id', 'contact_id INTEGER');
+  addColumn('emails', 'event_source', 'event_source TEXT');
+  addColumn('emails', 'sent_at', 'sent_at TEXT');
+
+  // One row per captured card — attribution, email status and review audit.
+  db.exec(`CREATE TABLE IF NOT EXISTS card_scans(
+    id INTEGER PRIMARY KEY, submitter_id INTEGER, submitter_email TEXT, submitter_name TEXT,
+    org_id INTEGER, contact_id INTEGER, event_source TEXT, follow_up_owner TEXT, follow_up_date TEXT,
+    consent INTEGER DEFAULT 0, is_duplicate INTEGER DEFAULT 0,
+    email_status TEXT, email_attempts INTEGER DEFAULT 0, email_last_error TEXT, email_sent_at TEXT,
+    raw_json TEXT, ip TEXT, created_at TEXT);`);
+  db.exec('CREATE INDEX IF NOT EXISTS idx_scans_event ON card_scans(event_source)');
+  db.exec('CREATE INDEX IF NOT EXISTS idx_scans_submitter ON card_scans(submitter_id)');
+  db.exec('CREATE INDEX IF NOT EXISTS idx_scans_created ON card_scans(created_at)');
+
   console.log('Migrations applied (additive; existing data preserved).');
 }
 runMigrations();
