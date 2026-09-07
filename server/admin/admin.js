@@ -173,27 +173,57 @@ async function viewScans() {
 
 /* ---------------- Event Scanner settings (Super Admin) ---------------- */
 async function viewScanConfig() {
-  setTitle('Event Scanner', 'GFF card-capture settings, event sources and the thank-you email');
+  setTitle('Event Scanner', 'Reusable card-capture settings: event sources, representatives and the thank-you email');
   const v = $('#view'); v.innerHTML = '<p class="muted">Loading…</p>';
   const { config } = await api('/api/settings/scan');
   v.innerHTML = '';
-  const note = el('p', 'notice', 'Create Event Scanner accounts in Admin Users (role “Event Scanner”). Each scanner signs in and is taken straight to the mobile capture form — they cannot see the CRM or any admin area.');
+  const note = el('p', 'notice', 'Create Event Scanner accounts in Admin Users (role “Event Scanner”) — one per representative. Each signs in and goes straight to the mobile capture form; they cannot see the CRM or any admin area. The scanner works for any event, meeting or conference.');
   v.appendChild(note);
-  const p = panel('Capture settings', config.email_configured ? 'Email is configured' : 'Email not configured — thank-yous will queue');
+
+  // ---- Event sources: add, rename, and toggle active/inactive (history preserved) ----
+  const sp = panel('Event sources', 'Deactivate an old event instead of deleting it — past scans keep their label. “General Meeting” is always available.');
+  const list = el('div', ''); sp.body.appendChild(list);
+  const rows = [];
+  const addRow = (name = '', active = true) => {
+    const row = el('div', 'item-row');
+    const permanent = name.toLowerCase() === 'general meeting';
+    const nm = el('input', 'input'); nm.value = name; nm.placeholder = 'Event / source name'; nm.style.maxWidth = '340px'; if (permanent) nm.disabled = true;
+    const lab = el('label', ''); lab.style.cssText = 'display:flex;align-items:center;gap:6px;font-size:.85rem;margin-left:auto';
+    const cb = el('input', ''); cb.type = 'checkbox'; cb.checked = active !== false; if (permanent) cb.disabled = true; cb.style.cssText = 'width:18px;height:18px;accent-color:var(--green)';
+    lab.append(cb, document.createTextNode('Active'));
+    row.append(nm, lab);
+    if (!permanent) { const rm = el('button', 'mini danger', 'Remove'); rm.onclick = () => { row.remove(); const i = rows.indexOf(ref); if (i >= 0) rows.splice(i, 1); }; row.appendChild(rm); }
+    const ref = { nm, cb }; rows.push(ref);
+    list.appendChild(row);
+  };
+  (config.event_sources || []).forEach(s => addRow(s.name, s.active));
+  if (!rows.length) addRow('General Meeting', true);
+  const addBtn = el('button', 'btn btn-ghost', '+ Add event source'); addBtn.onclick = () => addRow('', true);
+  const saveSrc = el('button', 'btn btn-primary', 'Save event sources'); saveSrc.style.marginLeft = '8px';
+  const srcMsg = el('span', 'muted'); srcMsg.style.marginLeft = '10px';
+  saveSrc.onclick = async () => {
+    const payload = { event_sources: rows.map(r => ({ name: r.nm.value.trim(), active: r.cb.checked })).filter(s => s.name) };
+    saveSrc.textContent = 'Saving…';
+    try { await api('/api/settings/scan', { method: 'PUT', body: JSON.stringify(payload) }); srcMsg.textContent = 'Saved ✓'; } catch (e) { srcMsg.textContent = e.message; }
+    saveSrc.textContent = 'Save event sources';
+  };
+  const bar = el('div', ''); bar.style.marginTop = '10px'; bar.append(addBtn, saveSrc, srcMsg); sp.body.appendChild(bar);
+  v.appendChild(sp.wrap);
+
+  // ---- Thank-you email template ----
+  const p = panel('Thank-you email', config.email_configured ? 'Email is configured' : 'Email not configured — thank-yous will queue for retry');
   const form = el('div', 'form');
-  const sources = fieldFor('event_sources', 'Event sources (one per line; the first is the default)', 'textarea', (config.event_sources || []).join('\n'));
-  const reps = fieldFor('representatives', 'Representatives (one per line, optional)', 'textarea', (config.representatives || []).join('\n'));
+  const reps = fieldFor('representatives', 'Representatives (one per line — validated as follow-up owners)', 'textarea', (config.representatives || []).join('\n'));
   const fromName = fieldFor('email_from_name', 'Email sender name', 'text', config.email_from_name);
   const subject = fieldFor('email_subject', 'Email subject', 'text', config.email_subject);
   const bodyF = fieldFor('email_body', 'Email body', 'textarea', config.email_body);
   const sig = fieldFor('email_signature', 'Email signature', 'textarea', config.email_signature);
   const help = el('p', 'notice', 'Personalisation tokens: {{first_name}}, {{event}}, {{rep}}, {{from_name}}.');
-  const save = el('button', 'btn btn-primary', 'Save settings');
+  const save = el('button', 'btn btn-primary', 'Save email settings');
   const msg = el('span', 'muted'); msg.style.marginLeft = '10px';
   save.onclick = async () => {
     save.textContent = 'Saving…';
     const payload = {
-      event_sources: sources.querySelector('[data-k]').value.split('\n').map(s => s.trim()).filter(Boolean),
       representatives: reps.querySelector('[data-k]').value.split('\n').map(s => s.trim()).filter(Boolean),
       email_from_name: fromName.querySelector('[data-k]').value,
       email_subject: subject.querySelector('[data-k]').value,
@@ -201,9 +231,9 @@ async function viewScanConfig() {
       email_signature: sig.querySelector('[data-k]').value,
     };
     try { await api('/api/settings/scan', { method: 'PUT', body: JSON.stringify(payload) }); msg.textContent = 'Saved ✓'; } catch (e) { msg.textContent = e.message; }
-    save.textContent = 'Save settings';
+    save.textContent = 'Save email settings';
   };
-  form.append(sources, reps, fromName, subject, bodyF, sig, help, save, msg);
+  form.append(reps, fromName, subject, bodyF, sig, help, save, msg);
   p.body.appendChild(form); v.appendChild(p.wrap);
 
   // Test email

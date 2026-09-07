@@ -1,14 +1,18 @@
 'use strict';
-/* GFF visiting-card capture — mobile-first.
-   OCR runs on-device (tesseract.js). The image is NEVER uploaded and is
-   discarded after use; only the reviewed text fields are submitted. */
+/* Event visiting-card capture — mobile-first, reusable for any event.
+   OCR runs on-device via SELF-HOSTED tesseract.js (served from /vendor, no CDN).
+   The image is NEVER uploaded and is discarded after extraction; only the
+   representative-reviewed text fields are submitted to the CRM. */
 const $ = s => document.querySelector(s);
 async function api(url, opts) {
   const r = await fetch(url, Object.assign({ headers: { 'Content-Type': 'application/json' } }, opts));
   const j = await r.json().catch(() => ({}));
   return { status: r.status, ok: r.ok, data: j };
 }
-let CONFIG = null;
+const MAX_BYTES = 12 * 1024 * 1024;         // reject oversized photos before OCR
+const MAX_DIM = 1600;                        // downscale bound (px) for OCR + memory safety
+const OK_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif', 'image/bmp'];
+let CONFIG = null, busy = false, ocrWorker = null;
 
 (async function init() {
   const me = await api('/api/auth/me');
@@ -21,10 +25,9 @@ let CONFIG = null;
   const cfg = await api('/api/scan/config');
   CONFIG = cfg.data;
   const sel = $('#event_source');
-  (CONFIG.event_sources || ['GFF 2026']).forEach(s => { const o = document.createElement('option'); o.value = o.textContent = s; if (s === CONFIG.default_event) o.selected = true; sel.appendChild(o); });
+  (CONFIG.event_sources || ['General Meeting']).forEach(s => { const o = document.createElement('option'); o.value = o.textContent = s; if (s === CONFIG.default_event) o.selected = true; sel.appendChild(o); });
   $('#form [name=follow_up_owner]').value = (me.data.user.name || '');
   if (!CONFIG.email_configured) {
-    // Make it clear email will queue, not send.
     $('#consent').closest('.checkrow').querySelector('span').innerHTML += ' <em style="color:#9a3412">(email service is not configured yet — the thank-you will be queued, not sent)</em>';
   }
   $('#gate').classList.add('hidden');
@@ -33,65 +36,94 @@ let CONFIG = null;
 
 $('#signout').addEventListener('click', async e => { e.preventDefault(); await api('/api/auth/logout', { method: 'POST' }); location.replace('/admin'); });
 
-/* ---------------- image capture + OCR ---------------- */
-let objectUrl = null;
-function clearImage() {
-  if (objectUrl) { URL.revokeObjectURL(objectUrl); objectUrl = null; }
+/* ---------------- image capture, safety checks + on-device OCR ---------------- */
+let previewUrl = null;
+function releaseImage() {
+  if (previewUrl) { URL.revokeObjectURL(previewUrl); previewUrl = null; }
   $('#cam').value = ''; $('#pick').value = '';
   $('#preview').classList.add('hidden'); $('#preview-img').removeAttribute('src');
 }
 function showForm() { $('#form').classList.remove('hidden'); $('#form').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+function setStatus(t) { $('#ocr-status').textContent = t; }
 
 ['#cam', '#pick'].forEach(id => $(id).addEventListener('change', ev => onImage(ev.target.files && ev.target.files[0])));
 $('#manual').addEventListener('click', () => { showForm(); });
-$('#retake').addEventListener('click', () => { clearImage(); });
+$('#retake').addEventListener('click', () => { if (!busy) releaseImage(); });
 
 async function onImage(file) {
+  if (busy) return;                                   // prevent repeated taps launching parallel OCR
   if (!file) return;
-  if (!/^image\//.test(file.type)) { setStatus('That file is not an image.'); return; }
-  if (objectUrl) URL.revokeObjectURL(objectUrl);
-  objectUrl = URL.createObjectURL(file);
-  $('#preview-img').src = objectUrl;
-  $('#preview').classList.remove('hidden');
+  // --- image safety: type + size ---
+  const typeOk = OK_TYPES.includes(file.type) || /\.(jpe?g|png|webp|heic|heif|bmp)$/i.test(file.name || '');
+  if (!typeOk) { showForm(); setStatus('Unsupported image type — please use a JPEG, PNG or WebP photo, or enter details manually.'); return; }
+  if (file.size > MAX_BYTES) { showForm(); setStatus('That image is too large (max 12 MB). Please retake at a lower resolution or enter details manually.'); return; }
+  busy = true;
   showForm();
-  if (typeof Tesseract === 'undefined') { setStatus('On-device text reader unavailable — please type the details from the card.'); return; }
-  setStatus('Reading card… you can start typing while this runs.');
+  // --- decode + orientation-correct + downscale in the browser ---
+  let bitmap = null, canvas = null;
   try {
-    const res = await Tesseract.recognize(objectUrl, 'eng', {
-      logger: m => { if (m.status === 'recognizing text') setStatus('Reading card… ' + Math.round((m.progress || 0) * 100) + '%'); }
-    });
-    const text = (res && res.data && res.data.text) || '';
-    parseInto(text);
+    previewUrl && URL.revokeObjectURL(previewUrl);
+    previewUrl = URL.createObjectURL(file);
+    $('#preview-img').src = previewUrl;
+    $('#preview').classList.remove('hidden');
+    try { bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' }); }
+    catch (e) { bitmap = await createImageBitmap(file); }   // older engines: no auto-orient option
+    if (!bitmap || !bitmap.width) throw new Error('decode');
+    const scale = Math.min(1, MAX_DIM / Math.max(bitmap.width, bitmap.height));
+    const w = Math.max(1, Math.round(bitmap.width * scale)), h = Math.max(1, Math.round(bitmap.height * scale));
+    canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h;
+    canvas.getContext('2d').drawImage(bitmap, 0, 0, w, h);
+  } catch (e) {
+    setStatus('That image could not be read (it may be corrupt). Please retake or enter the details manually.');
+    if (bitmap && bitmap.close) bitmap.close();
+    busy = false; return;
+  }
+  // --- OCR on the downscaled canvas (self-hosted; image stays on-device) ---
+  if (typeof Tesseract === 'undefined') {
+    setStatus('On-device text reader could not load — please type the details from the card.');
+    if (bitmap && bitmap.close) bitmap.close();
+    canvas.width = canvas.height = 0; busy = false; return;
+  }
+  setStatus('Reading card on your device… you can start typing while this runs.');
+  try {
+    if (!ocrWorker) {
+      ocrWorker = await Tesseract.createWorker('eng', 1, {
+        workerPath: '/vendor/tesseract/js/worker.min.js',
+        corePath: '/vendor/tesseract/core',
+        langPath: '/vendor/tesseract/lang',
+        logger: m => { if (m.status === 'recognizing text') setStatus('Reading card… ' + Math.round((m.progress || 0) * 100) + '%'); },
+      });
+    }
+    const res = await ocrWorker.recognize(canvas);
+    parseInto((res && res.data && res.data.text) || '');
     setStatus('Text read from the card — please check every field, then save.');
   } catch (e) {
-    setStatus('Could not read the card automatically — please type the details.');
+    setStatus('Automatic reading failed — please type the details from the card.');
   } finally {
-    // The image has served its purpose. Discard it (never uploaded, never stored).
-    if (objectUrl) { URL.revokeObjectURL(objectUrl); objectUrl = null; }
+    // Release every image reference — nothing is uploaded or retained.
+    if (bitmap && bitmap.close) bitmap.close();
+    if (canvas) { canvas.width = canvas.height = 0; }
+    if (previewUrl) { URL.revokeObjectURL(previewUrl); previewUrl = null; }
+    busy = false;
   }
 }
-function setStatus(t) { $('#ocr-status').textContent = t; }
 
 /* ---------------- best-effort field extraction (always human-reviewed) ---------------- */
-function setIfEmpty(name, val) { const el = $('#form [name=' + name + ']'); if (el && !el.value && val) el.value = val.trim(); }
+function setIfEmpty(name, val) { const el = $('#form [name=' + name + ']'); if (el && !el.value && val) el.value = String(val).trim(); }
 function parseInto(text) {
   const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
   const joined = lines.join('  ');
   const email = (joined.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i) || [])[0];
   if (email) setIfEmpty('email', email.toLowerCase());
-  // LinkedIn
   const li = (joined.match(/(?:https?:\/\/)?(?:[a-z]{2,3}\.)?linkedin\.com\/[^\s]+/i) || [])[0];
   if (li) setIfEmpty('linkedin', li.startsWith('http') ? li : 'https://' + li);
-  // Website (avoid the email's domain and linkedin)
   let web = (joined.match(/\b((https?:\/\/)?(www\.)?[a-z0-9-]+\.(com|org|net|in|io|co|gov|edu)(\.[a-z]{2})?(\/[^\s]*)?)/i) || [])[0];
   if (web && email && web.includes(email.split('@')[1])) web = null;
   if (web && /linkedin\./i.test(web)) web = null;
   if (web) setIfEmpty('website', web.startsWith('http') ? web : 'https://' + web);
-  // Phones (take up to two)
   const phones = (joined.match(/(\+?\d[\d\s().-]{7,}\d)/g) || []).map(p => p.trim()).filter(p => p.replace(/\D/g, '').length >= 8);
   if (phones[0]) setIfEmpty('mobile', phones[0]);
   if (phones[1]) setIfEmpty('alternate', phones[1]);
-  // Name / designation / organisation heuristics from the top lines
   const nonContact = lines.filter(l => !/@|\d{5,}|linkedin|www\.|https?:/i.test(l));
   if (nonContact[0]) setIfEmpty('full_name', nonContact[0]);
   if (nonContact[1]) setIfEmpty('designation', nonContact[1]);
@@ -100,7 +132,7 @@ function parseInto(text) {
   else if (nonContact[2]) setIfEmpty('organisation', nonContact[2]);
 }
 
-/* ---------------- submit ---------------- */
+/* ---------------- submit (reviewed text only; never the image) ---------------- */
 $('#form').addEventListener('submit', async e => {
   e.preventDefault();
   const msg = $('#form-msg'); msg.classList.add('hidden');
@@ -119,15 +151,16 @@ $('#form').addEventListener('submit', async e => {
 });
 
 function showDone(res) {
-  clearImage();
+  releaseImage();
   $('#app').classList.add('hidden');
   const done = $('#done'); done.classList.remove('hidden');
   const sent = res.email_status === 'sent';
-  const queued = res.email_status === 'queued' || res.email_status === 'failed';
+  const queuedOrFailed = res.email_status === 'queued' || res.email_status === 'failed';
   $('#done-title').textContent = sent ? 'Saved & email sent' : 'Saved to CRM';
   const m = $('#done-msg');
   m.textContent = res.message + (res.duplicate ? ' This matched an existing contact — your notes were added without overwriting their details.' : '');
-  m.className = 'msg ' + (sent ? 'ok' : (queued ? 'warn' : 'ok'));
+  m.className = 'msg ' + (sent ? 'ok' : (queuedOrFailed ? 'warn' : 'ok'));
   done.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 $('#another').addEventListener('click', () => location.reload());
+window.addEventListener('beforeunload', () => { try { if (ocrWorker && ocrWorker.terminate) ocrWorker.terminate(); } catch (e) {} });
