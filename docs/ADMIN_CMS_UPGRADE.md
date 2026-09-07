@@ -253,8 +253,10 @@ analytics, users, audit, CMS, settings — so a hand-entered URL leaks nothing.
 
 **Mobile capture + on-device OCR.** `/admin/scan.html` opens the phone camera
 (`<input type=file capture=environment>`) or accepts an uploaded image, then reads
-the text **on the device** with `tesseract.js` (loaded from cdnjs — no API key, no
-paid service). The image is **never uploaded** and is discarded (`URL.revokeObjectURL`)
+the text **on the device** with `tesseract.js` — **self-hosted, served same-origin
+from `/vendor/tesseract`** (the script, wasm core and `eng` language model are
+pinned npm dependencies, not loaded from any CDN — no API key, no paid service).
+The image is **never uploaded** and is discarded (`URL.revokeObjectURL`)
 after extraction; only the reviewed text fields are submitted. OCR results always
 require human review/correction/retake before saving.
 
@@ -432,3 +434,39 @@ scanner authorization across every API family, unlimited accounts + deactivate/
 reactivate, generic/General-Meeting events, historical event attribution, no
 third-party scanner script, no image upload, image-safety controls, and explicit
 scan-list fields without raw JSON or IP. `npm audit --omit=dev`: **0 vulnerabilities**.
+
+## 14. Revision 6 — email send-claim concurrency fix
+
+Fixes a concurrency defect in the thank-you-email send/retry path.
+
+**Defect.** Stale-`sending` recovery judged staleness by `emails.created_at`. An
+old queued/failed email that had just been claimed as `sending` still carried an
+old `created_at`, so a concurrent request could immediately reset it to `queued`,
+re-claim it and send a **duplicate**. Separately, `retryEmailRow()` rejected a row
+whose status was already `sending` *before* running stale recovery, so a genuinely
+abandoned `sending` record could never be recovered through the retry flow.
+
+**Fix.**
+- New guarded, additive column `emails.sending_started_at` (the claim clock).
+- The atomic claim now sets `status='sending'` **and** `sending_started_at=now` in
+  one `UPDATE … WHERE status IN ('queued','failed')`; only one caller can win.
+- `recoverStaleSending()` judges staleness **only** by `sending_started_at`
+  (`< cutoff`, or NULL for pre-migration leftovers) — **never** by `created_at`.
+  A row claimed just now (recent `sending_started_at`) is left alone even if it was
+  created long ago, so a concurrent request cannot reset-and-reclaim an in-flight send.
+- Stale recovery runs **before** retry eligibility is decided; a genuinely abandoned
+  `sending` row is recovered to `queued` and can then be retried.
+- `sending_started_at` is cleared whenever a row settles to `sent`, `failed` or `queued`.
+
+**Tests (REV6 section):** an email created long ago but claimed just now is not
+reclaimed by recovery or by a concurrent retry (stays `sending`, no duplicate send);
+a genuinely stale `sending` row is recovered to `queued` and then retried; and two
+truly interleaved retries make **exactly one** SMTP call. Test-only hooks
+(`/api/test/*`, registered only when `ALLOW_TEST_HOOKS=1`, Super-Admin-gated) build
+the scenarios and count send attempts. The scans list now also exposes `email_id`.
+
+**Docs:** corrected the Part-A note that still said Tesseract loads from cdnjs — OCR
+is **self-hosted** from `/vendor/tesseract` (see §12).
+
+**New migration surface in revision 6:** one additive column,
+`emails.sending_started_at`. No data deleted/reset.

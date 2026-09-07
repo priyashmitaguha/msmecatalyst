@@ -431,6 +431,39 @@ const waitHealth = async () => { for (let i = 0; i < 50; i++) { try { const r = 
     ]);
     ok('simultaneous retries send at most once', [rr1, rr2].filter(r => r.data.status === 'sent' && r.data.claimed).length === 1);
 
+    console.log('\nREV6 — STALE-SENDING RECOVERY (by sending_started_at, never created_at)');
+    // Build a row that was CREATED long ago but CLAIMED just now (recent sending_started_at).
+    await api('/api/scan/card', { method: 'POST', body: { full_name: 'StaleClock', email: 'staleclock@ex.com', consent: true } }, scanner); // queued (no SMTP)
+    const eid = (await api('/api/crm/scans', {}, admin2)).data.scans.find(s => s.contact_email === 'staleclock@ex.com').email_id;
+    ok('captured email id is exposed to admins', !!eid);
+    await api('/api/test/email-state', { method: 'POST', body: { id: eid, created_at: '2020-01-01T00:00:00.000Z', status: 'sending', sending_started_at: new Date().toISOString(), sent_at: null } }, admin2);
+    await api('/api/test/recover-stale', { method: 'POST' }, admin2);
+    ok('recovery does NOT reset a just-claimed row despite an ancient created_at', (await api('/api/test/email/' + eid, {}, admin2)).data.email.status === 'sending');
+    const concurrent = await api('/api/crm/emails/' + eid + '/retry', { method: 'POST', headers: { 'x-test-mail': 'sent' } }, admin2);
+    ok('a concurrent request cannot reclaim an in-flight send', concurrent.data.status === 'sending' && concurrent.data.claimed === false);
+    ok('the in-flight row stays sending (no duplicate send)', (await api('/api/test/email/' + eid, {}, admin2)).data.email.status === 'sending');
+
+    // A genuinely abandoned 'sending' row (claimed long ago) IS recovered to queued.
+    await api('/api/test/email-state', { method: 'POST', body: { id: eid, status: 'sending', sending_started_at: '2020-01-01T00:00:00.000Z', sent_at: null } }, admin2);
+    await api('/api/test/recover-stale', { method: 'POST' }, admin2);
+    ok('a genuinely stale sending row (old sending_started_at) is recovered to queued', (await api('/api/test/email/' + eid, {}, admin2)).data.email.status === 'queued');
+    // The retry flow recovers a stale 'sending' row BEFORE deciding eligibility, then sends it.
+    await api('/api/test/email-state', { method: 'POST', body: { id: eid, status: 'sending', sending_started_at: '2020-01-01T00:00:00.000Z', sent_at: null } }, admin2);
+    const recoverRetry = await api('/api/crm/emails/' + eid + '/retry', { method: 'POST', headers: { 'x-test-mail': 'sent' } }, admin2);
+    ok('retry recovers a stale sending row before eligibility, then sends', recoverRetry.data.status === 'sent');
+    ok('a settled (sent) row has sending_started_at cleared', !(await api('/api/test/email/' + eid, {}, admin2)).data.email.sending_started_at);
+
+    // Two truly interleaved retries make exactly ONE real SMTP call.
+    await api('/api/scan/card', { method: 'POST', body: { full_name: 'OneCall', email: 'onecall@ex.com', consent: true } }, scanner); // queued
+    const ocEid = (await api('/api/crm/scans', {}, admin2)).data.scans.find(s => s.contact_email === 'onecall@ex.com').email_id;
+    await api('/api/test/smtp-calls/reset', { method: 'POST' }, admin2);
+    const [o1, o2] = await Promise.all([
+      api('/api/crm/emails/' + ocEid + '/retry', { method: 'POST', headers: { 'x-test-mail': 'sent-slow' } }, admin2),
+      api('/api/crm/emails/' + ocEid + '/retry', { method: 'POST', headers: { 'x-test-mail': 'sent-slow' } }, admin2),
+    ]);
+    ok('two simultaneous retries make EXACTLY ONE SMTP call', (await api('/api/test/smtp-calls', {}, admin2)).data.calls === 1);
+    ok('one simultaneous retry sends; the other is deflected as sending', [o1, o2].filter(r => r.data.status === 'sent').length === 1 && [o1, o2].some(r => r.data.status === 'sending'));
+
     console.log('\nREV5 — REUSABLE SCANNER (generic events, unlimited accounts, attribution)');
     ok('General Meeting is always an available event source', (await api('/api/scan/config', {}, scanner)).data.event_sources.includes('General Meeting'));
     const genScan = await api('/api/scan/card', { method: 'POST', body: { full_name: 'Generic', email: 'generic@ex.com', event_source: 'General Meeting' } }, scanner);
