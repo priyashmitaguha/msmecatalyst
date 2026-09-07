@@ -879,26 +879,36 @@ const scanMsg = s => ({
 function thankyouIdemKey(event, emailNorm, contactId) {
   return 'thankyou|' + String(event) + '|' + (emailNorm || ('c' + contactId));
 }
-// Reset any email stuck in 'sending' (a process died mid-send) back to 'queued' so
-// it can be retried — but only after a safety delay, and never a terminal status.
+// Recover an email abandoned mid-send (a process died after claiming it) back to
+// 'queued' so it can be retried. Staleness is judged ONLY by sending_started_at —
+// the moment the row was claimed — never by created_at. A row claimed just now has
+// a recent sending_started_at and is left alone even if it was created long ago, so
+// a concurrent request can never reset-and-reclaim an in-flight send. A 'sending'
+// row with a missing claim time is a pre-migration leftover and is safe to recover.
 function recoverStaleSending(maxAgeMs = 5 * 60 * 1000) {
   const cutoff = new Date(Date.now() - maxAgeMs).toISOString();
-  db.prepare("UPDATE emails SET status='queued' WHERE status='sending' AND (sent_at IS NULL) AND (created_at < ? OR created_at IS NULL)").run(cutoff);
+  db.prepare("UPDATE emails SET status='queued', sending_started_at=NULL WHERE status='sending' AND sent_at IS NULL AND (sending_started_at IS NULL OR sending_started_at < ?)").run(cutoff);
 }
-/* Atomically claim a sendable email (queued/failed → sending), send it, then settle
-   to sent/failed/queued. Only ONE caller can claim a given row, so concurrent card
-   submits or concurrent retries can never send the same message twice. Historical
-   'legacy_unsent' and already-'sent'/'sending' rows are never claimed. */
+let TEST_SMTP_CALLS = 0;   // test-only counter (see /api/test/* hooks, gated by ALLOW_TEST_HOOKS)
+/* Atomically claim a sendable email (queued/failed → sending, stamping
+   sending_started_at) then send and settle to sent/failed/queued, clearing
+   sending_started_at. Only ONE caller can win the claim, so concurrent card
+   submits or concurrent retries can never send the same message twice. */
 async function sendClaimed(emailId, testMode) {
-  const claimed = db.prepare("UPDATE emails SET status='sending', attempts=attempts+1 WHERE id=? AND status IN ('queued','failed')").run(emailId).changes === 1;
+  const claimed = db.prepare("UPDATE emails SET status='sending', sending_started_at=?, attempts=attempts+1 WHERE id=? AND status IN ('queued','failed')")
+    .run(nowISO(), emailId).changes === 1;
   if (!claimed) { const r = db.prepare('SELECT status FROM emails WHERE id=?').get(emailId); return { claimed: false, status: r ? r.status : 'unknown' }; }
   const e = db.prepare('SELECT * FROM emails WHERE id=?').get(emailId);
-  const sent = testMode ? { ok: testMode === 'sent', configured: true, error: testMode === 'fail' ? 'simulated failure' : undefined }
-    : await mailer.sendMail({ to: e.to_addr, subject: e.subject, text: e.body });
+  if (process.env.ALLOW_TEST_HOOKS === '1') TEST_SMTP_CALLS++;               // count real send attempts in tests
+  let sent;
+  if (testMode) {
+    if (testMode === 'sent-slow') { await new Promise(r => setTimeout(r, 80)); sent = { ok: true, configured: true }; }
+    else sent = { ok: testMode === 'sent', configured: true, error: testMode === 'fail' ? 'simulated failure' : undefined };
+  } else sent = await mailer.sendMail({ to: e.to_addr, subject: e.subject, text: e.body });
   let status;
-  if (sent.ok) { status = 'sent'; db.prepare('UPDATE emails SET status=?,sent_at=?,last_error=NULL WHERE id=?').run(status, nowISO(), emailId); }
-  else if (sent.configured) { status = 'failed'; db.prepare('UPDATE emails SET status=?,last_error=? WHERE id=?').run(status, String(sent.error || 'send failed').slice(0, 300), emailId); }
-  else { status = 'queued'; db.prepare('UPDATE emails SET status=?,last_error=? WHERE id=?').run(status, 'SMTP not configured', emailId); }
+  if (sent.ok) { status = 'sent'; db.prepare('UPDATE emails SET status=?,sent_at=?,last_error=NULL,sending_started_at=NULL WHERE id=?').run(status, nowISO(), emailId); }
+  else if (sent.configured) { status = 'failed'; db.prepare('UPDATE emails SET status=?,last_error=?,sending_started_at=NULL WHERE id=?').run(status, String(sent.error || 'send failed').slice(0, 300), emailId); }
+  else { status = 'queued'; db.prepare('UPDATE emails SET status=?,last_error=?,sending_started_at=NULL WHERE id=?').run(status, 'SMTP not configured', emailId); }
   return { claimed: true, status };
 }
 
@@ -1109,7 +1119,7 @@ app.get('/api/crm/scans', requireAuth, (req, res) => {
   if (from) { where.push('s.created_at>=?'); args.push(from); }
   if (to) { where.push('s.created_at<=?'); args.push(to + 'T23:59:59'); }
   const sql = `SELECT s.id, s.created_at, s.event_source, s.submitter_id, s.submitter_email, s.submitter_name,
-      s.follow_up_owner, s.follow_up_date, s.consent, s.is_duplicate, s.email_status, s.email_attempts,
+      s.follow_up_owner, s.follow_up_date, s.consent, s.is_duplicate, s.email_status, s.email_id, s.email_attempts,
       c.name AS contact_name, c.email AS contact_email, c.phone AS contact_phone, o.legal_name AS org_name
     FROM card_scans s LEFT JOIN contacts c ON c.id=s.contact_id LEFT JOIN organisations o ON o.id=s.org_id
     ${where.length ? 'WHERE ' + where.join(' AND ') : ''} ORDER BY s.id DESC LIMIT 1000`;
@@ -1145,9 +1155,14 @@ app.get('/api/crm/scans.csv', requireAuth, (req, res) => {
 // atomic claim so two admins retrying at once cannot send twice. 'legacy_unsent'
 // historical rows are never retriable (they are not queued/failed).
 async function retryEmailRow(req, res, e) {
-  if (e.status === 'sent') return res.json({ ok: true, status: 'sent', message: 'Already sent.' });
-  if (!['queued', 'failed'].includes(e.status)) return res.status(400).json({ error: 'This email is not eligible for retry.' });
+  // Recover any genuinely abandoned 'sending' row FIRST, then re-read this row and
+  // decide eligibility on its post-recovery status — so a stuck 'sending' record can
+  // be recovered through the retry flow instead of being rejected as ineligible.
   recoverStaleSending();
+  e = db.prepare('SELECT * FROM emails WHERE id=?').get(e.id) || e;
+  if (e.status === 'sent') return res.json({ ok: true, status: 'sent', message: 'Already sent.' });
+  if (e.status === 'sending') return res.json({ ok: false, status: 'sending', claimed: false, message: 'Another process is currently sending this email.' });
+  if (!['queued', 'failed'].includes(e.status)) return res.status(400).json({ error: 'This email is not eligible for retry.' });
   const tm = process.env.ALLOW_TEST_HOOKS === '1' ? req.headers['x-test-mail'] : null;
   const r = await sendClaimed(e.id, tm);
   if (e.contact_id) db.prepare("UPDATE card_scans SET email_status=?, email_attempts=(SELECT COALESCE(attempts,0) FROM emails WHERE id=?), email_sent_at=? WHERE email_id=?")
@@ -1171,6 +1186,37 @@ app.post('/api/crm/scans/:id/retry-email', requireAuth, async (req, res) => {
   if (!e) return res.status(400).json({ error: 'No queued or failed email to retry for this card.' });
   return retryEmailRow(req, res, e);
 });
+
+/* Test-only hooks (registered ONLY when ALLOW_TEST_HOOKS=1; never in production).
+   They let the suite construct concurrency scenarios and observe SMTP call counts. */
+if (process.env.ALLOW_TEST_HOOKS === '1') {
+  app.post('/api/test/email-state', requireAuth, (req, res) => {
+    if (!ROLES[req.user.role]?.all) return forbid(res);
+    const b = req.body || {};
+    const e = db.prepare('SELECT * FROM emails WHERE id=?').get(b.id);
+    if (!e) return res.status(404).json({ error: 'Not found' });
+    const fields = ['created_at', 'status', 'sending_started_at', 'sent_at', 'last_error'].filter(k => k in b);
+    if (fields.length) db.prepare(`UPDATE emails SET ${fields.map(k => k + '=?').join(',')} WHERE id=?`).run(...fields.map(k => b[k]), e.id);
+    res.json({ ok: true, email: db.prepare('SELECT id,status,created_at,sending_started_at,sent_at FROM emails WHERE id=?').get(e.id) });
+  });
+  app.get('/api/test/email/:id', requireAuth, (req, res) => {
+    if (!ROLES[req.user.role]?.all) return forbid(res);
+    res.json({ email: db.prepare('SELECT id,status,created_at,sending_started_at,sent_at,attempts FROM emails WHERE id=?').get(req.params.id) });
+  });
+  app.post('/api/test/recover-stale', requireAuth, (req, res) => {
+    if (!ROLES[req.user.role]?.all) return forbid(res);
+    recoverStaleSending(req.body && typeof req.body.maxAgeMs === 'number' ? req.body.maxAgeMs : undefined);
+    res.json({ ok: true });
+  });
+  app.get('/api/test/smtp-calls', requireAuth, (req, res) => {
+    if (!ROLES[req.user.role]?.all) return forbid(res);
+    res.json({ calls: TEST_SMTP_CALLS });
+  });
+  app.post('/api/test/smtp-calls/reset', requireAuth, (req, res) => {
+    if (!ROLES[req.user.role]?.all) return forbid(res);
+    TEST_SMTP_CALLS = 0; res.json({ ok: true });
+  });
+}
 
 /* ---------------- static ---------------- */
 app.use('/uploads', express.static(UP));

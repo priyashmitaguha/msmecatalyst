@@ -209,6 +209,7 @@ function runMigrations() {
   addColumn('emails', 'event_source', 'event_source TEXT');
   addColumn('emails', 'sent_at', 'sent_at TEXT');
   addColumn('emails', 'idem_key', 'idem_key TEXT');                // thank-you idempotency key
+  addColumn('emails', 'sending_started_at', 'sending_started_at TEXT');  // when a row was claimed for send (stale-recovery clock)
   if (!hadEmailStatus) {
     // First introduction only. ADD COLUMN set every existing row to 'queued';
     // immediately correct that from the legacy `sent` flag. No live rows exist yet
