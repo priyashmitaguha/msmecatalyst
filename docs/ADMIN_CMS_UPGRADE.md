@@ -306,3 +306,129 @@ CRM create + de-duplication + record preservation, event/source attribution,
 follow-up task, email sent/queued/failed/duplicate-prevented/no-consent, scanner
 CANNOT view or export CRM, audit logging, and mobile capture-UI/OCR structure
 (image never uploaded). `npm audit --omit=dev`: **0 vulnerabilities**.
+
+## 13. Revision 5 — production-hardening of the card scanner
+
+Revision 5 makes the scanner a permanent, reusable CRM feature and closes the
+production blockers found in review. It changes **no** public website behaviour and
+does not weaken the ODR navigation, CMS, publishing, roles or security work.
+
+**Reusable, not GFF-specific.** Event sources are Super-Admin-configured objects
+`{name, active}`; a permanent **General Meeting** source is always present and
+cannot be removed or deactivated. Deactivating an event hides it from the capture
+form but past scans keep their label (history preserved). No event name is
+hard-coded in the UI, workflow, email, reporting or database logic. Unlimited
+individually-named Event Scanner accounts (created/deactivated/reactivated by
+Super Admin); every scan records the authenticated representative's stable user id,
+name, email and time.
+
+**Guarded email migration (B).** `emails.status` is introduced only when absent;
+on first introduction it maps the legacy `sent` flag once — `sent=1 → 'sent'`,
+everything else → **`legacy_unsent`** (a terminal status the send/retry logic never
+picks up). Later boots never rewrite statuses. Verified by a legacy-database test
+that boots twice and proves statuses are unchanged.
+
+**Idempotent CRM backfill (C).** Blank `contacts.email_norm`/`phone_norm` and
+`organisations.domain` are filled once from existing data (org domain from website,
+else a **business** contact email — never a free consumer mailbox). Fills blanks
+only, so re-running never rewrites corrected values.
+
+**Conservative phone normalisation (D).** Preserves the country code (`+`, `00`,
+spaces, brackets, hyphens handled); never slices to the last ten digits and never
+guesses a country code. Two international numbers with different country codes never
+collide; the human-readable number is kept separately from `phone_norm`.
+
+**Transactional persistence (E).** Organisation, contact, interaction, task,
+card-scan and the single queued email row are written in **one transaction**; SMTP
+is attempted only after commit. Injected-failure tests prove no partial rows remain.
+
+**Idempotent, concurrency-safe email (F).** A durable `UNIQUE(idem_key)` (recipient/
+contact + event) permits at most one thank-you record across queued/sending/sent.
+Sending uses an atomic `queued|failed → sending → sent|failed|queued` claim, so
+simultaneous card submits or simultaneous retries send at most once. Stale `sending`
+rows are recovered after a delay; attempt count and last error are preserved; a
+migrated historical email is never auto-sent.
+
+**Consent + honest status (G).** Email is attempted only with a valid confirmed
+address, explicit consent and a valid active event. The representative sees exactly
+one of: sent / queued / failed-and-retriable / skipped-no-consent / skipped-already-
+exists. The contact is never lost if email fails.
+
+**Data minimisation (H).** `GET /api/crm/scans` returns an explicit column list —
+no `raw_json`, no IP, no internal errors. The full reviewed snapshot is available
+only at `GET /api/crm/scans/:id` to CRM writers/Super Admin (never a scanner); it is
+retained purely as a per-card audit of what the representative confirmed.
+
+**CSRF hardening (I).** Strict verified same-origin for cookie-authenticated
+mutations: foreign, malformed and `null` origins are rejected; a missing Origin
+**and** Referer is rejected for authenticated requests; only `Host` and a configured
+`APP_BASE_URL` are trusted (no arbitrary `X-Forwarded-*`). Login/logout/scanner
+flows still work.
+
+**Self-hosted OCR + CSP (J).** Tesseract runtime, worker, wasm core and the English
+language model are pinned npm dependencies served same-origin from `/vendor/tesseract`
+— no CDN, no third-party script/worker/OCR data. A restrictive CSP is restored
+(no third-party script origins; Google Fonts allowed). The page explains if OCR
+assets fail to load; manual entry always works.
+
+**Mobile image safety (K).** Before OCR the browser checks type and size, rejects
+corrupt images, downscales to a bounded resolution, corrects orientation, releases
+object URLs/canvases, and prevents repeated taps from launching parallel OCR. The
+image is never uploaded; every OCR result stays editable and must be reviewed.
+
+**Follow-up ownership (L).** Stored as `tasks.owner_id` (stable) + `owner_name`
+(display), validated against configured representatives; a scanner cannot assign an
+arbitrary owner (defaults to the submitter). Historical ownership survives account
+deactivation.
+
+### Database migrations (Revision 5) — all additive & guarded, no data reset
+- `emails`: `idem_key` (+ partial UNIQUE index), and the guarded `status` mapping above (`status`,`attempts`,`last_error`,`contact_id`,`event_source`,`sent_at` were added in Rev 4).
+- `tasks`: `owner_id`, `owner_name`, `event_source`.
+- `card_scans`: `follow_up_owner_id`, `email_id` (table itself added in Rev 4).
+- One-time idempotent backfill of `contacts.email_norm`/`phone_norm` and `organisations.domain`.
+- New indexes: `idx_emails_idem` (unique, partial), `idx_emails_status`.
+
+### New / changed environment variables
+- **None required.** The scanner reuses the existing SMTP variables
+  (`SMTP_HOST/PORT/SECURE/USER/PASS`, `EMAIL_FROM`) and optional `APP_BASE_URL`
+  (already documented). `APP_BASE_URL` is now *recommended* in production so the
+  CSRF check accepts the public origin behind Render's proxy. `NODE_VERSION`
+  remains `22`.
+- New pinned dependencies (in `npm audit`): `tesseract.js`, `tesseract.js-core`
+  (transitive), `@tesseract.js-data/eng`. `jsdom` remains dev-only.
+
+### Manual deployment checklist
+1. Back up the SQLite data file (`cp "$DATA_DIR"/*.db "$DATA_DIR"/backup-$(date +%Y%m%d-%H%M%S).db`).
+2. Deploy the branch to a **preview** service first. Confirm the boot log shows
+   "Migrations applied" and, on a database with legacy emails, the one-time
+   "emails.status introduced" mapping line (appears once only).
+3. In Render, set `APP_BASE_URL` to the public site URL; keep `NODE_VERSION=22`.
+   Set SMTP variables if thank-you emails should actually send.
+4. `npm ci --omit=dev` runs at build; verify `/vendor/tesseract/js/tesseract.min.js`
+   and `/vendor/tesseract/lang/eng.traineddata.gz` return 200 (self-hosted OCR).
+5. Sign in as Super Admin → Event Scanner: confirm sources, edit the template, send
+   a test email. Create one Event Scanner account and verify it lands only on the
+   capture form.
+6. Verify existing CRM/council/member/ODR data is intact and that the ODR pages,
+   publishing controls and CMS still work.
+7. Only then promote to production.
+
+### Rollback procedure
+- The Rev 5 migrations are **additive**; the previous application version runs
+  against the same database (new columns/tables are ignored). To roll back, redeploy
+  the previous commit. No down-migration is needed.
+- If a restore is required, stop the service and copy the pre-deploy backup file
+  over `$DATA_DIR/msme-catalyst.db`, then start the previous version.
+- Because historical unsent emails were mapped to `legacy_unsent` (never auto-sent),
+  a rollback cannot cause an accidental send.
+
+**Tests:** `npm test` runs the main suite (**244 assertions**) plus a dedicated
+**legacy-database** suite (**15 assertions**) — historical email preservation,
+safe unsent handling, idempotent re-migration across reboots, CRM backfill +
+dedup of pre-existing rows, international phone non-collision, transaction rollback,
+email idempotency/concurrency (queued/failed/sent, simultaneous submits + retries,
+stale-sending recovery), CSRF (correct/foreign/missing/malformed + production proxy),
+scanner authorization across every API family, unlimited accounts + deactivate/
+reactivate, generic/General-Meeting events, historical event attribution, no
+third-party scanner script, no image upload, image-safety controls, and explicit
+scan-list fields without raw JSON or IP. `npm audit --omit=dev`: **0 vulnerabilities**.

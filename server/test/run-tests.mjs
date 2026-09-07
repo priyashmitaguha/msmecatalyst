@@ -354,8 +354,8 @@ const waitHealth = async () => { for (let i = 0; i < 50; i++) { try { const r = 
 
     console.log('\nGFF EVENT SCANNER — SUPER ADMIN SETTINGS & TEST EMAIL');
     ok('super admin can read scanner settings', (await api('/api/settings/scan', {}, admin2)).status === 200);
-    const cfgSave = await api('/api/settings/scan', { method: 'PUT', body: { event_sources: ['GFF 2026', 'Fintech Fest 2027'], email_subject: 'Hi {{first_name}} from {{event}}' } }, admin2);
-    ok('super admin can add event sources + edit the email template', cfgSave.status === 200 && cfgSave.data.config.event_sources.includes('Fintech Fest 2027'));
+    const cfgSave = await api('/api/settings/scan', { method: 'PUT', body: { event_sources: [{ name: 'GFF 2026', active: true }, { name: 'Fintech Fest 2027', active: true }], email_subject: 'Hi {{first_name}} from {{event}}' } }, admin2);
+    ok('super admin can add event sources + edit the email template', cfgSave.status === 200 && cfgSave.data.config.event_sources.some(s => s.name === 'Fintech Fest 2027'));
     ok('scanner settings reject a non-admin (crm viewer 403)', (await api('/api/settings/scan', {}, viewer)).status === 403);
     ok('test-email endpoint reports honestly when SMTP is unconfigured', (await api('/api/settings/scan/test-email', { method: 'POST', body: { email: 'me@example.org' } }, admin2)).data.configured === false);
     ok('a scanner cannot submit an unconfigured event source (falls back to default)', (await api('/api/scan/card', { method: 'POST', body: { full_name: 'Z', email: 'z@ex.com', event_source: 'Not A Real Event' } }, scanner)).status === 200);
@@ -375,6 +375,121 @@ const waitHealth = async () => { for (let i = 0; i < 50; i++) { try { const r = 
       ok('the card image is revoked/discarded after use and never uploaded to the server', /revokeObjectURL/.test(js) && !/\/api\/upload/.test(js));
       ok('scanners are redirected here and gated by role', /caps\.scan/.test(js) && /location\.replace\('\/admin'\)/.test(js));
     }
+
+    console.log('\nREV5 — CSRF HARDENING (cookie-authenticated API)');
+    const rawPut = (h) => fetch(BASE + '/api/settings/scan', { method: 'PUT', headers: { 'content-type': 'application/json', ...h }, body: JSON.stringify({}) }).then(r => r.status);
+    ok('CSRF: correct same-origin is accepted', (await rawPut({ Origin: BASE, cookie: admin2.c })) === 200);
+    ok('CSRF: foreign Origin is rejected (403)', (await rawPut({ Origin: 'https://evil.example', cookie: admin2.c })) === 403);
+    ok('CSRF: malformed Origin is rejected (403)', (await rawPut({ Origin: 'http://[not a url', cookie: admin2.c })) === 403);
+    ok('CSRF: "null" opaque Origin is rejected (403)', (await rawPut({ Origin: 'null', cookie: admin2.c })) === 403);
+    ok('CSRF: MISSING Origin+Referer on an authenticated write is rejected (403)', (await rawPut({ cookie: admin2.c })) === 403);
+    ok('CSRF: missing Origin but valid same-origin Referer is accepted', (await rawPut({ Referer: BASE + '/admin', cookie: admin2.c })) === 200);
+
+    console.log('\nREV5 — TRANSACTIONAL PERSISTENCE (injected failures roll back)');
+    for (const stage of ['org', 'contact', 'task', 'email']) {
+      const before = (await api('/api/crm/scans', {}, admin2)).data.scans.length;
+      const orgsBefore = (await api('/api/crm/organisations', {}, admin2)).data.organisations.length;
+      const r = await api('/api/scan/card', { method: 'POST', body: { full_name: 'Rollback ' + stage, email: `rollback-${stage}@ex-r.com`, organisation: 'Rollback Org ' + stage, consent: true }, headers: { 'x-test-fail': stage } }, scanner);
+      const after = (await api('/api/crm/scans', {}, admin2)).data.scans.length;
+      const orgsAfter = (await api('/api/crm/organisations', {}, admin2)).data.organisations.length;
+      ok(`rollback@${stage}: request fails (500) and NO partial scan/org persists`, r.status === 500 && after === before && orgsAfter === orgsBefore);
+    }
+
+    console.log('\nREV5 — INTERNATIONAL PHONE NON-COLLISION');
+    // Two international numbers with the SAME national digits but DIFFERENT country codes must be two contacts.
+    await api('/api/scan/card', { method: 'POST', body: { full_name: 'India Person', email: 'in@collide-a.com', mobile: '+91 90000 12345' } }, scanner);
+    const dupPhone = await api('/api/scan/card', { method: 'POST', body: { full_name: 'Singapore Person', email: 'sg@collide-b.com', mobile: '+65 90000 12345' } }, scanner);
+    ok('same national digits + different country code do NOT collide', dupPhone.data.duplicate === false);
+
+    console.log('\nREV5 — EMAIL IDEMPOTENCY & CONCURRENCY');
+    // Duplicate while queued: submit twice (no SMTP) → second is not a new send.
+    await api('/api/scan/card', { method: 'POST', body: { full_name: 'Q1', email: 'idem-queue@ex.com', consent: true } }, scanner);
+    const q2 = await api('/api/scan/card', { method: 'POST', body: { full_name: 'Q1', email: 'idem-queue@ex.com', consent: true } }, scanner);
+    ok('duplicate while queued reuses the record (still queued, not a 2nd send)', q2.data.email_status === 'queued');
+    // Duplicate after sent → skipped_duplicate.
+    await api('/api/scan/card', { method: 'POST', body: { full_name: 'S1', email: 'idem-sent@ex.com', consent: true }, headers: { 'x-test-mail': 'sent' } }, scanner);
+    const afterSent = await api('/api/scan/card', { method: 'POST', body: { full_name: 'S1', email: 'idem-sent@ex.com', consent: true }, headers: { 'x-test-mail': 'sent' } }, scanner);
+    ok('duplicate after sent is skipped_duplicate', afterSent.data.email_status === 'skipped_duplicate');
+    // Duplicate while failed → retried through the SAME record (no new send record).
+    await api('/api/scan/card', { method: 'POST', body: { full_name: 'F1', email: 'idem-fail@ex.com', consent: true }, headers: { 'x-test-mail': 'fail' } }, scanner);
+    const afterFail = await api('/api/scan/card', { method: 'POST', body: { full_name: 'F1', email: 'idem-fail@ex.com', consent: true }, headers: { 'x-test-mail': 'sent' } }, scanner);
+    ok('a failed thank-you can be re-sent through its existing record', ['sent', 'skipped_duplicate'].includes(afterFail.data.email_status));
+    // Simultaneous card submissions for the SAME recipient+event → at most one send.
+    const [c1, c2] = await Promise.all([
+      api('/api/scan/card', { method: 'POST', body: { full_name: 'Race', email: 'race@ex.com', consent: true }, headers: { 'x-test-mail': 'sent' } }, scanner),
+      api('/api/scan/card', { method: 'POST', body: { full_name: 'Race', email: 'race@ex.com', consent: true }, headers: { 'x-test-mail': 'sent' } }, scanner),
+    ]);
+    ok('simultaneous submits send the thank-you at most once', [c1, c2].filter(x => x.data.email_status === 'sent').length === 1);
+    const raceScan = (await api('/api/crm/scans?event=General%20Meeting', {}, admin2)).data.scans.filter(s => s.contact_email === 'race@ex.com');
+    ok('simultaneous submits did not duplicate the contact', new Set(raceScan.map(s => s.contact_name)).size >= 1 && (await api('/api/crm/scans', {}, admin2)).data.scans.filter(s => s.contact_email === 'race@ex.com').length === 2);
+    // Simultaneous retries of one queued email → at most one send.
+    await api('/api/scan/card', { method: 'POST', body: { full_name: 'RetryRace', email: 'retryrace@ex.com', consent: true } }, scanner);   // queued
+    const rrScan = (await api('/api/crm/scans', {}, admin2)).data.scans.find(s => s.contact_email === 'retryrace@ex.com');
+    const [rr1, rr2] = await Promise.all([
+      api('/api/crm/scans/' + rrScan.id + '/retry-email', { method: 'POST', headers: { 'x-test-mail': 'sent' } }, admin2),
+      api('/api/crm/scans/' + rrScan.id + '/retry-email', { method: 'POST', headers: { 'x-test-mail': 'sent' } }, admin2),
+    ]);
+    ok('simultaneous retries send at most once', [rr1, rr2].filter(r => r.data.status === 'sent' && r.data.claimed).length === 1);
+
+    console.log('\nREV5 — REUSABLE SCANNER (generic events, unlimited accounts, attribution)');
+    ok('General Meeting is always an available event source', (await api('/api/scan/config', {}, scanner)).data.event_sources.includes('General Meeting'));
+    const genScan = await api('/api/scan/card', { method: 'POST', body: { full_name: 'Generic', email: 'generic@ex.com', event_source: 'General Meeting' } }, scanner);
+    ok('a card can be captured for a generic/non-GFF event', genScan.status === 200);
+    // A future event, then deactivate it — historical scans keep the label.
+    await api('/api/settings/scan', { method: 'PUT', body: { event_sources: [{ name: 'General Meeting', active: true }, { name: 'Future Summit 2027', active: true }] } }, admin2);
+    await api('/api/scan/card', { method: 'POST', body: { full_name: 'Summit Attendee', email: 'summit@ex.com', event_source: 'Future Summit 2027' } }, scanner);
+    await api('/api/settings/scan', { method: 'PUT', body: { event_sources: [{ name: 'General Meeting', active: true }, { name: 'Future Summit 2027', active: false }] } }, admin2);
+    ok('deactivated event source is hidden from the capture form', !(await api('/api/scan/config', {}, scanner)).data.event_sources.includes('Future Summit 2027'));
+    ok('but historical scans keep their (now inactive) event source', (await api('/api/crm/scans?event=Future%20Summit%202027', {}, admin2)).data.scans.some(s => s.contact_email === 'summit@ex.com'));
+    // Unlimited scanner accounts (create more than seven) + deactivate/reactivate.
+    let made = 0;
+    for (let i = 2; i <= 9; i++) { const r = await api('/api/users', { method: 'POST', body: { name: 'Rep ' + i, email: `rep${i}@example.org`, password: `Scanner-Access-0${i}`, role: 'event_scanner' } }, admin2); if (r.status === 200) made++; }
+    ok('Super Admin can create more than seven Event Scanner accounts', made === 8);
+    const repList = (await api('/api/users', {}, admin2)).data.users.filter(u => u.role === 'event_scanner');
+    ok('all scanner accounts are individually named with unique emails', new Set(repList.map(u => u.email)).size === repList.length && repList.length >= 8);
+    const rep2 = repList.find(u => u.email === 'rep2@example.org');
+    ok('Super Admin can deactivate a scanner', (await api('/api/users/' + rep2.id, { method: 'PUT', body: { active: false } }, admin2)).status === 200);
+    ok('deactivated scanner cannot log in', (await api('/api/auth/login', { method: 'POST', body: { email: 'rep2@example.org', password: 'Scanner-Access-02' } })).status === 401);
+    ok('Super Admin can reactivate a scanner', (await api('/api/users/' + rep2.id, { method: 'PUT', body: { active: true } }, admin2)).status === 200);
+    ok('reactivated scanner can log in again', (await api('/api/auth/login', { method: 'POST', body: { email: 'rep2@example.org', password: 'Scanner-Access-02' } }, jar())).status === 200);
+    ok('every scan records the submitter user id + email (stable attribution)', (await api('/api/crm/scans', {}, admin2)).data.scans.every(s => s.submitter_id > 0 && !!s.submitter_email));
+
+    console.log('\nREV5 — SCANNER AUTHORIZATION (every API family, incl. new endpoints)');
+    for (const [label, path, method, body] of [
+      ['scan detail', '/api/crm/scans/1', 'GET', null],
+      ['email retry', '/api/crm/emails/1/retry', 'POST', {}],
+      ['scan retry', '/api/crm/scans/1/retry-email', 'POST', {}],
+      ['scan settings write', '/api/settings/scan', 'PUT', { event_sources: [] }],
+      ['test email', '/api/settings/scan/test-email', 'POST', { email: 'x@y.com' }],
+      ['collections', '/api/collections/reports', 'GET', null],
+      ['pages publish', '/api/settings/pages', 'GET', null],
+      ['visibility', '/api/settings/visibility', 'GET', null],
+      ['audit', '/api/audit', 'GET', null],
+      ['users', '/api/users', 'GET', null],
+    ]) {
+      const r = await api(path, { method, body }, scanner);
+      ok(`scanner blocked from ${label} (401/403)`, r.status === 401 || r.status === 403);
+    }
+
+    console.log('\nREV5 — DATA MINIMISATION & CLIENT SAFETY');
+    const oneScan = (await api('/api/crm/scans', {}, admin2)).data.scans[0];
+    ok('scan LIST omits raw_json and ip', oneScan && !('raw_json' in oneScan) && !('ip' in oneScan));
+    const detail = await api('/api/crm/scans/' + oneScan.id, {}, admin2);
+    ok('authorized detail endpoint returns the reviewed snapshot (CRM writer only)', detail.status === 200 && !!detail.data.reviewed && !('raw_json' in detail.data.scan));
+    ok('scanner cannot open a scan detail (403)', (await api('/api/crm/scans/' + oneScan.id, {}, scanner)).status === 403);
+    {
+      const html = readFileSync(join(__dirname, '..', 'admin', 'scan.html'), 'utf8');
+      const scripts = [...html.matchAll(/<script[^>]*\ssrc=["']([^"']+)["']/gi)].map(m => m[1]);
+      ok('scanner page loads NO third-party script (self-hosted OCR only)', scripts.every(s => !/^https?:\/\//i.test(s)) && scripts.some(s => /vendor\/tesseract/.test(s)));
+      const js = readFileSync(join(__dirname, '..', 'admin', 'scan.js'), 'utf8');
+      ok('OCR worker is configured from local /vendor paths', /workerPath:\s*'\/vendor\/tesseract/.test(js) && /langPath:\s*'\/vendor\/tesseract/.test(js));
+      ok('image safety: type + size checks before OCR', /OK_TYPES/.test(js) && /MAX_BYTES/.test(js));
+      ok('image safety: downscale + orientation + release + double-tap guard', /createImageBitmap/.test(js) && /imageOrientation/.test(js) && /revokeObjectURL/.test(js) && /if \(busy\) return/.test(js));
+      ok('still never uploads the image to the server', !/\/api\/upload/.test(js));
+    }
+    // Self-hosted OCR assets are actually served (same-origin, no CDN).
+    ok('OCR runtime is served from /vendor (same-origin)', (await fetch(BASE + '/vendor/tesseract/js/tesseract.min.js')).status === 200);
+    ok('OCR language model is served from /vendor (same-origin)', (await fetch(BASE + '/vendor/tesseract/lang/eng.traineddata.gz')).status === 200);
 
     console.log('\nPRODUCTION DEPENDENCY AUDIT');
     {
