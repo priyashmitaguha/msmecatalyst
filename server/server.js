@@ -31,6 +31,7 @@ app.use(cookieParser());
 // Strict limits in production; relaxed off-production so local dev and the test suite aren't throttled.
 const publicWriteLimit = rateLimit({ windowMs: 15 * 60 * 1000, limit: PRODUCTION ? 60 : 100000, standardHeaders: 'draft-7', legacyHeaders: false });
 const loginLimit = rateLimit({ windowMs: 15 * 60 * 1000, limit: PRODUCTION ? 10 : 100000, standardHeaders: 'draft-7', legacyHeaders: false });
+const scanLimit = rateLimit({ windowMs: 60 * 1000, limit: PRODUCTION ? 40 : 100000, standardHeaders: 'draft-7', legacyHeaders: false });
 
 const UP = process.env.UPLOAD_DIR || path.join(__dirname, 'uploads');
 if (!fs.existsSync(UP)) fs.mkdirSync(UP, { recursive: true });
@@ -119,6 +120,9 @@ function validPerm(p) {
 function canODR(user)      { const r = ROLES[user.role]; return !!(r && (r.all || r.odr)); }
 function canUsers(user)    { const r = ROLES[user.role]; return !!(r && (r.all || r.users)); }
 function canSettings(user) { return anyPageScope(user); }
+function isScanner(user)   { return !!(user && ROLES[user.role] && ROLES[user.role].scanner); }
+// Who may submit a captured card: the Event Scanners, plus CRM-writers/Super Admin.
+function canScan(user)     { return isScanner(user) || canCRMWrite(user); }
 const forbid = (res) => res.status(403).json({ error: 'Forbidden' });
 
 /* Anti-CSRF for cookie-authenticated state changes: require same-origin. */
@@ -129,6 +133,22 @@ function sameOrigin(req) {
 app.use((req, res, next) => {
   if (['POST','PUT','DELETE','PATCH'].includes(req.method) && req.path.startsWith('/api/') && !sameOrigin(req))
     return res.status(403).json({ error: 'Bad origin' });
+  next();
+});
+
+/* Event Scanner lockdown — enforced server-side for EVERY /api request.
+   A scanner may reach ONLY its own auth, the capture form config and card submit.
+   Any other API path (dashboard, CRM, users, analytics, audit, CMS, settings …)
+   returns 403, so a hand-entered URL or direct API call cannot leak data. */
+const SCANNER_ALLOW = [
+  /^\/api\/health$/, /^\/api\/auth\/(me|logout|login|change-password)$/,
+  /^\/api\/scan\/(config|card)$/,
+];
+app.use((req, res, next) => {
+  if (!req.path.startsWith('/api/')) return next();
+  const u = currentUser(req);
+  if (u && isScanner(u) && !SCANNER_ALLOW.some(re => re.test(req.path)))
+    return res.status(403).json({ error: 'Forbidden' });
   next();
 });
 
@@ -177,7 +197,7 @@ app.get('/api/auth/me', requireAuth, (req, res) => {
   res.json({
     user: { id: req.user.id, name: req.user.name, email: req.user.email, role: req.user.role, must_change: req.user.must_change, perms: userPerms(req.user) },
     role: { key: req.user.role, ...r }, collections: COLLECTIONS, roles: ROLES,
-    caps: { crmRead: canCRMRead(req.user), crmWrite: canCRMWrite(req.user), users: canUsers(req.user), odr: canODR(req.user), settings: canSettings(req.user) },
+    caps: { crmRead: canCRMRead(req.user), crmWrite: canCRMWrite(req.user), users: canUsers(req.user), odr: canODR(req.user), settings: canSettings(req.user), scanner: isScanner(req.user), scan: canScan(req.user) },
   });
 });
 
@@ -728,6 +748,253 @@ app.post('/api/upload', requireAuth, upload.single('file'), (req, res) => {
       'active', req.user.id, nowISO(), nowISO());
   audit(req, 'media_uploaded', 'media', info.lastInsertRowid, req.file.originalname);
   res.json({ url: '/uploads/' + req.file.filename, id: info.lastInsertRowid });
+});
+
+/* ==================== Event card scanner (GFF) ==================== */
+const SCAN_DEFAULTS = {
+  event_sources: ['GFF 2026'],
+  email_subject: 'Thank you for meeting MSME Catalyst at {{event}}',
+  email_body: 'Dear {{first_name}},\n\nThank you for connecting with {{rep}} of MSME Catalyst at {{event}}. It was a pleasure to meet you. We would be glad to stay in touch and explore how MSME Catalyst can be useful to you and your organisation.\n\nWe will follow up shortly. In the meantime, feel free to reply to this email with anything you would like to discuss.',
+  email_from_name: 'MSME Catalyst',
+  email_signature: 'Warm regards,\nMSME Catalyst\nDigital Growth Infrastructure Foundation (Section 8)',
+  representatives: [],
+};
+function scanSetting(key) {
+  const row = db.prepare('SELECT value FROM settings WHERE key=?').get('scan.' + key);
+  if (!row) return SCAN_DEFAULTS[key];
+  try { return JSON.parse(row.value); } catch (e) { return row.value; }
+}
+function scanConfig() {
+  const sources = scanSetting('event_sources');
+  return {
+    event_sources: Array.isArray(sources) && sources.length ? sources : SCAN_DEFAULTS.event_sources,
+    default_event: (Array.isArray(sources) && sources[0]) || 'GFF 2026',
+    email_subject: scanSetting('email_subject'), email_body: scanSetting('email_body'),
+    email_from_name: scanSetting('email_from_name'), email_signature: scanSetting('email_signature'),
+    representatives: scanSetting('representatives') || [],
+    email_configured: mailer.isConfigured(),
+  };
+}
+function personalise(tmpl, vars) {
+  return String(tmpl || '').replace(/\{\{\s*(first_name|event|rep|from_name)\s*\}\}/g, (_, k) => vars[k] != null ? vars[k] : '');
+}
+const normEmail = e => String(e || '').trim().toLowerCase();
+const normPhone = p => { const d = String(p || '').replace(/[^0-9]/g, ''); return d.length > 10 ? d.slice(-10) : d; };
+function domainOf(website, email) {
+  let d = '';
+  const w = String(website || '').trim();
+  if (w) { try { d = new URL(/^https?:/i.test(w) ? w : 'https://' + w).hostname.replace(/^www\./, '').toLowerCase(); } catch (e) {} }
+  if (!d && email && email.includes('@')) d = email.split('@')[1].toLowerCase();
+  const free = new Set(['gmail.com','yahoo.com','yahoo.co.in','outlook.com','hotmail.com','rediffmail.com','icloud.com','proton.me','protonmail.com','live.com','aol.com']);
+  return free.has(d) ? '' : d;
+}
+const validEmail = e => !e || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(e).trim());
+const validPhone = p => !p || /^[0-9+()\-.\s]{6,20}$/.test(String(p).trim());   // international-friendly
+const scanMsg = s => ({
+  sent: 'Saved to CRM and thank-you email sent.',
+  queued: 'Saved to CRM; email queued/not yet sent (email service not configured).',
+  failed: 'Saved to CRM; email queued for retry (sending failed).',
+  skipped_duplicate: 'Saved to CRM; a thank-you was already sent to this contact for this event.',
+  skipped: 'Saved to CRM. No thank-you email was requested.',
+}[s] || 'Saved to CRM.');
+
+// Config for the capture form (scanner + admin).
+app.get('/api/scan/config', requireAuth, (req, res) => {
+  if (!canScan(req.user)) return forbid(res);
+  const c = scanConfig();
+  res.json({ event_sources: c.event_sources, default_event: c.default_event,
+    email_configured: c.email_configured, me: { name: req.user.name, email: req.user.email } });
+});
+
+// Submit a reviewed card. The image is NEVER uploaded — only reviewed fields.
+app.post('/api/scan/card', requireAuth, scanLimit, async (req, res) => {
+  if (!canScan(req.user)) return forbid(res);
+  const b = req.body || {};
+  const T = (v, n = 500) => stripText(v).slice(0, n);
+  const name = T(b.full_name), designation = T(b.designation), org = T(b.organisation);
+  const email = stripText(b.email).trim();
+  const mobile = T(b.mobile, 40), alt = T(b.alternate, 40);
+  const city = T(b.city), state = T(b.state), country = T(b.country);
+  const address = T(b.address, 1000), notes = T(b.notes, 2000), interests = T(b.areas_of_interest, 500);
+  const website = safeUrl(b.website, { schemes: ['http', 'https'] });
+  const linkedin = safeUrl(b.linkedin, { schemes: ['http', 'https'] });
+  if (website === null) return res.status(400).json({ error: 'The website is not a valid or safe URL.' });
+  if (linkedin === null) return res.status(400).json({ error: 'The LinkedIn URL is not valid or safe.' });
+  if (!validEmail(email)) return res.status(400).json({ error: 'Please enter a valid email address.' });
+  if (!validPhone(mobile) || !validPhone(alt)) return res.status(400).json({ error: 'Please enter a valid phone number.' });
+  if (!name && !org && !email) return res.status(400).json({ error: 'Enter at least a name, organisation or email.' });
+
+  const cfg = scanConfig();
+  let event = T(b.event_source, 80) || cfg.default_event;
+  if (!cfg.event_sources.includes(event)) event = cfg.default_event;   // only configured sources
+  const consent = b.consent === true || b.consent === 'true' || b.consent === 1;
+  const followOwner = T(b.follow_up_owner, 120) || (req.user.name || '');
+  const followDate = /^\d{4}-\d{2}-\d{2}$/.test(b.follow_up_date || '') ? b.follow_up_date : null;
+  const emailNorm = normEmail(email), phoneNorm = normPhone(mobile), domain = domainOf(website, email);
+
+  // ---- de-duplication (email → phone → org domain/name); never silently overwrite ----
+  let contact = null;
+  if (emailNorm) contact = db.prepare('SELECT * FROM contacts WHERE email_norm=?').get(emailNorm);
+  if (!contact && phoneNorm) contact = db.prepare("SELECT * FROM contacts WHERE phone_norm=? AND phone_norm<>''").get(phoneNorm);
+  let org_id = null, isDup = !!contact;
+  if (contact) org_id = contact.org_id;
+  else {
+    let orgRow = null;
+    if (domain) orgRow = db.prepare("SELECT * FROM organisations WHERE domain=? AND domain<>''").get(domain);
+    if (!orgRow && org) orgRow = db.prepare('SELECT * FROM organisations WHERE lower(legal_name)=? OR lower(brand_name)=?').get(org.toLowerCase(), org.toLowerCase());
+    if (orgRow) {
+      org_id = orgRow.id;
+      const upd = {}; const cand = { website: website || '', address, city, state, country, domain };
+      Object.keys(cand).forEach(k => { if (cand[k] && !orgRow[k]) upd[k] = cand[k]; });   // fill blanks only
+      const keys = Object.keys(upd);
+      if (keys.length) db.prepare(`UPDATE organisations SET ${keys.map(k => k + '=?').join(',')},updated_at=? WHERE id=?`).run(...keys.map(k => upd[k]), nowISO(), orgRow.id);
+    } else {
+      const info = db.prepare('INSERT INTO organisations(legal_name,brand_name,website,address,city,state,country,domain,category,membership_status,application_date,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)')
+        .run(org || name || '(from card)', org || '', website || '', address, city, state, country, domain, 'Prospect', 'Prospect', nowISO().slice(0, 10), nowISO(), nowISO());
+      org_id = info.lastInsertRowid;
+    }
+  }
+  // ---- contact upsert: enrich blanks, append the event interaction to notes ----
+  let contact_id;
+  if (contact) {
+    const upd = {}; const cand = { name, designation, email, phone: mobile, phone_alt: alt, linkedin: linkedin || '', areas_of_interest: interests };
+    Object.keys(cand).forEach(k => { if (cand[k] && !contact[k]) upd[k] = cand[k]; });
+    const line = `[${event} · ${nowISO().slice(0, 10)}${req.user.name ? ' · ' + req.user.name : ''}] ${notes || 'card re-scanned'}`;
+    upd.notes = (contact.notes ? contact.notes + '\n' : '') + line;
+    upd.email_norm = contact.email_norm || emailNorm; upd.phone_norm = contact.phone_norm || phoneNorm;
+    upd.event_source = contact.event_source || event; upd.updated_at = nowISO();
+    const keys = Object.keys(upd);
+    db.prepare(`UPDATE contacts SET ${keys.map(k => k + '=?').join(',')} WHERE id=?`).run(...keys.map(k => upd[k]), contact.id);
+    contact_id = contact.id;
+  } else {
+    const info = db.prepare(`INSERT INTO contacts(org_id,type,name,designation,email,phone,phone_alt,linkedin,notes,areas_of_interest,email_norm,phone_norm,source,event_source,submitted_by,is_primary,created_at,updated_at)
+      VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,?,?)`).run(org_id, 'Event contact', name, designation, email, mobile, alt, linkedin || '', notes, interests, emailNorm, phoneNorm, 'card_scan', event, req.user.id, nowISO(), nowISO());
+    contact_id = info.lastInsertRowid;
+  }
+  // ---- follow-up task ----
+  db.prepare('INSERT INTO tasks(title,due,org_id,created_at) VALUES(?,?,?,?)')
+    .run(`Follow up: ${name || org || email || 'contact'} (${event})` + (followOwner ? ` — ${followOwner}` : ''), followDate || '', org_id, nowISO());
+
+  // ---- thank-you email: only on consent + valid email; prevent duplicates; queue on failure ----
+  let emailStatus = 'skipped', emailErr = null;
+  const wantEmail = consent && email && validEmail(email);
+  if (wantEmail) {
+    const already = db.prepare("SELECT 1 FROM emails WHERE template='thankyou' AND event_source=? AND lower(to_addr)=? AND status='sent'").get(event, emailNorm);
+    if (already) emailStatus = 'skipped_duplicate';
+    else {
+      const first = (name || '').split(/\s+/)[0] || 'there';
+      const rep = followOwner || req.user.name || cfg.email_from_name;
+      const subject = personalise(cfg.email_subject, { first_name: first, event, rep, from_name: cfg.email_from_name });
+      const bodyText = personalise(cfg.email_body, { first_name: first, event, rep, from_name: cfg.email_from_name }) + '\n\n' + cfg.email_signature;
+      const eInfo = db.prepare('INSERT INTO emails(to_addr,subject,body,template,org_id,contact_id,event_source,status,attempts,created_at) VALUES(?,?,?,?,?,?,?,?,?,?)')
+        .run(email, subject, bodyText, 'thankyou', org_id, contact_id, event, 'queued', 0, nowISO());
+      const emailId = eInfo.lastInsertRowid;
+      // Test-only hook (never active in production) to exercise sent/failed paths deterministically.
+      const tm = process.env.ALLOW_TEST_HOOKS === '1' ? req.headers['x-test-mail'] : null;
+      const sent = tm ? { ok: tm === 'sent', configured: true, error: tm === 'fail' ? 'simulated failure' : undefined }
+        : await mailer.sendMail({ to: email, subject, text: bodyText });
+      if (sent.ok) { emailStatus = 'sent'; db.prepare('UPDATE emails SET status=?,attempts=1,sent_at=? WHERE id=?').run('sent', nowISO(), emailId); }
+      else { emailStatus = sent.configured ? 'failed' : 'queued'; emailErr = sent.error || (sent.configured ? 'send failed' : 'SMTP not configured');
+        db.prepare('UPDATE emails SET status=?,attempts=1,last_error=? WHERE id=?').run(emailStatus, emailErr, emailId); }
+    }
+  }
+  const scanInfo = db.prepare(`INSERT INTO card_scans(submitter_id,submitter_email,submitter_name,org_id,contact_id,event_source,follow_up_owner,follow_up_date,consent,is_duplicate,email_status,email_attempts,email_last_error,email_sent_at,raw_json,ip,created_at)
+    VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).run(req.user.id, req.user.email, req.user.name || '', org_id, contact_id, event, followOwner, followDate, consent ? 1 : 0, isDup ? 1 : 0,
+      emailStatus, wantEmail && emailStatus !== 'skipped_duplicate' ? 1 : 0, emailErr, emailStatus === 'sent' ? nowISO() : null,
+      JSON.stringify({ name, designation, org, email, mobile, alt, website, linkedin, city, state, country, address, interests, notes }), clientIp(req), nowISO());
+  audit(req, 'card_captured', 'card_scan', scanInfo.lastInsertRowid, `${event} · ${email || name || org}${isDup ? ' · duplicate' : ''} · email:${emailStatus}`);
+  res.json({ ok: true, duplicate: isDup, contact_id, org_id, email_status: emailStatus, message: scanMsg(emailStatus) });
+});
+
+// Super Admin: scanner settings (event sources + editable email template).
+app.get('/api/settings/scan', requireAuth, (req, res) => {
+  if (!ROLES[req.user.role]?.all) return forbid(res);
+  res.json({ config: scanConfig(), defaults: SCAN_DEFAULTS });
+});
+app.put('/api/settings/scan', requireAuth, (req, res) => {
+  if (!ROLES[req.user.role]?.all) return forbid(res);
+  const b = req.body || {};
+  const save = (k, v) => db.prepare('INSERT INTO settings(key,value,updated_at,updated_by) VALUES(?,?,?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at,updated_by=excluded.updated_by')
+    .run('scan.' + k, JSON.stringify(v), nowISO(), req.user.id);
+  if (Array.isArray(b.event_sources)) save('event_sources', b.event_sources.map(s => stripText(s).slice(0, 80)).filter(Boolean).slice(0, 50));
+  if (Array.isArray(b.representatives)) save('representatives', b.representatives.map(s => stripText(s).slice(0, 120)).filter(Boolean).slice(0, 50));
+  ['email_subject', 'email_from_name', 'email_signature'].forEach(k => { if (typeof b[k] === 'string') save(k, stripText(b[k]).slice(0, 400)); });
+  if (typeof b.email_body === 'string') save('email_body', stripText(b.email_body).slice(0, 4000));
+  audit(req, 'scan_settings_updated', 'settings', 'scan', null);
+  res.json({ ok: true, config: scanConfig() });
+});
+// Super Admin: send a test thank-you email.
+app.post('/api/settings/scan/test-email', requireAuth, async (req, res) => {
+  if (!ROLES[req.user.role]?.all) return forbid(res);
+  const to = stripText((req.body && req.body.email) || '').trim();
+  if (!validEmail(to) || !to) return res.status(400).json({ error: 'Enter a valid test recipient email.' });
+  const cfg = scanConfig();
+  const subject = personalise(cfg.email_subject, { first_name: 'there', event: cfg.default_event, rep: req.user.name || cfg.email_from_name, from_name: cfg.email_from_name });
+  const bodyText = personalise(cfg.email_body, { first_name: 'there', event: cfg.default_event, rep: req.user.name || cfg.email_from_name, from_name: cfg.email_from_name }) + '\n\n' + cfg.email_signature;
+  const sent = await mailer.sendMail({ to, subject, text: bodyText });
+  audit(req, 'scan_test_email', 'settings', 'scan', sent.ok ? 'sent' : (sent.configured ? 'failed' : 'not_configured'));
+  if (sent.ok) return res.json({ ok: true, message: 'Test email sent to ' + to });
+  res.status(sent.configured ? 502 : 200).json({ ok: false, configured: sent.configured, message: sent.configured ? ('Send failed: ' + (sent.error || 'unknown')) : 'Email is not configured (SMTP env vars not set). Nothing was sent.' });
+});
+
+// CRM roles: browse / filter / export captured cards. Scanners are blocked (lockdown above).
+app.get('/api/crm/scans', requireAuth, (req, res) => {
+  if (!canCRMRead(req.user)) return forbid(res);
+  const { event, user, from, to, email_status } = req.query;
+  const where = [], args = [];
+  if (event) { where.push('s.event_source=?'); args.push(event); }
+  if (user) { where.push('s.submitter_id=?'); args.push(user); }
+  if (email_status) { where.push('s.email_status=?'); args.push(email_status); }
+  if (from) { where.push('s.created_at>=?'); args.push(from); }
+  if (to) { where.push('s.created_at<=?'); args.push(to + 'T23:59:59'); }
+  const sql = `SELECT s.*, c.name AS contact_name, c.email AS contact_email, o.legal_name AS org_name
+    FROM card_scans s LEFT JOIN contacts c ON c.id=s.contact_id LEFT JOIN organisations o ON o.id=s.org_id
+    ${where.length ? 'WHERE ' + where.join(' AND ') : ''} ORDER BY s.id DESC LIMIT 1000`;
+  res.json({ scans: db.prepare(sql).all(...args) });
+});
+app.get('/api/crm/scans.csv', requireAuth, (req, res) => {
+  if (!canCRMRead(req.user)) return forbid(res);
+  const rows = db.prepare(`SELECT s.created_at,s.event_source,s.submitter_email,c.name AS contact_name,c.email AS contact_email,
+    c.phone AS contact_phone,o.legal_name AS org_name,s.email_status,s.is_duplicate,s.follow_up_owner,s.follow_up_date
+    FROM card_scans s LEFT JOIN contacts c ON c.id=s.contact_id LEFT JOIN organisations o ON o.id=s.org_id ORDER BY s.id DESC LIMIT 5000`).all();
+  const cols = ['created_at','event_source','submitter_email','contact_name','contact_email','contact_phone','org_name','email_status','is_duplicate','follow_up_owner','follow_up_date'];
+  const esc = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+  const csv = [cols.join(',')].concat(rows.map(r => cols.map(c => esc(r[c])).join(','))).join('\r\n');
+  audit(req, 'scans_exported', 'card_scan', null, rows.length + ' rows');
+  res.setHeader('Content-Type', 'text/csv'); res.setHeader('Content-Disposition', 'attachment; filename="card-scans.csv"');
+  res.send(csv);
+});
+// Retry a failed/queued thank-you email (Super Admin / CRM writers).
+app.post('/api/crm/emails/:id/retry', requireAuth, async (req, res) => {
+  if (!canCRMWrite(req.user)) return forbid(res);
+  const e = db.prepare('SELECT * FROM emails WHERE id=?').get(req.params.id);
+  if (!e) return res.status(404).json({ error: 'Not found' });
+  if (e.status === 'sent') return res.json({ ok: true, status: 'sent', message: 'Already sent.' });
+  const sent = await mailer.sendMail({ to: e.to_addr, subject: e.subject, text: e.body });
+  const attempts = (e.attempts || 0) + 1;
+  const status = sent.ok ? 'sent' : (sent.configured ? 'failed' : 'queued');
+  db.prepare('UPDATE emails SET status=?,attempts=?,last_error=?,sent_at=? WHERE id=?')
+    .run(status, attempts, sent.ok ? null : (sent.error || 'SMTP not configured'), sent.ok ? nowISO() : null, e.id);
+  if (e.contact_id) db.prepare('UPDATE card_scans SET email_status=?,email_attempts=email_attempts+1,email_sent_at=? WHERE contact_id=? AND event_source=?')
+    .run(status, sent.ok ? nowISO() : null, e.contact_id, e.event_source);
+  audit(req, 'email_retried', 'email', e.id, status);
+  res.json({ ok: sent.ok, status, message: sent.ok ? 'Email sent.' : (sent.configured ? 'Send failed; kept for retry.' : 'Email not configured; still queued.') });
+});
+
+// Retry the thank-you email for a specific captured card.
+app.post('/api/crm/scans/:id/retry-email', requireAuth, async (req, res) => {
+  if (!canCRMWrite(req.user)) return forbid(res);
+  const s = db.prepare('SELECT * FROM card_scans WHERE id=?').get(req.params.id);
+  if (!s) return res.status(404).json({ error: 'Not found' });
+  const e = db.prepare("SELECT * FROM emails WHERE template='thankyou' AND contact_id=? AND event_source=? AND status<>'sent' ORDER BY id DESC").get(s.contact_id, s.event_source);
+  if (!e) return res.status(400).json({ error: 'No queued email to retry for this card.' });
+  const sent = await mailer.sendMail({ to: e.to_addr, subject: e.subject, text: e.body });
+  const status = sent.ok ? 'sent' : (sent.configured ? 'failed' : 'queued');
+  db.prepare('UPDATE emails SET status=?,attempts=?,last_error=?,sent_at=? WHERE id=?')
+    .run(status, (e.attempts || 0) + 1, sent.ok ? null : (sent.error || 'SMTP not configured'), sent.ok ? nowISO() : null, e.id);
+  db.prepare('UPDATE card_scans SET email_status=?,email_attempts=email_attempts+1,email_sent_at=? WHERE id=?').run(status, sent.ok ? nowISO() : null, s.id);
+  audit(req, 'email_retried', 'card_scan', s.id, status);
+  res.json({ ok: sent.ok, status });
 });
 
 /* ---------------- static ---------------- */
