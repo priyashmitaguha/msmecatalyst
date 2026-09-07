@@ -1826,6 +1826,20 @@
     "multiline": false,
     "page": "odr-about"
   },
+  "odr-about.c10": {
+    "default": "Who it's for",
+    "kind": "html",
+    "label": "Subheading: Who it's for",
+    "multiline": false,
+    "page": "odr-about"
+  },
+  "odr-about.c11": {
+    "default": "Any MSME facing payment-related commercial friction — a delayed receivable, a disputed invoice, or a stalled settlement with a buyer or counterparty.",
+    "kind": "html",
+    "label": "Paragraph: Any MSME facing payment-related commercial fri…",
+    "multiline": true,
+    "page": "odr-about"
+  },
   "odr-about.c1_href": {
     "default": "index.html",
     "kind": "url",
@@ -1848,30 +1862,72 @@
     "page": "odr-about"
   },
   "odr-about.c4": {
+    "default": "About the Programme",
+    "kind": "html",
+    "label": "Link: About the Programme",
+    "multiline": false,
+    "page": "odr-about"
+  },
+  "odr-about.c4_href": {
+    "default": "about.html",
+    "kind": "url",
+    "label": "Link URL: About the Programme",
+    "multiline": false,
+    "page": "odr-about"
+  },
+  "odr-about.c5": {
+    "default": "How ODR Works",
+    "kind": "html",
+    "label": "Link: How ODR Works",
+    "multiline": false,
+    "page": "odr-about"
+  },
+  "odr-about.c5_href": {
+    "default": "how-it-works.html",
+    "kind": "url",
+    "label": "Link URL: How ODR Works",
+    "multiline": false,
+    "page": "odr-about"
+  },
+  "odr-about.c6": {
+    "default": "Choose a Provider",
+    "kind": "html",
+    "label": "Link: Choose a Provider",
+    "multiline": false,
+    "page": "odr-about"
+  },
+  "odr-about.c6_href": {
+    "default": "choose-provider.html",
+    "kind": "url",
+    "label": "Link URL: Choose a Provider",
+    "multiline": false,
+    "page": "odr-about"
+  },
+  "odr-about.c7": {
+    "default": "Apply for Support",
+    "kind": "html",
+    "label": "Link: Apply for Support",
+    "multiline": false,
+    "page": "odr-about"
+  },
+  "odr-about.c7_href": {
+    "default": "apply.html",
+    "kind": "url",
+    "label": "Link URL: Apply for Support",
+    "multiline": false,
+    "page": "odr-about"
+  },
+  "odr-about.c8": {
     "default": "Late payments are one of the most common — and most damaging — sources of stress for a small business. Money that has been earned sits unpaid, cash flow tightens, and the enterprise is forced to choose between chasing the payment and running the business.",
     "kind": "html",
     "label": "Paragraph: Late payments are one of the most common — and…",
     "multiline": true,
     "page": "odr-about"
   },
-  "odr-about.c5": {
+  "odr-about.c9": {
     "default": "The MSME Catalyst ODR programme exists to reduce that burden. We help you understand what is happening, organise the evidence you already have, and see the routes available — from direct resolution and mediation to arbitration and the statutory MSEFC pathway. When you are ready, we connect you, neutrally, to an appropriate independent provider.",
     "kind": "html",
     "label": "Paragraph: The MSME Catalyst ODR programme exists to redu…",
-    "multiline": true,
-    "page": "odr-about"
-  },
-  "odr-about.c6": {
-    "default": "Who it's for",
-    "kind": "html",
-    "label": "Subheading: Who it's for",
-    "multiline": false,
-    "page": "odr-about"
-  },
-  "odr-about.c7": {
-    "default": "Any MSME facing payment-related commercial friction — a delayed receivable, a disputed invoice, or a stalled settlement with a buyer or counterparty.",
-    "kind": "html",
-    "label": "Paragraph: Any MSME facing payment-related commercial fri…",
     "multiline": true,
     "page": "odr-about"
   },
@@ -1903,124 +1959,61 @@
     "multiline": true,
     "page": "odr-apply"
   },
-  "odr-blogs.c1": {
-    "default": "ODR Home",
+  "odr-apply.c4": {
+    "default": "About the Programme",
     "kind": "html",
-    "label": "Link: ODR Home",
+    "label": "Link: About the Programme",
     "multiline": false,
-    "page": "odr-blogs"
+    "page": "odr-apply"
   },
-  "odr-blogs.c10": {
-    "default": "Article headline to be added",
-    "kind": "html",
-    "label": "Subheading: Article headline to be added",
-    "multiline": false,
-    "page": "odr-blogs"
-  },
-  "odr-blogs.c11": {
-    "default": "CMS-published with categories, author profile and social sharing.",
-    "kind": "html",
-    "label": "Paragraph: CMS-published with categories, author profile…",
-    "multiline": true,
-    "page": "odr-blogs"
-  },
-  "odr-blogs.c12": {
-    "default": "Article headline to be added",
-    "kind": "html",
-    "label": "Subheading: Article headline to be added",
-    "multiline": false,
-    "page": "odr-blogs"
-  },
-  "odr-blogs.c13": {
-    "default": "CMS-published with categories, author profile and social sharing.",
-    "kind": "html",
-    "label": "Paragraph: CMS-published with categories, author profile…",
-    "multiline": true,
-    "page": "odr-blogs"
-  },
-  "odr-blogs.c14": {
-    "default": "Article headline to be added",
-    "kind": "html",
-    "label": "Subheading: Article headline to be added",
-    "multiline": false,
-    "page": "odr-blogs"
-  },
-  "odr-blogs.c15": {
-    "default": "CMS-published with categories, author profile and social sharing.",
-    "kind": "html",
-    "label": "Paragraph: CMS-published with categories, author profile…",
-    "multiline": true,
-    "page": "odr-blogs"
-  },
-  "odr-blogs.c16": {
-    "default": "CMS publishing with categories, author profiles and social sharing.",
-    "kind": "html",
-    "label": "Paragraph: CMS publishing with categories, author profile…",
-    "multiline": true,
-    "page": "odr-blogs"
-  },
-  "odr-blogs.c1_href": {
-    "default": "index.html",
+  "odr-apply.c4_href": {
+    "default": "about.html",
     "kind": "url",
-    "label": "Link URL: ODR Home",
+    "label": "Link URL: About the Programme",
     "multiline": false,
-    "page": "odr-blogs"
+    "page": "odr-apply"
   },
-  "odr-blogs.c2": {
-    "default": "Plain-language writing on getting paid.",
+  "odr-apply.c5": {
+    "default": "How ODR Works",
     "kind": "html",
-    "label": "Heading: Plain-language writing on getting paid.",
+    "label": "Link: How ODR Works",
     "multiline": false,
-    "page": "odr-blogs"
+    "page": "odr-apply"
   },
-  "odr-blogs.c3": {
-    "default": "Practical articles that keep you engaged and informed while you work through a case.",
-    "kind": "html",
-    "label": "Paragraph: Practical articles that keep you engaged and i…",
-    "multiline": true,
-    "page": "odr-blogs"
-  },
-  "odr-blogs.c4": {
-    "default": "Article headline to be added",
-    "kind": "html",
-    "label": "Subheading: Article headline to be added",
+  "odr-apply.c5_href": {
+    "default": "how-it-works.html",
+    "kind": "url",
+    "label": "Link URL: How ODR Works",
     "multiline": false,
-    "page": "odr-blogs"
+    "page": "odr-apply"
   },
-  "odr-blogs.c5": {
-    "default": "CMS-published with categories, author profile and social sharing.",
+  "odr-apply.c6": {
+    "default": "Choose a Provider",
     "kind": "html",
-    "label": "Paragraph: CMS-published with categories, author profile…",
-    "multiline": true,
-    "page": "odr-blogs"
-  },
-  "odr-blogs.c6": {
-    "default": "Article headline to be added",
-    "kind": "html",
-    "label": "Subheading: Article headline to be added",
+    "label": "Link: Choose a Provider",
     "multiline": false,
-    "page": "odr-blogs"
+    "page": "odr-apply"
   },
-  "odr-blogs.c7": {
-    "default": "CMS-published with categories, author profile and social sharing.",
-    "kind": "html",
-    "label": "Paragraph: CMS-published with categories, author profile…",
-    "multiline": true,
-    "page": "odr-blogs"
-  },
-  "odr-blogs.c8": {
-    "default": "Article headline to be added",
-    "kind": "html",
-    "label": "Subheading: Article headline to be added",
+  "odr-apply.c6_href": {
+    "default": "choose-provider.html",
+    "kind": "url",
+    "label": "Link URL: Choose a Provider",
     "multiline": false,
-    "page": "odr-blogs"
+    "page": "odr-apply"
   },
-  "odr-blogs.c9": {
-    "default": "CMS-published with categories, author profile and social sharing.",
+  "odr-apply.c7": {
+    "default": "Apply for Support",
     "kind": "html",
-    "label": "Paragraph: CMS-published with categories, author profile…",
-    "multiline": true,
-    "page": "odr-blogs"
+    "label": "Link: Apply for Support",
+    "multiline": false,
+    "page": "odr-apply"
+  },
+  "odr-apply.c7_href": {
+    "default": "apply.html",
+    "kind": "url",
+    "label": "Link URL: Apply for Support",
+    "multiline": false,
+    "page": "odr-apply"
   },
   "odr-choose-provider.c1": {
     "default": "ODR Home",
@@ -2030,27 +2023,55 @@
     "page": "odr-choose-provider"
   },
   "odr-choose-provider.c10": {
+    "default": "Provider B",
+    "kind": "html",
+    "label": "Subheading: Provider B",
+    "multiline": false,
+    "page": "odr-choose-provider"
+  },
+  "odr-choose-provider.c11": {
+    "default": "Short description managed in the CMS.",
+    "kind": "html",
+    "label": "Paragraph: Short description managed in the CMS.",
+    "multiline": true,
+    "page": "odr-choose-provider"
+  },
+  "odr-choose-provider.c12": {
+    "default": "Provider C",
+    "kind": "html",
+    "label": "Subheading: Provider C",
+    "multiline": false,
+    "page": "odr-choose-provider"
+  },
+  "odr-choose-provider.c13": {
+    "default": "Short description managed in the CMS.",
+    "kind": "html",
+    "label": "Paragraph: Short description managed in the CMS.",
+    "multiline": true,
+    "page": "odr-choose-provider"
+  },
+  "odr-choose-provider.c14": {
     "default": "You are being redirected to <span id=\"redirect-name\">the provider</span>.",
     "kind": "html",
     "label": "Subheading: You are being redirected to the provider .",
     "multiline": true,
     "page": "odr-choose-provider"
   },
-  "odr-choose-provider.c11": {
+  "odr-choose-provider.c15": {
     "default": "Redirecting in <strong id=\"redirect-count\">3</strong> seconds…",
     "kind": "html",
     "label": "Paragraph: Redirecting in 3 seconds…",
     "multiline": true,
     "page": "odr-choose-provider"
   },
-  "odr-choose-provider.c12": {
+  "odr-choose-provider.c16": {
     "default": "Continue now →",
     "kind": "html",
     "label": "Link: Continue now →",
     "multiline": false,
     "page": "odr-choose-provider"
   },
-  "odr-choose-provider.c13": {
+  "odr-choose-provider.c17": {
     "default": "The provider list is a CMS collection (“ODR Providers”): logo, name, description, areas of support, website URL, display order and status. Provider selection is tracked in analytics and the CRM. MSME Catalyst does not imply any recommendation, guarantee or control over the provider's outcome.",
     "kind": "html",
     "label": "Paragraph: The provider list is a CMS collection (“ODR Pr…",
@@ -2079,44 +2100,72 @@
     "page": "odr-choose-provider"
   },
   "odr-choose-provider.c4": {
+    "default": "About the Programme",
+    "kind": "html",
+    "label": "Link: About the Programme",
+    "multiline": false,
+    "page": "odr-choose-provider"
+  },
+  "odr-choose-provider.c4_href": {
+    "default": "about.html",
+    "kind": "url",
+    "label": "Link URL: About the Programme",
+    "multiline": false,
+    "page": "odr-choose-provider"
+  },
+  "odr-choose-provider.c5": {
+    "default": "How ODR Works",
+    "kind": "html",
+    "label": "Link: How ODR Works",
+    "multiline": false,
+    "page": "odr-choose-provider"
+  },
+  "odr-choose-provider.c5_href": {
+    "default": "how-it-works.html",
+    "kind": "url",
+    "label": "Link URL: How ODR Works",
+    "multiline": false,
+    "page": "odr-choose-provider"
+  },
+  "odr-choose-provider.c6": {
+    "default": "Choose a Provider",
+    "kind": "html",
+    "label": "Link: Choose a Provider",
+    "multiline": false,
+    "page": "odr-choose-provider"
+  },
+  "odr-choose-provider.c6_href": {
+    "default": "choose-provider.html",
+    "kind": "url",
+    "label": "Link URL: Choose a Provider",
+    "multiline": false,
+    "page": "odr-choose-provider"
+  },
+  "odr-choose-provider.c7": {
+    "default": "Apply for Support",
+    "kind": "html",
+    "label": "Link: Apply for Support",
+    "multiline": false,
+    "page": "odr-choose-provider"
+  },
+  "odr-choose-provider.c7_href": {
+    "default": "apply.html",
+    "kind": "url",
+    "label": "Link URL: Apply for Support",
+    "multiline": false,
+    "page": "odr-choose-provider"
+  },
+  "odr-choose-provider.c8": {
     "default": "Provider A",
     "kind": "html",
     "label": "Subheading: Provider A",
     "multiline": false,
     "page": "odr-choose-provider"
   },
-  "odr-choose-provider.c5": {
+  "odr-choose-provider.c9": {
     "default": "Short description managed in the CMS (name, logo, areas of support, website, display order, status).",
     "kind": "html",
     "label": "Paragraph: Short description managed in the CMS (name, lo…",
-    "multiline": true,
-    "page": "odr-choose-provider"
-  },
-  "odr-choose-provider.c6": {
-    "default": "Provider B",
-    "kind": "html",
-    "label": "Subheading: Provider B",
-    "multiline": false,
-    "page": "odr-choose-provider"
-  },
-  "odr-choose-provider.c7": {
-    "default": "Short description managed in the CMS.",
-    "kind": "html",
-    "label": "Paragraph: Short description managed in the CMS.",
-    "multiline": true,
-    "page": "odr-choose-provider"
-  },
-  "odr-choose-provider.c8": {
-    "default": "Provider C",
-    "kind": "html",
-    "label": "Subheading: Provider C",
-    "multiline": false,
-    "page": "odr-choose-provider"
-  },
-  "odr-choose-provider.c9": {
-    "default": "Short description managed in the CMS.",
-    "kind": "html",
-    "label": "Paragraph: Short description managed in the CMS.",
     "multiline": true,
     "page": "odr-choose-provider"
   },
@@ -2125,6 +2174,34 @@
     "kind": "html",
     "label": "Link: ODR Home",
     "multiline": false,
+    "page": "odr-contact"
+  },
+  "odr-contact.c10": {
+    "default": "Ready to apply?",
+    "kind": "html",
+    "label": "Subheading: Ready to apply?",
+    "multiline": false,
+    "page": "odr-contact"
+  },
+  "odr-contact.c11": {
+    "default": "<a class=\"textlink\" href=\"apply.html\">Apply for ODR support →</a>",
+    "kind": "html",
+    "label": "Paragraph: Apply for ODR support →",
+    "multiline": true,
+    "page": "odr-contact"
+  },
+  "odr-contact.c12": {
+    "default": "Registered office",
+    "kind": "html",
+    "label": "Subheading: Registered office",
+    "multiline": false,
+    "page": "odr-contact"
+  },
+  "odr-contact.c13": {
+    "default": "Digital Growth Infrastructure Foundation (Section 8)<br/>CIN: U94990MH2026NPL468930<br/>WeWork 247 Park, 13th Floor, Vikhroli Corp, Mumbai, Mumbai, Mumbai – 400079, Maharashtra",
+    "kind": "html",
+    "label": "Paragraph: Digital Growth Infrastructure Foundation (Sect…",
+    "multiline": true,
     "page": "odr-contact"
   },
   "odr-contact.c1_href": {
@@ -2149,44 +2226,72 @@
     "page": "odr-contact"
   },
   "odr-contact.c4": {
+    "default": "About the Programme",
+    "kind": "html",
+    "label": "Link: About the Programme",
+    "multiline": false,
+    "page": "odr-contact"
+  },
+  "odr-contact.c4_href": {
+    "default": "about.html",
+    "kind": "url",
+    "label": "Link URL: About the Programme",
+    "multiline": false,
+    "page": "odr-contact"
+  },
+  "odr-contact.c5": {
+    "default": "How ODR Works",
+    "kind": "html",
+    "label": "Link: How ODR Works",
+    "multiline": false,
+    "page": "odr-contact"
+  },
+  "odr-contact.c5_href": {
+    "default": "how-it-works.html",
+    "kind": "url",
+    "label": "Link URL: How ODR Works",
+    "multiline": false,
+    "page": "odr-contact"
+  },
+  "odr-contact.c6": {
+    "default": "Choose a Provider",
+    "kind": "html",
+    "label": "Link: Choose a Provider",
+    "multiline": false,
+    "page": "odr-contact"
+  },
+  "odr-contact.c6_href": {
+    "default": "choose-provider.html",
+    "kind": "url",
+    "label": "Link URL: Choose a Provider",
+    "multiline": false,
+    "page": "odr-contact"
+  },
+  "odr-contact.c7": {
+    "default": "Apply for Support",
+    "kind": "html",
+    "label": "Link: Apply for Support",
+    "multiline": false,
+    "page": "odr-contact"
+  },
+  "odr-contact.c7_href": {
+    "default": "apply.html",
+    "kind": "url",
+    "label": "Link URL: Apply for Support",
+    "multiline": false,
+    "page": "odr-contact"
+  },
+  "odr-contact.c8": {
     "default": "ODR support",
     "kind": "html",
     "label": "Subheading: ODR support",
     "multiline": false,
     "page": "odr-contact"
   },
-  "odr-contact.c5": {
+  "odr-contact.c9": {
     "default": "<a class=\"textlink\" href=\"mailto:odr@msmecatalyst.org\">odr@msmecatalyst.org</a>",
     "kind": "html",
     "label": "Paragraph: odr@msmecatalyst.org",
-    "multiline": true,
-    "page": "odr-contact"
-  },
-  "odr-contact.c6": {
-    "default": "Ready to apply?",
-    "kind": "html",
-    "label": "Subheading: Ready to apply?",
-    "multiline": false,
-    "page": "odr-contact"
-  },
-  "odr-contact.c7": {
-    "default": "<a class=\"textlink\" href=\"apply.html\">Apply for ODR support →</a>",
-    "kind": "html",
-    "label": "Paragraph: Apply for ODR support →",
-    "multiline": true,
-    "page": "odr-contact"
-  },
-  "odr-contact.c8": {
-    "default": "Registered office",
-    "kind": "html",
-    "label": "Subheading: Registered office",
-    "multiline": false,
-    "page": "odr-contact"
-  },
-  "odr-contact.c9": {
-    "default": "Digital Growth Infrastructure Foundation (Section 8)<br/>CIN: U94990MH2026NPL468930<br/>WeWork 247 Park, 13th Floor, Vikhroli Corp, Mumbai, Mumbai, Mumbai – 400079, Maharashtra",
-    "kind": "html",
-    "label": "Paragraph: Digital Growth Infrastructure Foundation (Sect…",
     "multiline": true,
     "page": "odr-contact"
   },
@@ -2198,72 +2303,72 @@
     "page": "odr-how-it-works"
   },
   "odr-how-it-works.c10": {
+    "default": "Initial screening",
+    "kind": "html",
+    "label": "Subheading: Initial screening",
+    "multiline": false,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c11": {
+    "default": "We check the case for completeness and fit — is this payment friction, and is ODR a sensible route?",
+    "kind": "html",
+    "label": "Paragraph: We check the case for completeness and fit — i…",
+    "multiline": true,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c12": {
+    "default": "Case preparation through the Cluster Recovery Cell",
+    "kind": "html",
+    "label": "Subheading: Case preparation through the Cluster Recovery…",
+    "multiline": false,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c13": {
+    "default": "We help you organise invoices, POs, delivery proof, communications and a clear timeline, so your case stands on its own.",
+    "kind": "html",
+    "label": "Paragraph: We help you organise invoices, POs, delivery p…",
+    "multiline": true,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c14": {
     "default": "Neutral referral",
     "kind": "html",
     "label": "Subheading: Neutral referral",
     "multiline": false,
     "page": "odr-how-it-works"
   },
-  "odr-how-it-works.c11": {
+  "odr-how-it-works.c15": {
     "default": "We connect you to an appropriate independent provider. You choose which one.",
     "kind": "html",
     "label": "Paragraph: We connect you to an appropriate independent p…",
     "multiline": true,
     "page": "odr-how-it-works"
   },
-  "odr-how-it-works.c12": {
+  "odr-how-it-works.c16": {
     "default": "Track &amp; learn",
     "kind": "html",
     "label": "Subheading: Track & learn",
     "multiline": false,
     "page": "odr-how-it-works"
   },
-  "odr-how-it-works.c13": {
+  "odr-how-it-works.c17": {
     "default": "With your consent, the outcome feeds aggregate, de-identified learning that improves the whole system.",
     "kind": "html",
     "label": "Paragraph: With your consent, the outcome feeds aggregate…",
     "multiline": true,
     "page": "odr-how-it-works"
   },
-  "odr-how-it-works.c14": {
+  "odr-how-it-works.c18": {
     "default": "Ways a case can resolve",
     "kind": "html",
     "label": "Heading: Ways a case can resolve",
     "multiline": false,
     "page": "odr-how-it-works"
   },
-  "odr-how-it-works.c15": {
+  "odr-how-it-works.c19": {
     "default": "Direct resolution",
     "kind": "html",
     "label": "Subheading: Direct resolution",
-    "multiline": false,
-    "page": "odr-how-it-works"
-  },
-  "odr-how-it-works.c16": {
-    "default": "A well-prepared case often prompts payment without any formal process.",
-    "kind": "html",
-    "label": "Paragraph: A well-prepared case often prompts payment wit…",
-    "multiline": true,
-    "page": "odr-how-it-works"
-  },
-  "odr-how-it-works.c17": {
-    "default": "Mediation",
-    "kind": "html",
-    "label": "Subheading: Mediation",
-    "multiline": false,
-    "page": "odr-how-it-works"
-  },
-  "odr-how-it-works.c18": {
-    "default": "A neutral third party helps both sides reach a voluntary settlement.",
-    "kind": "html",
-    "label": "Paragraph: A neutral third party helps both sides reach a…",
-    "multiline": true,
-    "page": "odr-how-it-works"
-  },
-  "odr-how-it-works.c19": {
-    "default": "Conciliation",
-    "kind": "html",
-    "label": "Subheading: Conciliation",
     "multiline": false,
     "page": "odr-how-it-works"
   },
@@ -2282,51 +2387,72 @@
     "page": "odr-how-it-works"
   },
   "odr-how-it-works.c20": {
+    "default": "A well-prepared case often prompts payment without any formal process.",
+    "kind": "html",
+    "label": "Paragraph: A well-prepared case often prompts payment wit…",
+    "multiline": true,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c21": {
+    "default": "Mediation",
+    "kind": "html",
+    "label": "Subheading: Mediation",
+    "multiline": false,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c22": {
+    "default": "A neutral third party helps both sides reach a voluntary settlement.",
+    "kind": "html",
+    "label": "Paragraph: A neutral third party helps both sides reach a…",
+    "multiline": true,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c23": {
+    "default": "Conciliation",
+    "kind": "html",
+    "label": "Subheading: Conciliation",
+    "multiline": false,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c24": {
     "default": "Similar to mediation, with the conciliator able to suggest terms.",
     "kind": "html",
     "label": "Paragraph: Similar to mediation, with the conciliator abl…",
     "multiline": true,
     "page": "odr-how-it-works"
   },
-  "odr-how-it-works.c21": {
+  "odr-how-it-works.c25": {
     "default": "Arbitration",
     "kind": "html",
     "label": "Subheading: Arbitration",
     "multiline": false,
     "page": "odr-how-it-works"
   },
-  "odr-how-it-works.c22": {
+  "odr-how-it-works.c26": {
     "default": "A binding decision by an arbitrator, outside the court system.",
     "kind": "html",
     "label": "Paragraph: A binding decision by an arbitrator, outside t…",
     "multiline": true,
     "page": "odr-how-it-works"
   },
-  "odr-how-it-works.c23": {
+  "odr-how-it-works.c27": {
     "default": "Always remember",
     "kind": "html",
     "label": "Subheading: Always remember",
     "multiline": false,
     "page": "odr-how-it-works"
   },
-  "odr-how-it-works.c24": {
+  "odr-how-it-works.c28": {
     "default": "The statutory MSEFC pathway remains available and is not replaced",
     "kind": "html",
     "label": "List item: The statutory MSEFC pathway remains available…",
     "multiline": true,
     "page": "odr-how-it-works"
   },
-  "odr-how-it-works.c25": {
+  "odr-how-it-works.c29": {
     "default": "MSME Catalyst does not adjudicate, advise or guarantee recovery",
     "kind": "html",
     "label": "List item: MSME Catalyst does not adjudicate, advise or g…",
-    "multiline": true,
-    "page": "odr-how-it-works"
-  },
-  "odr-how-it-works.c26": {
-    "default": "You retain choice of provider throughout",
-    "kind": "html",
-    "label": "List item: You retain choice of provider throughout",
     "multiline": true,
     "page": "odr-how-it-works"
   },
@@ -2337,45 +2463,80 @@
     "multiline": true,
     "page": "odr-how-it-works"
   },
+  "odr-how-it-works.c30": {
+    "default": "You retain choice of provider throughout",
+    "kind": "html",
+    "label": "List item: You retain choice of provider throughout",
+    "multiline": true,
+    "page": "odr-how-it-works"
+  },
   "odr-how-it-works.c4": {
+    "default": "About the Programme",
+    "kind": "html",
+    "label": "Link: About the Programme",
+    "multiline": false,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c4_href": {
+    "default": "about.html",
+    "kind": "url",
+    "label": "Link URL: About the Programme",
+    "multiline": false,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c5": {
+    "default": "How ODR Works",
+    "kind": "html",
+    "label": "Link: How ODR Works",
+    "multiline": false,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c5_href": {
+    "default": "how-it-works.html",
+    "kind": "url",
+    "label": "Link URL: How ODR Works",
+    "multiline": false,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c6": {
+    "default": "Choose a Provider",
+    "kind": "html",
+    "label": "Link: Choose a Provider",
+    "multiline": false,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c6_href": {
+    "default": "choose-provider.html",
+    "kind": "url",
+    "label": "Link URL: Choose a Provider",
+    "multiline": false,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c7": {
+    "default": "Apply for Support",
+    "kind": "html",
+    "label": "Link: Apply for Support",
+    "multiline": false,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c7_href": {
+    "default": "apply.html",
+    "kind": "url",
+    "label": "Link URL: Apply for Support",
+    "multiline": false,
+    "page": "odr-how-it-works"
+  },
+  "odr-how-it-works.c8": {
     "default": "Apply",
     "kind": "html",
     "label": "Subheading: Apply",
     "multiline": false,
     "page": "odr-how-it-works"
   },
-  "odr-how-it-works.c5": {
+  "odr-how-it-works.c9": {
     "default": "Tell us about the enterprise, the counterparty, the amount and the paperwork you have. Upload what you've got.",
     "kind": "html",
     "label": "Paragraph: Tell us about the enterprise, the counterparty…",
-    "multiline": true,
-    "page": "odr-how-it-works"
-  },
-  "odr-how-it-works.c6": {
-    "default": "Initial screening",
-    "kind": "html",
-    "label": "Subheading: Initial screening",
-    "multiline": false,
-    "page": "odr-how-it-works"
-  },
-  "odr-how-it-works.c7": {
-    "default": "We check the case for completeness and fit — is this payment friction, and is ODR a sensible route?",
-    "kind": "html",
-    "label": "Paragraph: We check the case for completeness and fit — i…",
-    "multiline": true,
-    "page": "odr-how-it-works"
-  },
-  "odr-how-it-works.c8": {
-    "default": "Case preparation through the Cluster Recovery Cell",
-    "kind": "html",
-    "label": "Subheading: Case preparation through the Cluster Recovery…",
-    "multiline": false,
-    "page": "odr-how-it-works"
-  },
-  "odr-how-it-works.c9": {
-    "default": "We help you organise invoices, POs, delivery proof, communications and a clear timeline, so your case stands on its own.",
-    "kind": "html",
-    "label": "Paragraph: We help you organise invoices, POs, delivery p…",
     "multiline": true,
     "page": "odr-how-it-works"
   },
@@ -2394,65 +2555,93 @@
     "page": "odr-index"
   },
   "odr-index.c11": {
+    "default": "About the Programme",
+    "kind": "html",
+    "label": "Link: About the Programme",
+    "multiline": false,
+    "page": "odr-index"
+  },
+  "odr-index.c11_href": {
+    "default": "about.html",
+    "kind": "url",
+    "label": "Link URL: About the Programme",
+    "multiline": false,
+    "page": "odr-index"
+  },
+  "odr-index.c12": {
+    "default": "How ODR Works",
+    "kind": "html",
+    "label": "Link: How ODR Works",
+    "multiline": false,
+    "page": "odr-index"
+  },
+  "odr-index.c12_href": {
+    "default": "how-it-works.html",
+    "kind": "url",
+    "label": "Link URL: How ODR Works",
+    "multiline": false,
+    "page": "odr-index"
+  },
+  "odr-index.c13": {
+    "default": "Choose a Provider",
+    "kind": "html",
+    "label": "Link: Choose a Provider",
+    "multiline": false,
+    "page": "odr-index"
+  },
+  "odr-index.c13_href": {
+    "default": "choose-provider.html",
+    "kind": "url",
+    "label": "Link URL: Choose a Provider",
+    "multiline": false,
+    "page": "odr-index"
+  },
+  "odr-index.c14": {
+    "default": "Apply for Support",
+    "kind": "html",
+    "label": "Link: Apply for Support",
+    "multiline": false,
+    "page": "odr-index"
+  },
+  "odr-index.c14_href": {
+    "default": "apply.html",
+    "kind": "url",
+    "label": "Link URL: Apply for Support",
+    "multiline": false,
+    "page": "odr-index"
+  },
+  "odr-index.c15": {
     "default": "Understand your options before you act",
     "kind": "html",
     "label": "Heading: Understand your options before you act",
     "multiline": false,
     "page": "odr-index"
   },
-  "odr-index.c12": {
+  "odr-index.c16": {
     "default": "Evidence preparation",
     "kind": "html",
     "label": "Subheading: Evidence preparation",
     "multiline": false,
     "page": "odr-index"
   },
-  "odr-index.c13": {
+  "odr-index.c17": {
     "default": "Get your invoices, POs, delivery proof and communications in order.",
     "kind": "html",
     "label": "Paragraph: Get your invoices, POs, delivery proof and com…",
     "multiline": true,
     "page": "odr-index"
   },
-  "odr-index.c14": {
+  "odr-index.c18": {
     "default": "Mediation &amp; conciliation",
     "kind": "html",
     "label": "Subheading: Mediation & conciliation",
     "multiline": false,
     "page": "odr-index"
   },
-  "odr-index.c15": {
+  "odr-index.c19": {
     "default": "Understand faster, less adversarial routes to resolution.",
     "kind": "html",
     "label": "Paragraph: Understand faster, less adversarial routes to…",
-    "multiline": true,
-    "page": "odr-index"
-  },
-  "odr-index.c16": {
-    "default": "Arbitration &amp; statutory routes",
-    "kind": "html",
-    "label": "Subheading: Arbitration & statutory routes",
-    "multiline": false,
-    "page": "odr-index"
-  },
-  "odr-index.c17": {
-    "default": "Know when MSEFC and formal routes are the right path.",
-    "kind": "html",
-    "label": "Paragraph: Know when MSEFC and formal routes are the righ…",
-    "multiline": true,
-    "page": "odr-index"
-  },
-  "odr-index.c18": {
-    "default": "What this programme is — and is not",
-    "kind": "html",
-    "label": "Subheading: What this programme is — and is not",
-    "multiline": false,
-    "page": "odr-index"
-  },
-  "odr-index.c19": {
-    "default": "MSME Catalyst is not an ODR platform, law firm, mediator, arbitrator or court",
-    "kind": "html",
-    "label": "List item: MSME Catalyst is not an ODR platform, law firm…",
     "multiline": true,
     "page": "odr-index"
   },
@@ -2464,44 +2653,86 @@
     "page": "odr-index"
   },
   "odr-index.c20": {
+    "default": "Arbitration &amp; statutory routes",
+    "kind": "html",
+    "label": "Subheading: Arbitration & statutory routes",
+    "multiline": false,
+    "page": "odr-index"
+  },
+  "odr-index.c21": {
+    "default": "Know when MSEFC and formal routes are the right path.",
+    "kind": "html",
+    "label": "Paragraph: Know when MSEFC and formal routes are the righ…",
+    "multiline": true,
+    "page": "odr-index"
+  },
+  "odr-index.c22": {
+    "default": "What this programme is — and is not",
+    "kind": "html",
+    "label": "Subheading: What this programme is — and is not",
+    "multiline": false,
+    "page": "odr-index"
+  },
+  "odr-index.c23": {
+    "default": "MSME Catalyst is not an ODR platform, law firm, mediator, arbitrator or court",
+    "kind": "html",
+    "label": "List item: MSME Catalyst is not an ODR platform, law firm…",
+    "multiline": true,
+    "page": "odr-index"
+  },
+  "odr-index.c24": {
     "default": "It does not provide legal advice, compel participation, collect money or guarantee recovery",
     "kind": "html",
     "label": "List item: It does not provide legal advice, compel parti…",
     "multiline": true,
     "page": "odr-index"
   },
-  "odr-index.c21": {
+  "odr-index.c25": {
     "default": "The statutory MSEFC pathway remains available and is not replaced",
     "kind": "html",
     "label": "List item: The statutory MSEFC pathway remains available…",
     "multiline": true,
     "page": "odr-index"
   },
-  "odr-index.c22": {
-    "default": "Start with a prepared case.",
+  "odr-index.c26": {
+    "default": "Blogs, podcasts &amp; reports — on the main site",
     "kind": "html",
-    "label": "Heading: Start with a prepared case.",
+    "label": "Heading: Blogs, podcasts & reports — on the main site",
     "multiline": false,
     "page": "odr-index"
   },
-  "odr-index.c23": {
-    "default": "Apply and the Cluster Recovery Cell will help you organise your documents and understand your routes.",
+  "odr-index.c27": {
+    "default": "ODR insights live in the shared MSME Catalyst Knowledge Hub, not a separate library.",
     "kind": "html",
-    "label": "Paragraph: Apply and the Cluster Recovery Cell will help…",
+    "label": "Paragraph: ODR insights live in the shared MSME Catalyst…",
     "multiline": true,
     "page": "odr-index"
   },
-  "odr-index.c24": {
-    "default": "Apply for Support",
+  "odr-index.c28": {
+    "default": "<h3>Our Blogs</h3><p class=\"muted\">Plain-language articles on getting paid and resolving disputes.</p><span class=\"textlink\">Open on MSME Catalyst →</span>",
     "kind": "html",
-    "label": "Link: Apply for Support",
+    "label": "Link: Our Blogs Plain-language articles on getting p…",
     "multiline": false,
     "page": "odr-index"
   },
-  "odr-index.c24_href": {
-    "default": "apply.html",
+  "odr-index.c28_href": {
+    "default": "../blogs.html",
     "kind": "url",
-    "label": "Link URL: Apply for Support",
+    "label": "Link URL: Our Blogs Plain-language articles ",
+    "multiline": false,
+    "page": "odr-index"
+  },
+  "odr-index.c29": {
+    "default": "<h3>Our Podcasts</h3><p class=\"muted\">Conversations on MSME cash flow and dispute resolution.</p><span class=\"textlink\">Open on MSME Catalyst →</span>",
+    "kind": "html",
+    "label": "Link: Our Podcasts Conversations on MSME cash flow a…",
+    "multiline": false,
+    "page": "odr-index"
+  },
+  "odr-index.c29_href": {
+    "default": "../podcasts.html",
+    "kind": "url",
+    "label": "Link URL: Our Podcasts Conversations on MSME",
     "multiline": false,
     "page": "odr-index"
   },
@@ -2509,6 +2740,48 @@
     "default": "Apply for Support",
     "kind": "html",
     "label": "Link: Apply for Support",
+    "multiline": false,
+    "page": "odr-index"
+  },
+  "odr-index.c30": {
+    "default": "<h3>Whitepapers &amp; Reports</h3><p class=\"muted\">In-depth research, policy notes and reports.</p><span class=\"textlink\">Open on MSME Catalyst →</span>",
+    "kind": "html",
+    "label": "Link: Whitepapers & Reports In-depth research, polic…",
+    "multiline": false,
+    "page": "odr-index"
+  },
+  "odr-index.c30_href": {
+    "default": "../reports.html",
+    "kind": "url",
+    "label": "Link URL: Whitepapers & Reports In-depth res",
+    "multiline": false,
+    "page": "odr-index"
+  },
+  "odr-index.c31": {
+    "default": "Start with a prepared case.",
+    "kind": "html",
+    "label": "Heading: Start with a prepared case.",
+    "multiline": false,
+    "page": "odr-index"
+  },
+  "odr-index.c32": {
+    "default": "Apply and the Cluster Recovery Cell will help you organise your documents and understand your routes.",
+    "kind": "html",
+    "label": "Paragraph: Apply and the Cluster Recovery Cell will help…",
+    "multiline": true,
+    "page": "odr-index"
+  },
+  "odr-index.c33": {
+    "default": "Apply for Support",
+    "kind": "html",
+    "label": "Link: Apply for Support",
+    "multiline": false,
+    "page": "odr-index"
+  },
+  "odr-index.c33_href": {
+    "default": "apply.html",
+    "kind": "url",
+    "label": "Link URL: Apply for Support",
     "multiline": false,
     "page": "odr-index"
   },
@@ -2575,192 +2848,31 @@
     "multiline": false,
     "page": "odr-index"
   },
-  "odr-papers.c1": {
-    "default": "ODR Home",
-    "kind": "html",
-    "label": "Link: ODR Home",
-    "multiline": false,
-    "page": "odr-papers"
-  },
-  "odr-papers.c10": {
-    "default": "Paper title to be added",
-    "kind": "html",
-    "label": "Subheading: Paper title to be added",
-    "multiline": false,
-    "page": "odr-papers"
-  },
-  "odr-papers.c11": {
-    "default": "Uploaded report, policy note or white paper with a downloadable document.",
-    "kind": "html",
-    "label": "Paragraph: Uploaded report, policy note or white paper wi…",
-    "multiline": true,
-    "page": "odr-papers"
-  },
-  "odr-papers.c12": {
-    "default": "Uploaded reports, policy notes and white papers — downloadable documents managed in the CMS.",
-    "kind": "html",
-    "label": "Paragraph: Uploaded reports, policy notes and white paper…",
-    "multiline": true,
-    "page": "odr-papers"
-  },
-  "odr-papers.c1_href": {
-    "default": "index.html",
-    "kind": "url",
-    "label": "Link URL: ODR Home",
-    "multiline": false,
-    "page": "odr-papers"
-  },
-  "odr-papers.c2": {
-    "default": "Evidence and policy, in depth.",
-    "kind": "html",
-    "label": "Heading: Evidence and policy, in depth.",
-    "multiline": false,
-    "page": "odr-papers"
-  },
-  "odr-papers.c3": {
-    "default": "Reports, policy notes and white papers on MSME receivables and dispute resolution.",
-    "kind": "html",
-    "label": "Paragraph: Reports, policy notes and white papers on MSME…",
-    "multiline": true,
-    "page": "odr-papers"
-  },
-  "odr-papers.c4": {
-    "default": "Paper title to be added",
-    "kind": "html",
-    "label": "Subheading: Paper title to be added",
-    "multiline": false,
-    "page": "odr-papers"
-  },
-  "odr-papers.c5": {
-    "default": "Uploaded report, policy note or white paper with a downloadable document.",
-    "kind": "html",
-    "label": "Paragraph: Uploaded report, policy note or white paper wi…",
-    "multiline": true,
-    "page": "odr-papers"
-  },
-  "odr-papers.c6": {
-    "default": "Paper title to be added",
-    "kind": "html",
-    "label": "Subheading: Paper title to be added",
-    "multiline": false,
-    "page": "odr-papers"
-  },
-  "odr-papers.c7": {
-    "default": "Uploaded report, policy note or white paper with a downloadable document.",
-    "kind": "html",
-    "label": "Paragraph: Uploaded report, policy note or white paper wi…",
-    "multiline": true,
-    "page": "odr-papers"
-  },
-  "odr-papers.c8": {
-    "default": "Paper title to be added",
-    "kind": "html",
-    "label": "Subheading: Paper title to be added",
-    "multiline": false,
-    "page": "odr-papers"
-  },
-  "odr-papers.c9": {
-    "default": "Uploaded report, policy note or white paper with a downloadable document.",
-    "kind": "html",
-    "label": "Paragraph: Uploaded report, policy note or white paper wi…",
-    "multiline": true,
-    "page": "odr-papers"
-  },
-  "odr-podcasts.c1": {
-    "default": "ODR Home",
-    "kind": "html",
-    "label": "Link: ODR Home",
-    "multiline": false,
-    "page": "odr-podcasts"
-  },
-  "odr-podcasts.c10": {
-    "default": "Episode title",
-    "kind": "html",
-    "label": "Subheading: Episode title",
-    "multiline": false,
-    "page": "odr-podcasts"
-  },
-  "odr-podcasts.c11": {
-    "default": "Guest · organisation. Summary in the CMS.",
-    "kind": "html",
-    "label": "Paragraph: Guest · organisation. Summary in the CMS.",
-    "multiline": true,
-    "page": "odr-podcasts"
-  },
-  "odr-podcasts.c12": {
-    "default": "Episode title, guest, summary, embedded Spotify/YouTube/Apple links, transcript, tags and share buttons — all CMS-managed.",
-    "kind": "html",
-    "label": "Paragraph: Episode title, guest, summary, embedded Spotif…",
-    "multiline": true,
-    "page": "odr-podcasts"
-  },
-  "odr-podcasts.c1_href": {
-    "default": "index.html",
-    "kind": "url",
-    "label": "Link URL: ODR Home",
-    "multiline": false,
-    "page": "odr-podcasts"
-  },
-  "odr-podcasts.c2": {
-    "default": "Listen while you prepare.",
-    "kind": "html",
-    "label": "Heading: Listen while you prepare.",
-    "multiline": false,
-    "page": "odr-podcasts"
-  },
-  "odr-podcasts.c3": {
-    "default": "Short conversations on getting paid, resolving disputes and the realities of MSME cash flow.",
-    "kind": "html",
-    "label": "Paragraph: Short conversations on getting paid, resolving…",
-    "multiline": true,
-    "page": "odr-podcasts"
-  },
-  "odr-podcasts.c4": {
-    "default": "Episode title",
-    "kind": "html",
-    "label": "Subheading: Episode title",
-    "multiline": false,
-    "page": "odr-podcasts"
-  },
-  "odr-podcasts.c5": {
-    "default": "Guest · organisation. Summary in the CMS.",
-    "kind": "html",
-    "label": "Paragraph: Guest · organisation. Summary in the CMS.",
-    "multiline": true,
-    "page": "odr-podcasts"
-  },
-  "odr-podcasts.c6": {
-    "default": "Episode title",
-    "kind": "html",
-    "label": "Subheading: Episode title",
-    "multiline": false,
-    "page": "odr-podcasts"
-  },
-  "odr-podcasts.c7": {
-    "default": "Guest · organisation. Summary in the CMS.",
-    "kind": "html",
-    "label": "Paragraph: Guest · organisation. Summary in the CMS.",
-    "multiline": true,
-    "page": "odr-podcasts"
-  },
-  "odr-podcasts.c8": {
-    "default": "Episode title",
-    "kind": "html",
-    "label": "Subheading: Episode title",
-    "multiline": false,
-    "page": "odr-podcasts"
-  },
-  "odr-podcasts.c9": {
-    "default": "Guest · organisation. Summary in the CMS.",
-    "kind": "html",
-    "label": "Paragraph: Guest · organisation. Summary in the CMS.",
-    "multiline": true,
-    "page": "odr-podcasts"
-  },
   "odr-resources.c1": {
     "default": "ODR Home",
     "kind": "html",
     "label": "Link: ODR Home",
+    "multiline": false,
+    "page": "odr-resources"
+  },
+  "odr-resources.c10": {
+    "default": "Does MSME Catalyst take a cut of what I recover?",
+    "kind": "html",
+    "label": "Summary: Does MSME Catalyst take a cut of what I recove…",
+    "multiline": false,
+    "page": "odr-resources"
+  },
+  "odr-resources.c11": {
+    "default": "Will I still be able to go to MSEFC or court?",
+    "kind": "html",
+    "label": "Summary: Will I still be able to go to MSEFC or court?",
+    "multiline": false,
+    "page": "odr-resources"
+  },
+  "odr-resources.c12": {
+    "default": "Do you give legal advice?",
+    "kind": "html",
+    "label": "Summary: Do you give legal advice?",
     "multiline": false,
     "page": "odr-resources"
   },
@@ -2786,37 +2898,72 @@
     "page": "odr-resources"
   },
   "odr-resources.c4": {
+    "default": "About the Programme",
+    "kind": "html",
+    "label": "Link: About the Programme",
+    "multiline": false,
+    "page": "odr-resources"
+  },
+  "odr-resources.c4_href": {
+    "default": "about.html",
+    "kind": "url",
+    "label": "Link URL: About the Programme",
+    "multiline": false,
+    "page": "odr-resources"
+  },
+  "odr-resources.c5": {
+    "default": "How ODR Works",
+    "kind": "html",
+    "label": "Link: How ODR Works",
+    "multiline": false,
+    "page": "odr-resources"
+  },
+  "odr-resources.c5_href": {
+    "default": "how-it-works.html",
+    "kind": "url",
+    "label": "Link URL: How ODR Works",
+    "multiline": false,
+    "page": "odr-resources"
+  },
+  "odr-resources.c6": {
+    "default": "Choose a Provider",
+    "kind": "html",
+    "label": "Link: Choose a Provider",
+    "multiline": false,
+    "page": "odr-resources"
+  },
+  "odr-resources.c6_href": {
+    "default": "choose-provider.html",
+    "kind": "url",
+    "label": "Link URL: Choose a Provider",
+    "multiline": false,
+    "page": "odr-resources"
+  },
+  "odr-resources.c7": {
+    "default": "Apply for Support",
+    "kind": "html",
+    "label": "Link: Apply for Support",
+    "multiline": false,
+    "page": "odr-resources"
+  },
+  "odr-resources.c7_href": {
+    "default": "apply.html",
+    "kind": "url",
+    "label": "Link URL: Apply for Support",
+    "multiline": false,
+    "page": "odr-resources"
+  },
+  "odr-resources.c8": {
     "default": "Frequently asked questions",
     "kind": "html",
     "label": "Heading: Frequently asked questions",
     "multiline": false,
     "page": "odr-resources"
   },
-  "odr-resources.c5": {
+  "odr-resources.c9": {
     "default": "What counts as “payment friction”?",
     "kind": "html",
     "label": "Summary: What counts as “payment friction”?",
-    "multiline": false,
-    "page": "odr-resources"
-  },
-  "odr-resources.c6": {
-    "default": "Does MSME Catalyst take a cut of what I recover?",
-    "kind": "html",
-    "label": "Summary: Does MSME Catalyst take a cut of what I recove…",
-    "multiline": false,
-    "page": "odr-resources"
-  },
-  "odr-resources.c7": {
-    "default": "Will I still be able to go to MSEFC or court?",
-    "kind": "html",
-    "label": "Summary: Will I still be able to go to MSEFC or court?",
-    "multiline": false,
-    "page": "odr-resources"
-  },
-  "odr-resources.c8": {
-    "default": "Do you give legal advice?",
-    "kind": "html",
-    "label": "Summary: Do you give legal advice?",
     "multiline": false,
     "page": "odr-resources"
   },

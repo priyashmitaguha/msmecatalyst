@@ -212,3 +212,30 @@ schemes are rejected or stripped across page copy, collections and CRM, while
 ordinary formatting and valid `https`/relative links keep working.
 
 **New migration surface in revision 3:** none.
+
+## 11. Revision 4 — ODR micro-site navigation
+
+The ODR micro-site now shares the **main MSME Catalyst header/navigation**
+(Home · About Us · Our Approach · Membership · ODR Support · Knowledge Hub ·
+Contact Us · Join), with **ODR Support** marked active. `pages_odr.py` delegates
+its header to the main `header()` (prefix `../`), so desktop, mobile and dropdown
+behaviour and styling are identical.
+
+The old crowded ODR top nav (Resources · Blogs · Papers · Podcasts · Apply ·
+Contact · Main Site) is gone. The ODR journey stays reachable through in-content
+buttons — an `journey()` band (**About the Programme · How ODR Works · Choose a
+Provider · Apply for Support**) on every ODR page — plus the existing hero CTAs.
+
+The separate ODR **Blogs / Papers / Podcasts** libraries were removed
+(`public/odr/blogs.html`, `papers.html`, `podcasts.html` deleted; `odr-blogs`,
+`odr-papers`, `odr-podcasts` dropped from the server `PAGES` list). The
+micro-site now links to the shared main-site Knowledge Hub — **Our Blogs
+(`../blogs.html`), Our Podcasts (`../podcasts.html`), Whitepapers & Reports
+(`../reports.html`)** — via the header dropdown, the ODR footer, and a
+"Knowledge Hub" card row on the ODR home.
+
+All CMS editability, page-publishing controls, role permissions, security
+sanitisation and data are preserved. **Tests:** grew to **152 assertions** (added
+an ODR MICROSITE NAVIGATION section covering desktop + mobile nav parity, active
+section, journey-page links, shared Knowledge Hub links, and 404s for the removed
+libraries). **New migration surface in revision 4:** none.

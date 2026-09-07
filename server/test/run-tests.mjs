@@ -138,7 +138,7 @@ const waitHealth = async () => { for (let i = 0; i < 50; i++) { try { const r = 
     const pc = await api('/api/pagecopy', {}, admin2);
     const groups = pc.data.groups || {};
     const expectPages = ['index','about','approach','programmes','membership','odr-support','contact',
-      'odr-index','odr-about','odr-how-it-works','odr-choose-provider','odr-apply','odr-resources','odr-papers','odr-podcasts','odr-blogs','odr-contact','global'];
+      'odr-index','odr-about','odr-how-it-works','odr-choose-provider','odr-apply','odr-resources','odr-contact','global'];
     ok('registry covers all main + ODR pages + global chrome', expectPages.every(p => groups[p] && groups[p].length));
     ok('pages are more than just hero fields (deep editability)', (groups['about']||[]).length >= 8 && (groups['odr-how-it-works']||[]).length >= 6);
     // Update one representative field on EVERY registered page group, then confirm it is retrievable publicly.
@@ -203,6 +203,37 @@ const waitHealth = async () => { for (let i = 0; i < 50; i++) { try { const r = 
       MCVis.applyHiddenSections(d, { council: false });
       ok('hiding council removes the section and every council anchor link', d.querySelectorAll('[data-section="council"]').length === 0);
     }
+
+    console.log('\nODR MICROSITE NAVIGATION');
+    const MAIN_NAV = ['Home', 'About Us', 'Our Approach', 'Membership', 'ODR Support', 'Knowledge Hub', 'Contact Us'];
+    const odrPages = ['index.html', 'about.html', 'how-it-works.html', 'choose-provider.html', 'apply.html', 'resources.html', 'contact.html'];
+    for (const f of odrPages) {
+      const dom = new JSDOM(readFileSync(join(PUBLIC, 'odr', f), 'utf8'), { url: BASE + '/odr/' + f });
+      const d = dom.window.document;
+      const top = [...d.querySelectorAll('.nav-links > a, .nav-links > .has-drop > a')].map(a => a.textContent.replace(/\s*▾/, '').trim());
+      ok('ODR ' + f + ': top navigation matches the main site', JSON.stringify(top) === JSON.stringify(MAIN_NAV));
+      ok('ODR ' + f + ': ODR Support is the active section', [...d.querySelectorAll('.nav-links a.active')].some(a => /ODR Support/.test(a.textContent)));
+      ok('ODR ' + f + ': every top-nav link points to the main site (../)', [...d.querySelectorAll('.nav-links a')].every(a => { const h = a.getAttribute('href') || ''; return h.startsWith('../') || h.startsWith('#'); }));
+      ok('ODR ' + f + ': Join button present in the header', [...d.querySelectorAll('.nav-cta a')].some(a => /Join/i.test(a.textContent)));
+      ok('ODR ' + f + ': mobile menu present (desktop + mobile parity)', d.querySelectorAll('.mobile-menu a').length >= 7);
+      ok('ODR ' + f + ': old ODR-specific top-nav links are gone', ![...d.querySelectorAll('.nav-links a, .nav-cta a, .mobile-menu a')].some(a => /^(apply|resources|contact|blogs|papers|podcasts|about|how-it-works|choose-provider)\.html$/.test(a.getAttribute('href') || '')));
+    }
+    // In-content ODR journey buttons carry the user through the ODR pages.
+    for (const f of ['about.html', 'how-it-works.html', 'choose-provider.html', 'apply.html', 'resources.html', 'contact.html']) {
+      const d = new JSDOM(readFileSync(join(PUBLIC, 'odr', f), 'utf8')).window.document;
+      const j = [...d.querySelectorAll('.odr-journey a')].map(a => a.getAttribute('href'));
+      ok('ODR ' + f + ': in-content journey buttons present', ['about.html', 'how-it-works.html', 'choose-provider.html', 'apply.html'].every(x => j.includes(x)));
+    }
+    // Shared Knowledge Hub — links go to the MAIN site, not separate ODR libraries.
+    {
+      const home = new JSDOM(readFileSync(join(PUBLIC, 'odr', 'index.html'), 'utf8')).window.document;
+      const links = [...home.querySelectorAll('a[href]')].map(a => a.getAttribute('href'));
+      ok('ODR home links to shared Blogs/Podcasts/Reports on the main site', ['../blogs.html', '../podcasts.html', '../reports.html'].every(x => links.includes(x)));
+    }
+    ok('separate ODR Blogs library page removed (404)', (await fetch(BASE + '/odr/blogs.html')).status === 404);
+    ok('separate ODR Podcasts library page removed (404)', (await fetch(BASE + '/odr/podcasts.html')).status === 404);
+    ok('separate ODR Papers library page removed (404)', (await fetch(BASE + '/odr/papers.html')).status === 404);
+    ok('odr-blogs is no longer a publishable page', !(await api('/api/settings/pages', {}, admin2)).data.pages.some(p => p.slug === 'odr-blogs'));
 
     console.log('\nEDITOR PAGE/SECTION SCOPING (backend-enforced)');
     // Editor assigned ONLY to the ODR-about page and the council section.

@@ -616,9 +616,11 @@ const PAGES = [
   ['reports','Reports & Papers'], ['blogs','Blogs'], ['podcasts','Podcasts'], ['events','Events & Labs'],
   ['contact','Contact'], ['privacy','Privacy'], ['terms','Terms'],
   // ODR micro-site pages (served under /odr/). Each is independently publishable/hideable.
+  // Blogs/Podcasts/Papers are NOT separate ODR libraries — they live in the shared
+  // Knowledge Hub (main-site blogs/podcasts/reports), so no odr-blogs/-papers/-podcasts.
   ['odr-index','ODR · Home'], ['odr-about','ODR · About the Programme'], ['odr-how-it-works','ODR · How It Works'],
   ['odr-choose-provider','ODR · Choose a Provider'], ['odr-apply','ODR · Apply'], ['odr-resources','ODR · Resources'],
-  ['odr-papers','ODR · Papers'], ['odr-podcasts','ODR · Podcasts'], ['odr-blogs','ODR · Blogs'], ['odr-contact','ODR · Contact'],
+  ['odr-contact','ODR · Contact'],
 ];
 // Map a request path to its page slug — the SAME rule the public site uses (main.js slugFromPath).
 function slugForPath(p) {
