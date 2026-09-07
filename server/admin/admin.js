@@ -45,7 +45,10 @@ $('#logout').addEventListener('click', async () => { await api('/api/auth/logout
 let ROLE = null;
 async function boot() {
   const me = await api('/api/auth/me'); ME = me.user; DEF = me.collections; ROLES = me.roles;
-  const role = me.role; ROLE = role; CAPS = me.caps || {}; show('#app');
+  const role = me.role; ROLE = role; CAPS = me.caps || {};
+  // Event Scanners never see the admin panel — send them straight to the capture form.
+  if (CAPS.scanner) { location.replace('/admin/scan.html'); return; }
+  show('#app');
   $('#side-role').textContent = role.label + ' · ' + ME.name + (CAPS.crmRead && !CAPS.crmWrite ? '' : '');
   const nav = $('#side-nav'); nav.innerHTML = '';
   const add = (key, label) => { const b = el('button', '', label); b.dataset.key = key; b.onclick = () => route(key); nav.appendChild(b); };
@@ -68,7 +71,7 @@ async function boot() {
   // ODR
   if (CAPS.odr) { groupLabel('ODR'); add('col:odr_providers', DEF.odr_providers.label); add('col:odr_resources', DEF.odr_resources.label); add('odr', 'ODR Applications'); }
   // Membership CRM
-  if (CAPS.crmRead) { groupLabel('Membership'); add('crm', 'Membership CRM' + (CAPS.crmWrite ? '' : ' (read-only)')); }
+  if (CAPS.crmRead) { groupLabel('Membership'); add('crm', 'Membership CRM' + (CAPS.crmWrite ? '' : ' (read-only)')); add('scans', '🪪 Scanned Cards'); }
   // Media + analytics
   const util = [];
   if (allowed('media')) util.push(['col:media', DEF.media.label]);
@@ -78,6 +81,7 @@ async function boot() {
   const admin = [];
   admin.push(['account', '🔐 Account & Security']);
   if (CAPS.users) admin.push(['users', '👥 Admin Users']);
+  if (role.all) admin.push(['scancfg', '🎪 Event Scanner']);
   if (CAPS.users || role.content) admin.push(['audit', '🧾 Audit Log']);
   groupLabel('Administration'); admin.forEach(([k, l]) => add(k, l));
 
@@ -108,7 +112,116 @@ function route(key) {
   if (key === 'account') return viewAccount();
   if (key === 'users') return viewUsers();
   if (key === 'audit') return viewAudit();
+  if (key === 'scans') return viewScans();
+  if (key === 'scancfg') return viewScanConfig();
   if (key.startsWith('col:')) return viewCollection(key.slice(4));
+}
+
+/* ---------------- Scanned Cards (CRM roles) ---------------- */
+async function viewScans() {
+  setTitle('Scanned Cards', 'Visiting cards captured at events — filter, review and export');
+  const v = $('#view'); v.innerHTML = '<p class="muted">Loading…</p>';
+  const { scans } = await api('/api/crm/scans');
+  v.innerHTML = '';
+  const bar = el('div', 'panel'); bar.innerHTML = '<div class="panel-body"></div>';
+  const b = bar.querySelector('.panel-body'); b.style.cssText = 'display:flex;gap:10px;flex-wrap:wrap;align-items:end';
+  const evs = Array.from(new Set(scans.map(s => s.event_source).filter(Boolean)));
+  const stField = fieldFor('st', 'Email status', 'select', '', false, ['', 'sent', 'queued', 'failed', 'skipped', 'skipped_duplicate']);
+  const evField = fieldFor('ev', 'Event', 'select', '', false, [''].concat(evs));
+  const apply = el('button', 'btn btn-primary', 'Filter');
+  const csv = el('button', 'btn btn-ghost', '⬇ Export CSV');
+  csv.onclick = () => { window.open('/api/crm/scans.csv', '_blank'); };
+  b.append(evField, stField, apply, csv);
+  v.appendChild(bar);
+  const listWrap = el('div', ''); v.appendChild(listWrap);
+  const render = rows => {
+    listWrap.innerHTML = '';
+    const p = panel('Captured cards', rows.length + ' record(s)');
+    const table = el('div', 'table-wrap');
+    table.innerHTML = `<table class="tbl"><thead><tr><th>When</th><th>Contact</th><th>Organisation</th><th>Event</th><th>By</th><th>Email</th><th>Dup</th></tr></thead><tbody></tbody></table>`;
+    const tb = table.querySelector('tbody');
+    rows.forEach(s => {
+      const tr = el('tr');
+      const badge = { sent: 'st-ok', queued: 'st-warn', failed: 'st-off', skipped: 'st-warn', skipped_duplicate: 'st-warn' }[s.email_status] || 'st-warn';
+      tr.innerHTML = `<td class="muted" style="font-size:.78rem;white-space:nowrap">${esc((s.created_at || '').slice(0, 16).replace('T', ' '))}</td>
+        <td><b>${esc(s.contact_name || '—')}</b><br><span class="muted" style="font-size:.78rem">${esc(s.contact_email || '')}</span></td>
+        <td>${esc(s.org_name || '—')}</td><td>${esc(s.event_source || '')}</td>
+        <td class="muted" style="font-size:.8rem">${esc(s.submitter_email || '')}</td>
+        <td><span class="st ${badge}">${esc(s.email_status || '')}</span></td>
+        <td>${s.is_duplicate ? '⚠' : ''}</td>`;
+      if ((s.email_status === 'failed' || s.email_status === 'queued') && CAPS.crmWrite) {
+        const rt = el('button', 'mini', 'Retry email');
+        rt.onclick = async () => { rt.textContent = '…'; try { await api('/api/crm/scans/' + s.id + '/retry-email', { method: 'POST' }); viewScans(); } catch (e) { alert(e.message); } };
+        tr.lastChild.appendChild(rt);
+      }
+      tb.appendChild(tr);
+    });
+    if (!rows.length) p.body.innerHTML = '<p class="muted">No cards captured yet.</p>';
+    else { p.body.style.padding = '0'; p.body.appendChild(table); }
+    listWrap.appendChild(p.wrap);
+  };
+  apply.onclick = async () => {
+    const q = [];
+    const ev = evField.querySelector('[data-k]').value; const st = stField.querySelector('[data-k]').value;
+    if (ev) q.push('event=' + encodeURIComponent(ev));
+    if (st) q.push('email_status=' + encodeURIComponent(st));
+    const r = await api('/api/crm/scans' + (q.length ? '?' + q.join('&') : ''));
+    render(r.scans);
+  };
+  render(scans);
+}
+
+/* ---------------- Event Scanner settings (Super Admin) ---------------- */
+async function viewScanConfig() {
+  setTitle('Event Scanner', 'GFF card-capture settings, event sources and the thank-you email');
+  const v = $('#view'); v.innerHTML = '<p class="muted">Loading…</p>';
+  const { config } = await api('/api/settings/scan');
+  v.innerHTML = '';
+  const note = el('p', 'notice', 'Create Event Scanner accounts in Admin Users (role “Event Scanner”). Each scanner signs in and is taken straight to the mobile capture form — they cannot see the CRM or any admin area.');
+  v.appendChild(note);
+  const p = panel('Capture settings', config.email_configured ? 'Email is configured' : 'Email not configured — thank-yous will queue');
+  const form = el('div', 'form');
+  const sources = fieldFor('event_sources', 'Event sources (one per line; the first is the default)', 'textarea', (config.event_sources || []).join('\n'));
+  const reps = fieldFor('representatives', 'Representatives (one per line, optional)', 'textarea', (config.representatives || []).join('\n'));
+  const fromName = fieldFor('email_from_name', 'Email sender name', 'text', config.email_from_name);
+  const subject = fieldFor('email_subject', 'Email subject', 'text', config.email_subject);
+  const bodyF = fieldFor('email_body', 'Email body', 'textarea', config.email_body);
+  const sig = fieldFor('email_signature', 'Email signature', 'textarea', config.email_signature);
+  const help = el('p', 'notice', 'Personalisation tokens: {{first_name}}, {{event}}, {{rep}}, {{from_name}}.');
+  const save = el('button', 'btn btn-primary', 'Save settings');
+  const msg = el('span', 'muted'); msg.style.marginLeft = '10px';
+  save.onclick = async () => {
+    save.textContent = 'Saving…';
+    const payload = {
+      event_sources: sources.querySelector('[data-k]').value.split('\n').map(s => s.trim()).filter(Boolean),
+      representatives: reps.querySelector('[data-k]').value.split('\n').map(s => s.trim()).filter(Boolean),
+      email_from_name: fromName.querySelector('[data-k]').value,
+      email_subject: subject.querySelector('[data-k]').value,
+      email_body: bodyF.querySelector('[data-k]').value,
+      email_signature: sig.querySelector('[data-k]').value,
+    };
+    try { await api('/api/settings/scan', { method: 'PUT', body: JSON.stringify(payload) }); msg.textContent = 'Saved ✓'; } catch (e) { msg.textContent = e.message; }
+    save.textContent = 'Save settings';
+  };
+  form.append(sources, reps, fromName, subject, bodyF, sig, help, save, msg);
+  p.body.appendChild(form); v.appendChild(p.wrap);
+
+  // Test email
+  const tp = panel('Send a test email', 'Verify your SMTP settings and template');
+  const tform = el('div', 'form');
+  const to = fieldFor('to', 'Send test to', 'email', ME.email);
+  const tb = el('button', 'btn btn-ghost', 'Send test email');
+  const tmsg = el('span', 'muted'); tmsg.style.marginLeft = '10px';
+  tb.onclick = async () => {
+    tb.textContent = 'Sending…'; tmsg.textContent = '';
+    try {
+      const r = await fetch('/api/settings/scan/test-email', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: to.querySelector('[data-k]').value }) });
+      const j = await r.json().catch(() => ({}));
+      tmsg.textContent = j.message || (r.ok ? 'Sent' : 'Failed');
+    } catch (e) { tmsg.textContent = e.message; }
+    tb.textContent = 'Send test email';
+  };
+  tform.append(to, tb, tmsg); tp.body.appendChild(tform); v.appendChild(tp.wrap);
 }
 
 /* ---------------- Dashboard ---------------- */
