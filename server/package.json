@@ -4,12 +4,18 @@
   "description": "CMS + Membership CRM + ODR admin back-end for MSME Catalyst (Digital Growth Infrastructure Foundation, Section 8).",
   "main": "server.js",
   "type": "commonjs",
+  "engines": {
+    "node": ">=22 <23"
+  },
   "scripts": {
     "start": "node server.js",
     "seed": "node db.js --seed",
-    "dev": "node server.js"
+    "migrate": "node db.js --migrate",
+    "dev": "node server.js",
+    "test": "node test/run-tests.mjs && node test/legacy.test.mjs"
   },
   "dependencies": {
+    "@tesseract.js-data/eng": "^1.0.0",
     "bcryptjs": "^2.4.3",
     "better-sqlite3": "^11.3.0",
     "cookie-parser": "^1.4.6",
@@ -17,7 +23,16 @@
     "express-rate-limit": "^7.5.1",
     "helmet": "^8.1.0",
     "multer": "^2.0.2",
-    "nanoid": "^3.3.7"
+    "nanoid": "^3.3.7",
+    "nodemailer": "^10.0.0",
+    "sanitize-html": "^2.17.7",
+    "tesseract.js": "^5.1.1"
   },
-  "license": "UNLICENSED"
+  "overrides": {
+    "qs": "^6.15.4"
+  },
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "jsdom": "^30.0.1"
+  }
 }

@@ -25,7 +25,17 @@
       <button class="btn btn-primary btn-lg" type="submit">Sign in</button>
       <p id="li-err" class="muted" style="color:var(--danger);display:none"></p>
     </form>
-    <p class="notice" style="margin-top:18px">Use the administrator email and password configured securely during deployment.</p>
+    <p style="text-align:center;margin-top:14px"><a href="#" id="li-forgot" style="font-size:.9rem;color:var(--green,#15803d)">Forgot password?</a></p>
+
+    <!-- Forgot password (request a reset link) -->
+    <form id="forgot-form" class="form" style="display:none;margin-top:8px">
+      <div class="field"><label>Email</label><input class="input" id="fp-email" type="email" autocomplete="email" required></div>
+      <button class="btn btn-primary btn-lg" type="submit">Send reset link</button>
+      <p id="fp-msg" class="muted" style="display:none"></p>
+      <p style="text-align:center;margin-top:8px"><a href="#" id="fp-back" style="font-size:.9rem;color:var(--green,#15803d)">← Back to sign in</a></p>
+    </form>
+
+    <p class="notice" style="margin-top:18px">Use the administrator email and password configured securely during deployment. We never display or email an existing password — “Forgot password?” sends a secure single-use link that expires in one hour.</p>
   </div>
 </div>
 

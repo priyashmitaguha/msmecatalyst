@@ -140,14 +140,26 @@
   function esc(s){return (s==null?'':String(s)).replace(/[&<>"]/g,function(m){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]);});}
   function initials(n){return (n||'?').split(/\s+/).map(function(w){return w[0]||'';}).join('').slice(0,2).toUpperCase();}
 
-  // 1) Page-copy overrides: replace default text with admin-edited values.
-  var cmsEls = document.querySelectorAll('[data-cms]');
+  // 1) Page-copy overrides: replace default text / links / images with admin-edited values.
+  var cmsEls = document.querySelectorAll('[data-cms],[data-cms-href],[data-cms-src],[data-cms-alt]');
   if (cmsEls.length) {
     fetch('/api/public/pagecopy').then(function(r){return r.json();}).then(function(d){
       var map = d.copy || {};
-      cmsEls.forEach(function(el){
+      document.querySelectorAll('[data-cms]').forEach(function(el){
         var k = el.getAttribute('data-cms');
         if (map[k] != null && map[k] !== '') el.innerHTML = map[k];
+      });
+      document.querySelectorAll('[data-cms-href]').forEach(function(el){
+        var k = el.getAttribute('data-cms-href');
+        if (map[k] != null && map[k] !== '') el.setAttribute('href', map[k]);
+      });
+      document.querySelectorAll('[data-cms-src]').forEach(function(el){
+        var k = el.getAttribute('data-cms-src');
+        if (map[k] != null && map[k] !== '') el.setAttribute('src', map[k]);
+      });
+      document.querySelectorAll('[data-cms-alt]').forEach(function(el){
+        var k = el.getAttribute('data-cms-alt');
+        if (map[k] != null && map[k] !== '') el.setAttribute('alt', map[k]);
       });
     }).catch(function(){ /* static hosting: keep built-in defaults */ });
   }
@@ -180,15 +192,18 @@
   });
 })();
 
-/* ---------- Section visibility (hide links for sections not yet live) ---------- */
+/* ---------- Section visibility (hide sections + their anchor links) ---------- */
 (function () {
-  var els = document.querySelectorAll('[data-section]');
-  if (!els.length) return;
+  if (typeof MCVis === 'undefined' || !document.querySelector('[data-section]')) return;
   fetch('/api/public/visibility').then(function (r) { return r.json(); }).then(function (d) {
-    var vis = (d && d.visible) || {};
-    els.forEach(function (el) {
-      var s = el.getAttribute('data-section');
-      if (vis[s] === false) el.remove();
-    });
+    MCVis.applyHiddenSections(document, (d && d.visible) || {});
+  }).catch(function () { /* static hosting: show everything */ });
+})();
+
+/* ---------- Page publishing (drop nav/button/text/footer links to hidden pages) ---------- */
+(function () {
+  if (typeof MCVis === 'undefined') return;
+  fetch('/api/public/pages').then(function (r) { return r.json(); }).then(function (d) {
+    MCVis.applyHiddenPages(document, location.href, (d && d.hidden) || [], location.origin);
   }).catch(function () { /* static hosting: show everything */ });
 })();

@@ -10,7 +10,7 @@ services:
     healthCheckPath: /api/health
     envVars:
       - key: NODE_VERSION
-        value: "20"
+        value: "22"
       - key: NODE_ENV
         value: production
       - key: ADMIN_EMAIL
@@ -21,6 +21,24 @@ services:
         value: /opt/render/project/src/server/persistent/data
       - key: UPLOAD_DIR
         value: /opt/render/project/src/server/persistent/uploads
+      # Public base URL used to build password-reset links in emails.
+      - key: APP_BASE_URL
+        value: https://msmecatalyst.org
+      # Outbound email (password reset). Leave unset to disable email;
+      # reset links are then written to the CMS "email outbox" for an operator.
+      # Set these securely in the Render dashboard (do NOT commit real values).
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        sync: false
+      - key: SMTP_SECURE
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
     disk:
       name: msme-data
       mountPath: /opt/render/project/src/server/persistent

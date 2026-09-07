@@ -1,39 +1,28 @@
 # -*- coding: utf-8 -*-
-"""ODR micro-site pages. Lives under /public/odr/ with its own navigation."""
-
-ODR_NAV = [
-    ("Home","index.html"),("About the Programme","about.html"),("How ODR Works","how-it-works.html"),
-    ("Choose a Provider","choose-provider.html"),("Resources","resources.html"),("Blogs","blogs.html"),
-    ("Papers","papers.html"),("Podcasts","podcasts.html"),("Apply","apply.html"),("Contact","contact.html"),
-]
+"""ODR micro-site pages. Lives under /public/odr/ and now shares the MAIN
+MSME Catalyst site header/navigation; the ODR journey is provided by in-content
+buttons and cards, and blogs/podcasts/papers link to the shared Knowledge Hub."""
 
 def build(g):
     write = g["write"]; brand = g["brand"]; footer_disc = None
+    annotate = g["annotate"]; REG = g["REG"]
+
+    def odr_slug(active):
+        s = (active or "").strip()
+        if s.endswith(".html"):
+            s = s[:-5]
+        return "odr-" + (s or "index")
     A = "../assets"  # asset prefix from /odr/
     BRAND = brand("../", 40)
     BRAND_FOOT = f'<span style="display:inline-block;background:#fff;padding:10px 14px;border-radius:12px">{brand("../", 44)}</span>'
 
+    # The ODR micro-site now uses the SAME header/navigation as the main site
+    # (Home · About Us · Our Approach · Membership · ODR Support · Knowledge Hub ·
+    # Contact Us · Join). Links resolve to the main site via the ../ prefix, and
+    # "ODR Support" is marked active so the current section is clear. Desktop,
+    # mobile and dropdown behaviour and styling are inherited unchanged.
     def header(active):
-        links = "".join(
-            f'<a href="{h}" class="{"active" if active==h else ""}">{t}</a>' for t,h in ODR_NAV)
-        mobile = "".join(f'<a href="{h}">{t}</a>' for t,h in ODR_NAV)
-        return f"""<header class="site-header">
-  <div class="wrap nav">
-    <a class="brand" href="index.html" aria-label="MSME Catalyst ODR home">
-      {BRAND}
-      <span class="badge orange" style="margin-left:4px">ODR</span>
-    </a>
-    <nav class="nav-links" aria-label="Primary">{links}</nav>
-    <div class="nav-cta">
-      <a class="btn btn-ghost" href="../index.html">← Main site</a>
-      <a class="btn btn-primary btn-arrow" href="apply.html">Apply for Support</a>
-    </div>
-    <button class="nav-toggle" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
-  </div>
-  <div class="mobile-menu">{mobile}
-    <div class="mm-cta"><a class="btn btn-ghost" href="../index.html">← Main MSME Catalyst site</a><a class="btn btn-primary" href="apply.html">Apply for Support</a></div>
-  </div>
-</header>"""
+        return g["header"]("odr-support.html", "../")
 
     def footer():
         return f"""<footer class="site-footer">
@@ -42,9 +31,9 @@ def build(g):
       <div class="foot-brand">{BRAND_FOOT}
         <p style="margin-top:16px;max-width:36ch;font-size:.92rem;color:#9aa8a0">The MSME Catalyst ODR programme helps businesses organise payment-friction cases and connect with independent providers. Part of MSME Catalyst, operated by Digital Growth Infrastructure Foundation (Section 8).</p>
       </div>
-      <div><h4>Programme</h4><ul class="foot-links"><li><a href="about.html">About the Programme</a></li><li><a href="how-it-works.html">How ODR Works</a></li><li><a href="choose-provider.html">Choose a Provider</a></li><li><a href="apply.html">Apply for Support</a></li></ul></div>
-      <div><h4>Learn</h4><ul class="foot-links"><li><a href="resources.html">Resources</a></li><li><a href="papers.html">Papers</a></li><li><a href="blogs.html">Blogs</a></li><li><a href="podcasts.html">Podcasts</a></li></ul></div>
-      <div><h4>MSME Catalyst</h4><ul class="foot-links"><li><a href="../index.html">Main site</a></li><li><a href="../programmes.html">Programmes</a></li><li><a href="../membership.html">Membership</a></li><li><a href="contact.html">Contact</a></li></ul></div>
+      <div><h4>ODR Programme</h4><ul class="foot-links"><li><a href="about.html">About the Programme</a></li><li><a href="how-it-works.html">How ODR Works</a></li><li><a href="choose-provider.html">Choose a Provider</a></li><li><a href="resources.html">Resources</a></li><li><a href="apply.html">Apply for Support</a></li></ul></div>
+      <div><h4>Knowledge Hub</h4><ul class="foot-links"><li><a href="../blogs.html">Our Blogs</a></li><li><a href="../podcasts.html">Our Podcasts</a></li><li><a href="../reports.html">Whitepapers &amp; Reports</a></li></ul></div>
+      <div><h4>MSME Catalyst</h4><ul class="foot-links"><li><a href="../index.html">Main site</a></li><li><a href="../approach.html">Our Approach</a></li><li><a href="../membership.html">Membership</a></li><li><a href="../contact.html">Contact Us</a></li></ul></div>
     </div>
     <div class="foot-disclaimer">
       <strong>Important.</strong> MSME Catalyst is not an ODR platform, law firm, mediator, arbitrator or court. It does not provide legal advice, compel participation, collect money or guarantee recovery. Submitting a form does not create a lawyer-client relationship. The statutory MSEFC pathway remains available and is not replaced. Independent ODR providers retain all dispute-resolution decisions; MSMEs retain choice of provider.
@@ -58,6 +47,7 @@ def build(g):
 </footer>"""
 
     def doc(title, desc, body, active):
+        body = annotate(body, odr_slug(active))
         return f"""<!doctype html>
 <html lang="en"><head>
 <script>document.documentElement.className+=' js';</script>
@@ -72,12 +62,45 @@ def build(g):
 {header(active)}
 <main>{body}</main>
 {footer()}
+<script src="{A}/js/visibility-lib.js"></script>
 <script src="{A}/js/main.js"></script>
 </body></html>"""
 
     def phero(kicker,h1,lead,crumb=""):
         cr = f'<div class="crumb"><a href="index.html">ODR Home</a> · {crumb}</div>' if crumb else ""
         return f'<section class="page-hero"><div class="wrap">{cr}<span class="kicker">{kicker}</span><h1 class="h1" style="margin-top:16px;max-width:22ch">{h1}</h1><p class="lead mt-s maxch">{lead}</p></div></section>'
+
+    # In-content ODR journey navigation — replaces the old crowded top nav.
+    # Clear buttons/cards let visitors move through the ODR-specific pages while
+    # the top navigation stays identical to the main MSME Catalyst site.
+    JOURNEY = [("About the Programme","about.html"),("How ODR Works","how-it-works.html"),
+               ("Choose a Provider","choose-provider.html"),("Apply for Support","apply.html")]
+    def journey(active=""):
+        btns = ""
+        for t,h in JOURNEY:
+            cls = "btn-primary" if h == "apply.html" else ("btn-dark" if h == active else "btn-ghost")
+            cur = ' aria-current="page"' if h == active else ""
+            btns += f'<a class="btn {cls}" href="{h}"{cur}>{t}</a>'
+        return (f'<section class="section" style="padding-top:26px;padding-bottom:10px"><div class="wrap">'
+                f'<div class="odr-journey" style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">{btns}</div>'
+                f'</div></section>')
+
+    # Shared Knowledge Hub — the ODR micro-site links to the MAIN site's blogs,
+    # podcasts and reports rather than keeping its own separate libraries.
+    def knowledge():
+        cards = [("Our Blogs","Plain-language articles on getting paid and resolving disputes.","../blogs.html"),
+                 ("Our Podcasts","Conversations on MSME cash flow and dispute resolution.","../podcasts.html"),
+                 ("Whitepapers & Reports","In-depth research, policy notes and reports.","../reports.html")]
+        c = "".join(
+            f'<a class="card hoverable reveal" href="{u}" style="text-decoration:none;display:block">'
+            f'<h3>{t}</h3><p class="muted">{d}</p><span class="textlink">Open on MSME Catalyst →</span></a>'
+            for t,d,u in cards)
+        return (f'<section class="section bg-sand"><div class="wrap">'
+                f'<div class="center reveal" style="max-width:56ch;margin-inline:auto">'
+                f'<span class="kicker" style="justify-content:center">Knowledge Hub</span>'
+                f'<h2 class="h2 mt-s">Blogs, podcasts &amp; reports — on the main site</h2>'
+                f'<p class="muted mt-s">ODR insights live in the shared MSME Catalyst Knowledge Hub, not a separate library.</p></div>'
+                f'<div class="grid g3 mt-l">{c}</div></div></section>')
 
     # -------- ODR HOME --------
     home = f"""
@@ -108,6 +131,8 @@ def build(g):
   </div>
 </div></section>
 
+{journey()}
+
 <section class="section"><div class="wrap">
   <div class="center reveal" style="max-width:56ch;margin-inline:auto"><span class="kicker" style="justify-content:center">Plain-language help</span><h2 class="h2 mt-s">Understand your options before you act</h2></div>
   <div class="grid g3 mt-l">
@@ -128,6 +153,8 @@ def build(g):
   </div>
 </div></section>
 
+{knowledge()}
+
 <section class="section"><div class="wrap"><div class="cta-band reveal"><span class="kicker on-dark">Facing a delayed payment?</span><h2 class="h2 mt-s">Start with a prepared case.</h2><p class="mt-s">Apply and the Cluster Recovery Cell will help you organise your documents and understand your routes.</p><div class="hero-ctas"><a class="btn btn-primary btn-arrow" href="apply.html">Apply for Support</a></div></div></div></section>
 """
     write("odr/index.html", doc("MSME Catalyst ODR | Resolve payment friction",
@@ -137,6 +164,7 @@ def build(g):
     about = f"""
 {phero("About the Programme","A neutral bridge between payment friction and resolution.",
   "The ODR programme prepares MSMEs and refers them, neutrally, to independent providers — it never decides the outcome.","About the Programme")}
+{journey("about.html")}
 <section class="section"><div class="wrap narrow stack">
   <p class="lead">Late payments are one of the most common — and most damaging — sources of stress for a small business. Money that has been earned sits unpaid, cash flow tightens, and the enterprise is forced to choose between chasing the payment and running the business.</p>
   <p>The MSME Catalyst ODR programme exists to reduce that burden. We help you understand what is happening, organise the evidence you already have, and see the routes available — from direct resolution and mediation to arbitration and the statutory MSEFC pathway. When you are ready, we connect you, neutrally, to an appropriate independent provider.</p>
@@ -152,6 +180,7 @@ def build(g):
     how = f"""
 {phero("How ODR Works","From a stuck payment to a prepared, referred case.",
   "Five clear steps. You stay in control at every one of them.","How ODR Works")}
+{journey("how-it-works.html")}
 <section class="section"><div class="wrap narrow">
   <div class="steps">
     <div class="step reveal"><h3>Apply</h3><p>Tell us about the enterprise, the counterparty, the amount and the paperwork you have. Upload what you've got.</p></div>
@@ -177,6 +206,7 @@ def build(g):
     choose = f"""
 {phero("Choose a Provider","Three independent ODR providers. Your choice.",
   "Review the providers and select one. We will hand you over — we do not recommend, guarantee or control their outcome.","Choose a Provider")}
+{journey("choose-provider.html")}
 <section class="section"><div class="wrap">
   <div class="grid g3">
     <div class="card hoverable reveal"><div class="ico orange">A</div><h3>Provider A</h3><p>Short description managed in the CMS (name, logo, areas of support, website, display order, status).</p><div class="pill-row mt-s"><span class="badge neutral">Mediation</span><span class="badge neutral">Conciliation</span></div></div>
@@ -222,6 +252,7 @@ def build(g):
     resources = f"""
 {phero("Resources","A library to help you prepare.",
   "Explainer articles, checklists, templates and FAQs — in simple language, free to download.","Resources")}
+{journey("resources.html")}
 <section class="section"><div class="wrap">
   <div class="field" style="max-width:360px"><input class="input" placeholder="Search resources…"></div>
   <div class="filters mt-m" data-filter-group data-target="#res-grid"><button data-filter="all" class="active">All</button>{res_filters}</div>
@@ -238,49 +269,17 @@ def build(g):
     write("odr/resources.html", doc("Resources | MSME Catalyst ODR",
         "A resource library of explainers, checklists, templates and FAQs on payment friction and ODR.", resources, "resources.html"))
 
-    # -------- BLOGS --------
-    blog_items = "".join(f"""
-      <article class="rcard reveal"><div class="thumb {'o' if i%2 else ''}"><span class="badge {'orange' if i%2 else ''} tag">ODR</span></div>
-      <div class="rb"><h3>Article headline to be added</h3><p class="muted" style="font-size:.9rem">CMS-published with categories, author profile and social sharing.</p><div class="meta">Author · 5 min · 2026</div></div></article>""" for i in range(6))
-    blogs = f"""
-{phero("Blogs","Plain-language writing on getting paid.",
-  "Practical articles that keep you engaged and informed while you work through a case.","Blogs")}
-<section class="section"><div class="wrap"><div class="grid g3">{blog_items}</div>
-<p class="notice mt-l">CMS publishing with categories, author profiles and social sharing.</p></div></section>
-"""
-    write("odr/blogs.html", doc("Blogs | MSME Catalyst ODR",
-        "Plain-language articles on payment friction, evidence and resolution routes.", blogs, "blogs.html"))
-
-    # -------- PAPERS --------
-    paper_items = "".join(f"""
-      <article class="rcard reveal"><div class="thumb {'o' if i%2 else ''}"><span class="badge {'orange' if i%2 else ''} tag">{'White paper' if i%2 else 'Policy note'}</span></div>
-      <div class="rb"><h3>Paper title to be added</h3><p class="muted" style="font-size:.9rem">Uploaded report, policy note or white paper with a downloadable document.</p><div class="meta">PDF · Download</div></div></article>""" for i in range(4))
-    papers = f"""
-{phero("Papers","Evidence and policy, in depth.",
-  "Reports, policy notes and white papers on MSME receivables and dispute resolution.","Papers")}
-<section class="section"><div class="wrap"><div class="grid g2">{paper_items}</div>
-<p class="notice mt-l">Uploaded reports, policy notes and white papers — downloadable documents managed in the CMS.</p></div></section>
-"""
-    write("odr/papers.html", doc("Papers | MSME Catalyst ODR",
-        "Reports, policy notes and white papers on MSME receivables and dispute resolution.", papers, "papers.html"))
-
-    # -------- PODCASTS --------
-    pod_items = "".join(f"""
-      <article class="rcard reveal"><div class="thumb {'o' if i%2 else ''}"><span class="badge {'orange' if i%2 else ''} tag">Episode {i+1:02d}</span></div>
-      <div class="rb"><h3>Episode title</h3><p class="muted" style="font-size:.9rem">Guest · organisation. Summary in the CMS.</p><div class="pill-row" style="margin:4px 0"><span class="badge neutral">Spotify</span><span class="badge neutral">YouTube</span><span class="badge neutral">Apple</span></div><div class="meta">Transcript · tags · share</div></div></article>""" for i in range(4))
-    podcasts = f"""
-{phero("Podcasts","Listen while you prepare.",
-  "Short conversations on getting paid, resolving disputes and the realities of MSME cash flow.","Podcasts")}
-<section class="section"><div class="wrap"><div class="grid g2">{pod_items}</div>
-<p class="notice mt-l">Episode title, guest, summary, embedded Spotify/YouTube/Apple links, transcript, tags and share buttons — all CMS-managed.</p></div></section>
-"""
-    write("odr/podcasts.html", doc("Podcasts | MSME Catalyst ODR",
-        "Conversations on getting paid, resolving disputes and MSME cash flow.", podcasts, "podcasts.html"))
+    # -------- BLOGS / PAPERS / PODCASTS --------
+    # The ODR micro-site no longer keeps its own Blogs, Papers or Podcasts
+    # libraries. These now live in the shared MSME Catalyst Knowledge Hub and are
+    # reached from the main-site navigation, the ODR footer, and the "Knowledge
+    # Hub" cards on the ODR home (see knowledge()).
 
     # -------- APPLY --------
     apply = f"""
 {phero("Apply for ODR Support","Start with a prepared case.",
   "Give us the details and upload what you have. The Cluster Recovery Cell will help you organise your case and understand your routes.","Apply")}
+{journey("apply.html")}
 <section class="section"><div class="wrap narrow">
   <form class="form-card form" data-demo data-endpoint="/api/public/odr-apply" enctype="multipart/form-data">
     <div class="form-grid fg2">
@@ -319,6 +318,7 @@ def build(g):
     # -------- CONTACT --------
     contact = f"""
 {phero("Contact","Questions about the ODR programme?","We're here to help you understand your options.","Contact")}
+{journey("contact.html")}
 <section class="section"><div class="wrap"><div class="two-col" style="align-items:start">
   <div class="reveal">
     <div class="card"><div class="ico orange">⚖️</div><h3>ODR support</h3><p><a class="textlink" href="mailto:odr@msmecatalyst.org">odr@msmecatalyst.org</a></p></div>

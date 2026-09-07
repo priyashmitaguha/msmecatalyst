@@ -11,7 +11,7 @@ async function api(url, opts) {
 }
 function show(sel) { $('#login').style.display = sel === '#login' ? 'grid' : 'none'; $('#app').style.display = sel === '#app' ? 'grid' : 'none'; }
 
-let ME = null, DEF = null, ROLES = null;
+let ME = null, DEF = null, ROLES = null, CAPS = {};
 
 /* ---------------- login ---------------- */
 $('#login-form').addEventListener('submit', async e => {
@@ -23,41 +23,81 @@ $('#login-form').addEventListener('submit', async e => {
 });
 $('#logout').addEventListener('click', async () => { await api('/api/auth/logout', { method: 'POST' }); location.reload(); });
 
+/* ---------------- forgot password ---------------- */
+(function () {
+  const link = document.getElementById('li-forgot'), back = document.getElementById('fp-back');
+  const lf = document.getElementById('login-form'), ff = document.getElementById('forgot-form');
+  if (!link) return;
+  link.addEventListener('click', e => { e.preventDefault(); lf.style.display = 'none'; ff.style.display = ''; const em = document.getElementById('li-email'); if (em.value) document.getElementById('fp-email').value = em.value; });
+  back.addEventListener('click', e => { e.preventDefault(); ff.style.display = 'none'; lf.style.display = ''; });
+  ff.addEventListener('submit', async e => {
+    e.preventDefault();
+    const msg = document.getElementById('fp-msg'); msg.style.display = 'block'; msg.style.color = 'var(--muted,#666)'; msg.textContent = 'Sending…';
+    try {
+      await fetch('/api/auth/forgot', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: document.getElementById('fp-email').value }) });
+    } catch (ex) { }
+    msg.style.color = 'var(--green,#15803d)';
+    msg.textContent = 'If that email is registered, a secure reset link (valid one hour, one-time use) has been sent. Check your inbox.';
+  });
+})();
+
 /* ---------------- boot / nav ---------------- */
+let ROLE = null;
 async function boot() {
   const me = await api('/api/auth/me'); ME = me.user; DEF = me.collections; ROLES = me.roles;
-  const role = me.role; show('#app');
-  $('#side-role').textContent = role.label + ' · ' + ME.name;
+  const role = me.role; ROLE = role; CAPS = me.caps || {};
+  // Event Scanners never see the admin panel — send them straight to the capture form.
+  if (CAPS.scanner) { location.replace('/admin/scan.html'); return; }
+  show('#app');
+  $('#side-role').textContent = role.label + ' · ' + ME.name + (CAPS.crmRead && !CAPS.crmWrite ? '' : '');
   const nav = $('#side-nav'); nav.innerHTML = '';
-  const add = (key, label, group) => { const b = el('button', '', label); b.dataset.key = key; b.onclick = () => route(key); nav.appendChild(b); };
+  const add = (key, label) => { const b = el('button', '', label); b.dataset.key = key; b.onclick = () => route(key); nav.appendChild(b); };
   const groupLabel = t => { const d = el('div', 'navgroup', t); nav.appendChild(d); };
 
-  if (role.all || role.crm || role.odr) { add('dashboard', '▸ Dashboard'); }
+  if (role.all || CAPS.crmRead || CAPS.odr) { add('dashboard', '▸ Dashboard'); }
   // Governance
-  const gov = ['council', 'advisory', 'secretariat'].filter(c => allowed(role, c));
+  const gov = ['council', 'advisory', 'secretariat'].filter(c => allowed(c));
   if (gov.length) { groupLabel('Governance'); gov.forEach(c => add('col:' + c, DEF[c].label)); }
   // Content
-  const content = ['blogs', 'reports', 'events', 'podcasts', 'social'].filter(c => allowed(role, c));
-  const hasPages = allowed(role, 'pages');
+  const content = ['blogs', 'reports', 'events', 'podcasts', 'social'].filter(c => allowed(c));
+  const hasPages = allowed('pages') || CAPS.settings;
   if (content.length || hasPages) {
     groupLabel('Content');
     if (hasPages) add('pagecopy', '✎ Page Content');
-    if (hasPages) add('visibility', '👁 Visibility');
+    if (hasPages) add('visibility', '👁 Section Visibility');
+    if (CAPS.settings) add('pages', '📄 Page Publishing');
     content.forEach(c => add('col:' + c, DEF[c].label));
   }
   // ODR
-  if (role.all || role.odr) { groupLabel('ODR'); add('col:odr_providers', DEF.odr_providers.label); add('col:odr_resources', DEF.odr_resources.label); add('odr', 'ODR Applications'); }
+  if (CAPS.odr) { groupLabel('ODR'); add('col:odr_providers', DEF.odr_providers.label); add('col:odr_resources', DEF.odr_resources.label); add('odr', 'ODR Applications'); }
   // Membership CRM
-  if (role.all || role.crm) { groupLabel('Membership'); add('crm', 'Membership CRM'); }
+  if (CAPS.crmRead) { groupLabel('Membership'); add('crm', 'Membership CRM' + (CAPS.crmWrite ? '' : ' (read-only)')); add('scans', '🪪 Scanned Cards'); }
   // Media + analytics
   const util = [];
-  if (allowed(role, 'media')) util.push(['col:media', DEF.media.label]);
+  if (allowed('media')) util.push(['col:media', DEF.media.label]);
   if (role.all) util.push(['analytics', 'Analytics']);
   if (util.length) { groupLabel('Utilities'); util.forEach(([k, l]) => add(k, l)); }
+  // Administration
+  const admin = [];
+  admin.push(['account', '🔐 Account & Security']);
+  if (CAPS.users) admin.push(['users', '👥 Admin Users']);
+  if (role.all) admin.push(['scancfg', '🎪 Event Scanner']);
+  if (CAPS.users || role.content) admin.push(['audit', '🧾 Audit Log']);
+  groupLabel('Administration'); admin.forEach(([k, l]) => add(k, l));
 
-  route((role.all || role.crm || role.odr) ? 'dashboard' : ('col:' + gov.concat(content)[0]));
+  // Force a password change first if the account was flagged (new user / admin reset).
+  if (ME.must_change) { route('account'); return; }
+  const first = (role.all || CAPS.crmRead || CAPS.odr) ? 'dashboard'
+    : (gov.concat(content)[0] ? 'col:' + gov.concat(content)[0] : 'account');
+  route(first);
 }
-function allowed(role, c) { return role.all || (Array.isArray(role.collections) && role.collections.includes(c)); }
+// Mirrors the server's canManage(): never trust this for security — the API re-checks.
+function allowed(c) {
+  if (!ROLE) return false;
+  if (ROLE.all || ROLE.content) return true;
+  if (ROLE.editorScoped) return Array.isArray(ME.perms) && ME.perms.includes(c);
+  return Array.isArray(ROLE.collections) && ROLE.collections.includes(c);
+}
 
 function route(key) {
   document.querySelectorAll('#side-nav button').forEach(b => b.classList.toggle('active', b.dataset.key === key));
@@ -65,10 +105,153 @@ function route(key) {
   if (key === 'dashboard') return viewDashboard();
   if (key === 'pagecopy') return viewPageContent();
   if (key === 'visibility') return viewVisibility();
+  if (key === 'pages') return viewPages();
   if (key === 'crm') return viewCRM();
   if (key === 'odr') return viewODR();
   if (key === 'analytics') return viewAnalytics();
+  if (key === 'account') return viewAccount();
+  if (key === 'users') return viewUsers();
+  if (key === 'audit') return viewAudit();
+  if (key === 'scans') return viewScans();
+  if (key === 'scancfg') return viewScanConfig();
   if (key.startsWith('col:')) return viewCollection(key.slice(4));
+}
+
+/* ---------------- Scanned Cards (CRM roles) ---------------- */
+async function viewScans() {
+  setTitle('Scanned Cards', 'Visiting cards captured at events — filter, review and export');
+  const v = $('#view'); v.innerHTML = '<p class="muted">Loading…</p>';
+  const { scans } = await api('/api/crm/scans');
+  v.innerHTML = '';
+  const bar = el('div', 'panel'); bar.innerHTML = '<div class="panel-body"></div>';
+  const b = bar.querySelector('.panel-body'); b.style.cssText = 'display:flex;gap:10px;flex-wrap:wrap;align-items:end';
+  const evs = Array.from(new Set(scans.map(s => s.event_source).filter(Boolean)));
+  const stField = fieldFor('st', 'Email status', 'select', '', false, ['', 'sent', 'queued', 'failed', 'skipped', 'skipped_duplicate']);
+  const evField = fieldFor('ev', 'Event', 'select', '', false, [''].concat(evs));
+  const apply = el('button', 'btn btn-primary', 'Filter');
+  const csv = el('button', 'btn btn-ghost', '⬇ Export CSV');
+  csv.onclick = () => { window.open('/api/crm/scans.csv', '_blank'); };
+  b.append(evField, stField, apply, csv);
+  v.appendChild(bar);
+  const listWrap = el('div', ''); v.appendChild(listWrap);
+  const render = rows => {
+    listWrap.innerHTML = '';
+    const p = panel('Captured cards', rows.length + ' record(s)');
+    const table = el('div', 'table-wrap');
+    table.innerHTML = `<table class="tbl"><thead><tr><th>When</th><th>Contact</th><th>Organisation</th><th>Event</th><th>By</th><th>Email</th><th>Dup</th></tr></thead><tbody></tbody></table>`;
+    const tb = table.querySelector('tbody');
+    rows.forEach(s => {
+      const tr = el('tr');
+      const badge = { sent: 'st-ok', queued: 'st-warn', failed: 'st-off', skipped: 'st-warn', skipped_duplicate: 'st-warn' }[s.email_status] || 'st-warn';
+      tr.innerHTML = `<td class="muted" style="font-size:.78rem;white-space:nowrap">${esc((s.created_at || '').slice(0, 16).replace('T', ' '))}</td>
+        <td><b>${esc(s.contact_name || '—')}</b><br><span class="muted" style="font-size:.78rem">${esc(s.contact_email || '')}</span></td>
+        <td>${esc(s.org_name || '—')}</td><td>${esc(s.event_source || '')}</td>
+        <td class="muted" style="font-size:.8rem">${esc(s.submitter_email || '')}</td>
+        <td><span class="st ${badge}">${esc(s.email_status || '')}</span></td>
+        <td>${s.is_duplicate ? '⚠' : ''}</td>`;
+      if ((s.email_status === 'failed' || s.email_status === 'queued') && CAPS.crmWrite) {
+        const rt = el('button', 'mini', 'Retry email');
+        rt.onclick = async () => { rt.textContent = '…'; try { await api('/api/crm/scans/' + s.id + '/retry-email', { method: 'POST' }); viewScans(); } catch (e) { alert(e.message); } };
+        tr.lastChild.appendChild(rt);
+      }
+      tb.appendChild(tr);
+    });
+    if (!rows.length) p.body.innerHTML = '<p class="muted">No cards captured yet.</p>';
+    else { p.body.style.padding = '0'; p.body.appendChild(table); }
+    listWrap.appendChild(p.wrap);
+  };
+  apply.onclick = async () => {
+    const q = [];
+    const ev = evField.querySelector('[data-k]').value; const st = stField.querySelector('[data-k]').value;
+    if (ev) q.push('event=' + encodeURIComponent(ev));
+    if (st) q.push('email_status=' + encodeURIComponent(st));
+    const r = await api('/api/crm/scans' + (q.length ? '?' + q.join('&') : ''));
+    render(r.scans);
+  };
+  render(scans);
+}
+
+/* ---------------- Event Scanner settings (Super Admin) ---------------- */
+async function viewScanConfig() {
+  setTitle('Event Scanner', 'Reusable card-capture settings: event sources, representatives and the thank-you email');
+  const v = $('#view'); v.innerHTML = '<p class="muted">Loading…</p>';
+  const { config } = await api('/api/settings/scan');
+  v.innerHTML = '';
+  const note = el('p', 'notice', 'Create Event Scanner accounts in Admin Users (role “Event Scanner”) — one per representative. Each signs in and goes straight to the mobile capture form; they cannot see the CRM or any admin area. The scanner works for any event, meeting or conference.');
+  v.appendChild(note);
+
+  // ---- Event sources: add, rename, and toggle active/inactive (history preserved) ----
+  const sp = panel('Event sources', 'Deactivate an old event instead of deleting it — past scans keep their label. “General Meeting” is always available.');
+  const list = el('div', ''); sp.body.appendChild(list);
+  const rows = [];
+  const addRow = (name = '', active = true) => {
+    const row = el('div', 'item-row');
+    const permanent = name.toLowerCase() === 'general meeting';
+    const nm = el('input', 'input'); nm.value = name; nm.placeholder = 'Event / source name'; nm.style.maxWidth = '340px'; if (permanent) nm.disabled = true;
+    const lab = el('label', ''); lab.style.cssText = 'display:flex;align-items:center;gap:6px;font-size:.85rem;margin-left:auto';
+    const cb = el('input', ''); cb.type = 'checkbox'; cb.checked = active !== false; if (permanent) cb.disabled = true; cb.style.cssText = 'width:18px;height:18px;accent-color:var(--green)';
+    lab.append(cb, document.createTextNode('Active'));
+    row.append(nm, lab);
+    if (!permanent) { const rm = el('button', 'mini danger', 'Remove'); rm.onclick = () => { row.remove(); const i = rows.indexOf(ref); if (i >= 0) rows.splice(i, 1); }; row.appendChild(rm); }
+    const ref = { nm, cb }; rows.push(ref);
+    list.appendChild(row);
+  };
+  (config.event_sources || []).forEach(s => addRow(s.name, s.active));
+  if (!rows.length) addRow('General Meeting', true);
+  const addBtn = el('button', 'btn btn-ghost', '+ Add event source'); addBtn.onclick = () => addRow('', true);
+  const saveSrc = el('button', 'btn btn-primary', 'Save event sources'); saveSrc.style.marginLeft = '8px';
+  const srcMsg = el('span', 'muted'); srcMsg.style.marginLeft = '10px';
+  saveSrc.onclick = async () => {
+    const payload = { event_sources: rows.map(r => ({ name: r.nm.value.trim(), active: r.cb.checked })).filter(s => s.name) };
+    saveSrc.textContent = 'Saving…';
+    try { await api('/api/settings/scan', { method: 'PUT', body: JSON.stringify(payload) }); srcMsg.textContent = 'Saved ✓'; } catch (e) { srcMsg.textContent = e.message; }
+    saveSrc.textContent = 'Save event sources';
+  };
+  const bar = el('div', ''); bar.style.marginTop = '10px'; bar.append(addBtn, saveSrc, srcMsg); sp.body.appendChild(bar);
+  v.appendChild(sp.wrap);
+
+  // ---- Thank-you email template ----
+  const p = panel('Thank-you email', config.email_configured ? 'Email is configured' : 'Email not configured — thank-yous will queue for retry');
+  const form = el('div', 'form');
+  const reps = fieldFor('representatives', 'Representatives (one per line — validated as follow-up owners)', 'textarea', (config.representatives || []).join('\n'));
+  const fromName = fieldFor('email_from_name', 'Email sender name', 'text', config.email_from_name);
+  const subject = fieldFor('email_subject', 'Email subject', 'text', config.email_subject);
+  const bodyF = fieldFor('email_body', 'Email body', 'textarea', config.email_body);
+  const sig = fieldFor('email_signature', 'Email signature', 'textarea', config.email_signature);
+  const help = el('p', 'notice', 'Personalisation tokens: {{first_name}}, {{event}}, {{rep}}, {{from_name}}.');
+  const save = el('button', 'btn btn-primary', 'Save email settings');
+  const msg = el('span', 'muted'); msg.style.marginLeft = '10px';
+  save.onclick = async () => {
+    save.textContent = 'Saving…';
+    const payload = {
+      representatives: reps.querySelector('[data-k]').value.split('\n').map(s => s.trim()).filter(Boolean),
+      email_from_name: fromName.querySelector('[data-k]').value,
+      email_subject: subject.querySelector('[data-k]').value,
+      email_body: bodyF.querySelector('[data-k]').value,
+      email_signature: sig.querySelector('[data-k]').value,
+    };
+    try { await api('/api/settings/scan', { method: 'PUT', body: JSON.stringify(payload) }); msg.textContent = 'Saved ✓'; } catch (e) { msg.textContent = e.message; }
+    save.textContent = 'Save email settings';
+  };
+  form.append(reps, fromName, subject, bodyF, sig, help, save, msg);
+  p.body.appendChild(form); v.appendChild(p.wrap);
+
+  // Test email
+  const tp = panel('Send a test email', 'Verify your SMTP settings and template');
+  const tform = el('div', 'form');
+  const to = fieldFor('to', 'Send test to', 'email', ME.email);
+  const tb = el('button', 'btn btn-ghost', 'Send test email');
+  const tmsg = el('span', 'muted'); tmsg.style.marginLeft = '10px';
+  tb.onclick = async () => {
+    tb.textContent = 'Sending…'; tmsg.textContent = '';
+    try {
+      const r = await fetch('/api/settings/scan/test-email', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: to.querySelector('[data-k]').value }) });
+      const j = await r.json().catch(() => ({}));
+      tmsg.textContent = j.message || (r.ok ? 'Sent' : 'Failed');
+    } catch (e) { tmsg.textContent = e.message; }
+    tb.textContent = 'Send test email';
+  };
+  tform.append(to, tb, tmsg); tp.body.appendChild(tform); v.appendChild(tp.wrap);
 }
 
 /* ---------------- Dashboard ---------------- */
@@ -354,6 +537,209 @@ async function viewAnalytics() {
   v.appendChild(p.wrap);
 }
 
+/* ---------------- Account & Security (change password) ---------------- */
+async function viewAccount() {
+  setTitle('Account & Security', 'Change your password — we never store or email your existing password');
+  const v = $('#view'); v.innerHTML = '';
+  if (ME.must_change) {
+    const warn = el('p', 'notice');
+    warn.style.cssText = 'background:#fff7ed;border-color:#fed7aa;color:#9a3412';
+    warn.textContent = 'For your security, please set a new password before continuing. A temporary password was set by an administrator or on first login.';
+    v.appendChild(warn);
+  }
+  const p = panel('Change password', 'Signed in as ' + esc(ME.email));
+  const form = el('div', 'form');
+  const cur = fieldFor('current', 'Current password', 'password');
+  const nx = fieldFor('next', 'New password', 'password');
+  const cf = fieldFor('confirm', 'Confirm new password', 'password');
+  const help = el('p', 'notice', 'Minimum 12 characters, including at least one letter and one number, and must not contain your email name.');
+  const msg = el('p', ''); msg.style.cssText = 'font-size:.85rem;margin-top:8px;display:none';
+  const btn = el('button', 'btn btn-primary', 'Update password'); btn.style.marginTop = '8px';
+  btn.onclick = async () => {
+    msg.style.display = 'none';
+    const current = cur.querySelector('[data-k]').value;
+    const next = nx.querySelector('[data-k]').value;
+    const confirm = cf.querySelector('[data-k]').value;
+    if (next !== confirm) { msg.style.display = 'block'; msg.style.color = 'var(--danger,#b91c1c)'; msg.textContent = 'New password and confirmation do not match.'; return; }
+    try {
+      btn.textContent = 'Updating…'; btn.disabled = true;
+      await api('/api/auth/change-password', { method: 'POST', body: JSON.stringify({ current, next, confirm }) });
+      msg.style.display = 'block'; msg.style.color = 'var(--green,#15803d)';
+      msg.textContent = 'Password updated. All your other sessions have been signed out.';
+      ME.must_change = 0;
+      cur.querySelector('[data-k]').value = nx.querySelector('[data-k]').value = cf.querySelector('[data-k]').value = '';
+    } catch (e) { msg.style.display = 'block'; msg.style.color = 'var(--danger,#b91c1c)'; msg.textContent = e.message; }
+    finally { btn.textContent = 'Update password'; btn.disabled = false; }
+  };
+  form.append(cur, nx, cf, help, btn, msg);
+  p.body.appendChild(form); v.appendChild(p.wrap);
+
+  const info = panel('Forgot your password?', '');
+  info.body.innerHTML = '<p class="muted" style="font-size:.9rem">If you are ever locked out, use the “Forgot password?” link on the sign-in screen. We send a single-use link that expires in one hour and never reveal or email your existing password — it can only be securely reset.</p>';
+  v.appendChild(info.wrap);
+}
+
+/* ---------------- Page Publishing (hide/show whole pages) ---------------- */
+async function viewPages() {
+  setTitle('Page Publishing', 'Publish or hide entire pages. A hidden page returns 404 and its links are removed from the public site — the content is kept in the CMS.');
+  const v = $('#view'); v.innerHTML = '<p class="muted">Loading…</p>';
+  const { pages } = await api('/api/settings/pages');
+  v.innerHTML = '';
+  const p = panel('Public pages', pages.length + ' page(s)');
+  pages.forEach(pg => {
+    const r = el('div', 'item-row');
+    r.innerHTML = `<div class="grow"><b>${esc(pg.label)}</b><span>${pg.published ? 'Published — live at /' + esc(pg.slug) + '.html' : 'Hidden — direct access returns 404'}</span></div>`;
+    const wrap = el('label', ''); wrap.style.cssText = 'display:flex;align-items:center;gap:8px;font-size:.85rem;cursor:pointer';
+    const cb = el('input', ''); cb.type = 'checkbox'; cb.checked = pg.published; cb.style.cssText = 'width:18px;height:18px;accent-color:var(--green)';
+    const txt = el('span', '', pg.published ? 'Published' : 'Hidden');
+    cb.onchange = async () => {
+      cb.disabled = true;
+      try {
+        await api('/api/settings/pages/' + encodeURIComponent(pg.slug), { method: 'PUT', body: JSON.stringify({ published: cb.checked }) });
+        txt.textContent = cb.checked ? 'Published' : 'Hidden';
+        r.querySelector('.grow span').textContent = cb.checked ? 'Published — live at /' + pg.slug + '.html' : 'Hidden — direct access returns 404';
+      } catch (e) { cb.checked = !cb.checked; alert(e.message); }
+      finally { cb.disabled = false; }
+    };
+    wrap.append(cb, txt); r.appendChild(wrap); p.body.appendChild(r);
+  });
+  p.body.appendChild(el('p', 'notice', 'Hiding a page removes it from the public site immediately: the page URL returns 404 and menu/button/text links to it are dropped. Nothing is deleted — re-publish any time to restore it.'));
+  v.appendChild(p.wrap);
+}
+
+/* ---------------- Admin Users (Super Admin) ---------------- */
+async function viewUsers() {
+  setTitle('Admin Users', 'Add, edit, deactivate or delete admin accounts and assign roles & page-level permissions');
+  let META = null;
+  const btn = el('button', 'btn btn-primary', '+ New admin user'); btn.onclick = () => editUser(null, META);
+  $('#top-actions').innerHTML = ''; $('#top-actions').appendChild(btn);
+  const v = $('#view'); v.innerHTML = '<p class="muted">Loading…</p>';
+  const { users, roles, collections, pages, sections } = await api('/api/users');
+  const meta = { roles, collections, pages: pages || [], sections: sections || [] }; META = meta;
+  const pageLabel = {}; (pages || []).forEach(p => pageLabel['page:' + p.slug] = p.label);
+  const secLabel = {}; (sections || []).forEach(s => secLabel['sec:' + s.key] = s.label);
+  const permLabel = x => (DEF[x] && DEF[x].label) || pageLabel[x] || secLabel[x] || x;
+  v.innerHTML = '';
+  const p = panel('Admin accounts', users.length + ' user(s)');
+  const table = el('div', 'table-wrap');
+  table.innerHTML = `<table class="tbl"><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Scope</th><th>Status</th><th></th></tr></thead><tbody></tbody></table>`;
+  const tb = table.querySelector('tbody');
+  users.forEach(u => {
+    const roleLabel = (roles[u.role] && roles[u.role].label) || u.role;
+    const scope = (roles[u.role] && roles[u.role].editorScoped)
+      ? ((u.perms && u.perms.length) ? u.perms.map(permLabel).join(', ') : 'none assigned')
+      : '—';
+    const tr = el('tr');
+    tr.innerHTML = `<td><b>${esc(u.name)}</b>${u.id === ME.id ? ' <span class="muted">(you)</span>' : ''}</td>
+      <td>${esc(u.email)}</td><td>${esc(roleLabel)}</td>
+      <td class="muted" style="font-size:.82rem">${esc(scope)}</td>
+      <td>${u.active ? '<span class="st st-ok">Active</span>' : '<span class="st st-off">Deactivated</span>'}</td><td></td>`;
+    const cell = tr.lastChild;
+    const ed = el('button', 'mini primary', 'Edit'); ed.onclick = () => editUser(u, meta);
+    cell.appendChild(ed);
+    if (u.id !== ME.id) {
+      const tog = el('button', 'mini', u.active ? 'Deactivate' : 'Reactivate');
+      tog.onclick = async () => {
+        if (u.active && !confirmBox('Deactivate ' + u.email + '? They will be signed out and cannot log in until reactivated.')) return;
+        await api('/api/users/' + u.id, { method: 'PUT', body: JSON.stringify({ active: !u.active }) });
+        viewUsers();
+      };
+      const del = el('button', 'mini danger', 'Delete');
+      del.onclick = async () => {
+        if (!confirmBox('Permanently delete ' + u.email + '? This cannot be undone. Consider deactivating instead.')) return;
+        try { await api('/api/users/' + u.id, { method: 'DELETE' }); viewUsers(); } catch (e) { alert(e.message); }
+      };
+      cell.append(tog, del);
+    }
+    tb.appendChild(tr);
+  });
+  p.body.style.padding = '0'; p.body.appendChild(table); v.appendChild(p.wrap);
+  v.appendChild(el('p', 'notice', 'Deactivating keeps the account and its history but blocks sign-in — preferred over deletion. The last active Super Admin cannot be deleted, and you cannot delete or deactivate your own account.'));
+}
+
+function editUser(u, meta) {
+  const isNew = !u;
+  const roles = (meta && meta.roles) || ROLES;
+  const collections = (meta && meta.collections) || Object.keys(DEF);
+  const body = el('div', 'form');
+  const name = fieldFor('name', 'Full name', 'text', u ? u.name : '');
+  const email = fieldFor('email', 'Email', 'email', u ? u.email : '');
+  if (!isNew) email.querySelector('[data-k]').disabled = true;
+  // Role selector
+  const roleWrap = el('div', 'field'); roleWrap.innerHTML = '<label>Role</label>';
+  const roleSel = el('select', 'select');
+  Object.keys(roles).forEach(rk => { const o = el('option', '', roles[rk].label + ' (' + rk + ')'); o.value = rk; if (u && u.role === rk) o.selected = true; roleSel.appendChild(o); });
+  if (isNew) roleSel.value = 'editor';
+  roleWrap.appendChild(roleSel);
+  // Password
+  const pw = fieldFor('password', isNew ? 'Temporary password' : 'Reset password (leave blank to keep)', 'password', '');
+  const pwHelp = el('p', 'notice', 'Min 12 chars, a letter and a number, not containing the email name. The user is required to change it at next sign-in.');
+  // Per-item permissions (only meaningful for the Editor / editorScoped role).
+  const pages = (meta && meta.pages) || [];
+  const sections = (meta && meta.sections) || [];
+  const curPerms = (u && u.perms) || [];
+  const permsWrap = el('div', 'field');
+  permsWrap.innerHTML = '<label>Assigned access <span class="muted" style="font-weight:400;font-size:.78rem">· Editor role only — the backend enforces exactly these</span></label>';
+  const permsBox = el('div', '');
+  const group = (title, items, valueOf, labelOf) => {
+    if (!items.length) return;
+    permsBox.appendChild(el('div', 'muted', title)).style.cssText = 'font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;margin:10px 0 4px';
+    const grid = el('div', ''); grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:6px';
+    items.forEach(it => {
+      const val = valueOf(it);
+      const lab = el('label', ''); lab.style.cssText = 'display:flex;align-items:center;gap:6px;font-size:.85rem';
+      const cb = el('input', ''); cb.type = 'checkbox'; cb.value = val; cb.checked = curPerms.includes(val); cb.dataset.perm = val;
+      lab.append(cb, document.createTextNode(labelOf(it))); grid.appendChild(lab);
+    });
+    permsBox.appendChild(grid);
+  };
+  group('Content types', collections, c => c, c => (DEF[c] && DEF[c].label) || c);
+  group('Pages (content + publish/hide)', pages, p => 'page:' + p.slug, p => p.label);
+  group('Sections (visibility)', sections, s => 'sec:' + s.key, s => s.label);
+  permsWrap.appendChild(permsBox);
+  const syncPerms = () => { const scoped = roles[roleSel.value] && roles[roleSel.value].editorScoped; permsWrap.style.display = scoped ? '' : 'none'; };
+  roleSel.onchange = syncPerms;
+  body.append(name, email, roleWrap, pw, pwHelp, permsWrap); syncPerms();
+
+  openModal(isNew ? 'New admin user' : 'Edit: ' + u.email, body, async () => {
+    const payload = {
+      name: name.querySelector('[data-k]').value,
+      role: roleSel.value,
+      perms: Array.from(permsBox.querySelectorAll('input[type=checkbox]')).filter(x => x.checked).map(x => x.value),
+    };
+    const pwv = pw.querySelector('[data-k]').value;
+    if (isNew) { payload.email = email.querySelector('[data-k]').value; payload.password = pwv; await api('/api/users', { method: 'POST', body: JSON.stringify(payload) }); }
+    else { if (pwv) payload.password = pwv; await api('/api/users/' + u.id, { method: 'PUT', body: JSON.stringify(payload) }); }
+    closeModal(); viewUsers();
+  });
+}
+
+/* ---------------- Audit Log ---------------- */
+async function viewAudit() {
+  setTitle('Audit Log', 'Who changed what, and when — the 200 most recent actions');
+  const v = $('#view'); v.innerHTML = '<p class="muted">Loading…</p>';
+  const { audit } = await api('/api/audit');
+  v.innerHTML = '';
+  const p = panel('Recent activity', audit.length + ' record(s)');
+  const table = el('div', 'table-wrap');
+  table.innerHTML = `<table class="tbl"><thead><tr><th>When</th><th>Who</th><th>Action</th><th>Entity</th><th>Detail</th></tr></thead><tbody></tbody></table>`;
+  const tb = table.querySelector('tbody');
+  const pretty = a => esc(String(a || '').replace(/_/g, ' '));
+  audit.forEach(a => {
+    const tr = el('tr');
+    const when = a.created_at ? new Date(a.created_at).toLocaleString() : '—';
+    tr.innerHTML = `<td class="muted" style="font-size:.8rem;white-space:nowrap">${esc(when)}</td>
+      <td>${esc(a.actor_email || 'system')}</td>
+      <td>${pretty(a.action)}</td>
+      <td class="muted" style="font-size:.82rem">${esc(a.entity || '')}${a.entity_id ? ' #' + esc(a.entity_id) : ''}</td>
+      <td class="muted" style="font-size:.82rem">${esc(a.detail || '')}</td>`;
+    tb.appendChild(tr);
+  });
+  if (!audit.length) p.body.innerHTML = '<p class="muted">No activity recorded yet.</p>';
+  else { p.body.style.padding = '0'; p.body.appendChild(table); }
+  v.appendChild(p.wrap);
+}
+
 /* ---------------- UI helpers ---------------- */
 function setTitle(t, s) { $('#view-title').textContent = t; $('#view-sub').textContent = s || ''; }
 function panel(title, sub) { const wrap = el('div', 'panel'); wrap.innerHTML = `<div class="panel-head"><div><h3>${esc(title)}</h3></div><span class="muted" style="font-size:.85rem">${esc(sub || '')}</span></div><div class="panel-body"></div>`; return { wrap, body: wrap.querySelector('.panel-body') }; }
@@ -365,7 +751,7 @@ function fieldFor(k, label, type, val, req, opts) {
   else if (type === 'bool') ctrl = `<label class="checkrow"><input type="checkbox" data-k="${k}" id="${id}" ${val ? 'checked' : ''}> ${esc(label)}</label>`;
   else if (type === 'select') ctrl = `<select class="select" data-k="${k}" id="${id}">${(opts || []).map(o => `<option ${o == val ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select>`;
   else if (type === 'file') ctrl = `<input class="input" data-k="${k}" id="${id}" value="${esc(val)}" placeholder="/uploads/… or paste a URL"><div class="notice" style="margin-top:6px">Media library / upload endpoint: POST /api/upload</div>`;
-  else ctrl = `<input class="input" type="${type === 'number' ? 'number' : type === 'date' ? 'date' : type === 'email' ? 'email' : type === 'url' ? 'url' : 'text'}" data-k="${k}" id="${id}" value="${esc(val)}">`;
+  else ctrl = `<input class="input" type="${type === 'number' ? 'number' : type === 'date' ? 'date' : type === 'email' ? 'email' : type === 'url' ? 'url' : type === 'password' ? 'password' : 'text'}" data-k="${k}" id="${id}" value="${esc(val)}"${type === 'password' ? ' autocomplete="new-password"' : ''}>`;
   f.innerHTML = type === 'bool' ? ctrl : `<label for="${id}">${esc(label)}${req ? ' <span class="req">*</span>' : ''}</label>${ctrl}`;
   return f;
 }
