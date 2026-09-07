@@ -30,8 +30,8 @@ function ok(name, cond) { if (cond) { passed++; console.log('  ✓ ' + name); } 
 
 // Minimal cookie jar per "session".
 function jar() { return { c: '' }; }
-async function api(path, { method = 'GET', body, j } = {}, sess) {
-  const headers = { Origin: BASE };
+async function api(path, { method = 'GET', body, j, headers: extra } = {}, sess) {
+  const headers = { Origin: BASE, ...(extra || {}) };
   if (body && !(body instanceof FormData)) headers['content-type'] = 'application/json';
   if (sess && sess.c) headers.cookie = sess.c;
   const res = await fetch(BASE + path, { method, headers, body: body instanceof FormData ? body : (body ? JSON.stringify(body) : undefined), redirect: 'manual' });
@@ -291,6 +291,90 @@ const waitHealth = async () => { for (let i = 0; i < 50; i++) { try { const r = 
     ok('CRM rejects javascript: website (400)', (await api('/api/crm/organisations', { method: 'POST', body: { legal_name: 'Evil', website: 'javascript:alert(1)' } }, admin2)).status === 400);
     ok('CRM rejects unsafe logo URL (400)', (await api('/api/crm/organisations', { method: 'POST', body: { legal_name: 'Evil2', logo: 'vbscript:msgbox(1)' } }, admin2)).status === 400);
     ok('CRM accepts a valid https website + relative logo', (await api('/api/crm/organisations', { method: 'POST', body: { legal_name: 'Good Co', website: 'https://good.example', logo: '/uploads/logo.png' } }, admin2)).status === 200);
+
+    console.log('\nGFF EVENT SCANNER — ACCESS LOCKDOWN');
+    // Super Admin creates an individually-attributable Event Scanner account.
+    const sc = await api('/api/users', { method: 'POST', body: { name: 'Rep One', email: 'scanner1@example.org', password: 'Scanner-Access-01', role: 'event_scanner' } }, admin2);
+    ok('super admin can create an Event Scanner account', sc.status === 200);
+    const scanner = jar();
+    await api('/api/auth/login', { method: 'POST', body: { email: 'scanner1@example.org', password: 'Scanner-Access-01' } }, scanner);
+    const scMe = await api('/api/auth/me', {}, scanner);
+    ok('scanner me exposes scanner cap (and no admin caps)', scMe.data.caps.scanner === true && scMe.data.caps.users === false && scMe.data.caps.crmRead === false);
+    ok('scanner CAN read its capture config', (await api('/api/scan/config', {}, scanner)).status === 200);
+    ok('scanner CANNOT read the CRM (403)', (await api('/api/crm/organisations', {}, scanner)).status === 403);
+    ok('scanner CANNOT browse scanned cards (403)', (await api('/api/crm/scans', {}, scanner)).status === 403);
+    ok('scanner CANNOT export scans (403)', (await api('/api/crm/scans.csv', {}, scanner)).status === 403);
+    ok('scanner CANNOT read the dashboard (403)', (await api('/api/crm/dashboard', {}, scanner)).status === 403);
+    ok('scanner CANNOT read analytics (403)', (await api('/api/analytics/summary', {}, scanner)).status === 403);
+    ok('scanner CANNOT read the audit log (403)', (await api('/api/audit', {}, scanner)).status === 403);
+    ok('scanner CANNOT manage users (403)', (await api('/api/users', {}, scanner)).status === 403);
+    ok('scanner CANNOT read page copy / CMS (403)', (await api('/api/pagecopy', {}, scanner)).status === 403);
+    ok('scanner CANNOT read scanner settings (403)', (await api('/api/settings/scan', {}, scanner)).status === 403);
+
+    console.log('\nGFF EVENT SCANNER — CAPTURE, VALIDATION, CRM, DEDUP');
+    ok('card rejects a javascript: website (400)', (await api('/api/scan/card', { method: 'POST', body: { full_name: 'X', email: 'x@y.com', website: 'javascript:alert(1)' } }, scanner)).status === 400);
+    ok('card rejects an invalid email (400)', (await api('/api/scan/card', { method: 'POST', body: { full_name: 'X', email: 'not-an-email' } }, scanner)).status === 400);
+    ok('card rejects an empty submission (400)', (await api('/api/scan/card', { method: 'POST', body: { notes: 'nothing useful' } }, scanner)).status === 400);
+    const card1 = await api('/api/scan/card', { method: 'POST', body: { full_name: 'Asha Rao', designation: 'CEO', organisation: 'Acme Fintech Pvt Ltd', email: 'asha@acmefintech.com', mobile: '+91 98765 43210', website: 'acmefintech.com', city: 'Mumbai', notes: 'Interested in ODR', consent: false, event_source: 'GFF 2026' } }, scanner);
+    ok('scanner can submit a reviewed card (200)', card1.status === 200 && card1.data.duplicate === false);
+    // International phone format accepted
+    ok('accepts a legitimate international phone', (await api('/api/scan/card', { method: 'POST', body: { full_name: 'Lee Wong', email: 'lee@sg-example.com', mobile: '+65 6123 4567' } }, scanner)).status === 200);
+    // Duplicate by same email → append, do not overwrite, do not duplicate the contact.
+    const dup = await api('/api/scan/card', { method: 'POST', body: { full_name: 'Asha Rao', organisation: 'Acme', email: 'asha@acmefintech.com', mobile: '+91 98765 43210', notes: 'Met again at the booth', consent: false, event_source: 'GFF 2026' } }, scanner);
+    ok('duplicate email is detected (not silently overwritten)', dup.status === 200 && dup.data.duplicate === true);
+    // Verify via admin: one Acme contact, notes preserved+appended, event/source/submitter recorded.
+    const orgs = (await api('/api/crm/organisations', {}, admin2)).data.organisations;
+    const acme = orgs.find(o => /acme/i.test((o.legal_name || '') + (o.brand_name || '')));
+    ok('duplicate did NOT create a second Acme contact', acme && acme.contacts.length === 1);
+    ok('existing notes preserved and the new interaction appended', acme && /Interested in ODR/.test(acme.contacts[0].notes) && /Met again at the booth/.test(acme.contacts[0].notes));
+    ok('org domain normalised for dedup', acme && acme.domain === 'acmefintech.com');
+    const scans = (await api('/api/crm/scans', {}, admin2)).data.scans;
+    ok('scan records attribute event + submitter', scans.some(s => s.event_source === 'GFF 2026' && s.submitter_email === 'scanner1@example.org'));
+    ok('captured card created a follow-up task', (await api('/api/crm/dashboard', {}, admin2)).data.tasks.some(t => /Follow up: Asha Rao/.test(t.title)));
+    ok('admin can filter scans by event', (await api('/api/crm/scans?event=GFF%202026', {}, admin2)).data.scans.length >= 1);
+    ok('admin can export scans as CSV', (await api('/api/crm/scans.csv', {}, admin2)).status === 200);
+    ok('scanner capture is audited', (await api('/api/audit', {}, admin2)).data.audit.some(a => a.action === 'card_captured'));
+
+    console.log('\nGFF EVENT SCANNER — THANK-YOU EMAIL (sent / queued / failed / duplicate-prevented)');
+    // No SMTP configured in tests → consented email should QUEUE, never falsely report "sent".
+    const q = await api('/api/scan/card', { method: 'POST', body: { full_name: 'Queue Person', email: 'queue@ex-one.com', consent: true, event_source: 'GFF 2026' } }, scanner);
+    ok('consented email with no SMTP is queued (not falsely "sent")', q.data.email_status === 'queued');
+    // Test hook simulates a successful send.
+    const sent = await api('/api/scan/card', { method: 'POST', body: { full_name: 'Sent Person', email: 'sent@ex-two.com', consent: true, event_source: 'GFF 2026' }, headers: { 'x-test-mail': 'sent' } }, scanner);
+    ok('successful send reports email_status = sent', sent.data.email_status === 'sent');
+    // Re-submitting the same email+event after a successful send must NOT resend.
+    const skip = await api('/api/scan/card', { method: 'POST', body: { full_name: 'Sent Person', email: 'sent@ex-two.com', consent: true, event_source: 'GFF 2026' }, headers: { 'x-test-mail': 'sent' } }, scanner);
+    ok('duplicate thank-you is prevented (skipped_duplicate)', skip.data.email_status === 'skipped_duplicate');
+    // Simulated failure → queued for retry, contact still saved.
+    const fail = await api('/api/scan/card', { method: 'POST', body: { full_name: 'Fail Person', email: 'fail@ex-three.com', consent: true, event_source: 'GFF 2026' }, headers: { 'x-test-mail': 'fail' } }, scanner);
+    ok('failed send is recorded as failed and the contact is kept', fail.data.email_status === 'failed' && fail.data.contact_id > 0);
+    // No consent → no email attempted.
+    const noc = await api('/api/scan/card', { method: 'POST', body: { full_name: 'No Consent', email: 'noconsent@ex.com', consent: false } }, scanner);
+    ok('no email is sent without consent', noc.data.email_status === 'skipped');
+
+    console.log('\nGFF EVENT SCANNER — SUPER ADMIN SETTINGS & TEST EMAIL');
+    ok('super admin can read scanner settings', (await api('/api/settings/scan', {}, admin2)).status === 200);
+    const cfgSave = await api('/api/settings/scan', { method: 'PUT', body: { event_sources: ['GFF 2026', 'Fintech Fest 2027'], email_subject: 'Hi {{first_name}} from {{event}}' } }, admin2);
+    ok('super admin can add event sources + edit the email template', cfgSave.status === 200 && cfgSave.data.config.event_sources.includes('Fintech Fest 2027'));
+    ok('scanner settings reject a non-admin (crm viewer 403)', (await api('/api/settings/scan', {}, viewer)).status === 403);
+    ok('test-email endpoint reports honestly when SMTP is unconfigured', (await api('/api/settings/scan/test-email', { method: 'POST', body: { email: 'me@example.org' } }, admin2)).data.configured === false);
+    ok('a scanner cannot submit an unconfigured event source (falls back to default)', (await api('/api/scan/card', { method: 'POST', body: { full_name: 'Z', email: 'z@ex.com', event_source: 'Not A Real Event' } }, scanner)).status === 200);
+
+    console.log('\nGFF EVENT SCANNER — MOBILE CAPTURE UI / OCR');
+    {
+      const html = readFileSync(join(__dirname, '..', 'admin', 'scan.html'), 'utf8');
+      const d = new JSDOM(html).window.document;
+      ok('capture form opens the phone camera (capture=environment)', !!d.querySelector('input[type=file][capture=environment][accept^="image"]'));
+      ok('capture form allows uploading an existing image', d.querySelectorAll('input[type=file][accept^="image"]').length >= 2);
+      ok('OCR library is loaded for on-device text extraction', /tesseract/i.test(html));
+      const need = ['full_name','designation','organisation','email','mobile','alternate','website','address','city','state','country','linkedin','notes','areas_of_interest','follow_up_owner','follow_up_date','event_source','consent'];
+      ok('every required card field is present for human review', need.every(n => d.querySelector(`[name="${n}"]`)));
+      ok('consent checkbox gates the thank-you email', !!d.querySelector('input[type=checkbox][name=consent]'));
+      const js = readFileSync(join(__dirname, '..', 'admin', 'scan.js'), 'utf8');
+      ok('submission sends reviewed JSON fields, not the image', /\/api\/scan\/card/.test(js) && /JSON\.stringify/.test(js));
+      ok('the card image is revoked/discarded after use and never uploaded to the server', /revokeObjectURL/.test(js) && !/\/api\/upload/.test(js));
+      ok('scanners are redirected here and gated by role', /caps\.scan/.test(js) && /location\.replace\('\/admin'\)/.test(js));
+    }
 
     console.log('\nPRODUCTION DEPENDENCY AUDIT');
     {

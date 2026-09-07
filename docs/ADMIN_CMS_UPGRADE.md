@@ -238,4 +238,71 @@ All CMS editability, page-publishing controls, role permissions, security
 sanitisation and data are preserved. **Tests:** grew to **152 assertions** (added
 an ODR MICROSITE NAVIGATION section covering desktop + mobile nav parity, active
 section, journey-page links, shared Knowledge Hub links, and 404s for the removed
-libraries). **New migration surface in revision 4:** none.
+libraries). **New migration surface in revision 4 (ODR):** none.
+
+## 12. Revision 4 (Part A) — GFF visiting-card scanner
+
+A restricted, mobile-first capture tool for MSME Catalyst representatives at events.
+
+**New role: Event Scanner.** Created and managed by Super Admin in Admin Users
+(one account per representative — never a shared password). A scanner signing in
+is taken straight to `/admin/scan.html` and can reach **only** the capture form
+and its config. A server-side lockdown (`app.use` guard on every `/api/*` request)
+returns 403 for any other endpoint — dashboard, CRM, scanned-cards list/export,
+analytics, users, audit, CMS, settings — so a hand-entered URL leaks nothing.
+
+**Mobile capture + on-device OCR.** `/admin/scan.html` opens the phone camera
+(`<input type=file capture=environment>`) or accepts an uploaded image, then reads
+the text **on the device** with `tesseract.js` (loaded from cdnjs — no API key, no
+paid service). The image is **never uploaded** and is discarded (`URL.revokeObjectURL`)
+after extraction; only the reviewed text fields are submitted. OCR results always
+require human review/correction/retake before saving.
+
+**CRM integration with de-duplication.** `POST /api/scan/card` validates and
+sanitises every field server-side (URLs via `safeUrl`, text via `stripText`,
+international-friendly email/phone checks), then creates/updates the contact and
+organisation. Duplicates are detected by normalised email → mobile → organisation
+domain/name; an existing record is **never silently overwritten** — the new event
+interaction and notes are appended and blank fields enriched. Each submission
+records source, timestamp and submitting user, and creates a follow-up task.
+CRM roles can filter (`GET /api/crm/scans`) and export (`/api/crm/scans.csv`) by
+event, submitter, date and email status; **Event Scanners cannot**.
+
+**Thank-you email (honest status, no duplicates).** Sent only after the scanner
+confirms the email and ticks consent, using the **existing SMTP** configuration.
+A prior successful send for the same email+event is not resent (`skipped_duplicate`).
+The result is reported truthfully: `sent`, `queued` (SMTP unconfigured — kept in
+the outbox), `failed` (send error — kept for retry) or `skipped`. The contact is
+never lost if email fails. Super Admin can edit the subject/body/sender/signature
+(with `{{first_name}}`/`{{event}}`/`{{rep}}` personalisation), manage event sources,
+send a test email, and retry failed/queued emails.
+
+**Audit + security.** Login, capture, CRM create/update, duplicate handling, email
+attempt/result, record correction, and account activation/deactivation are audited.
+Rate limiting (`scanLimit`), same-origin CSRF, session auth, input sanitisation,
+safe-URL validation and the scanner lockdown all apply. No image is stored; no other
+contact's data is exposed to a scanner.
+
+**Database migrations (additive, guarded — no data deleted/reset):**
+- `organisations`: `city`, `state`, `country`, `domain`
+- `contacts`: `phone_alt`, `linkedin`, `notes`, `areas_of_interest`, `email_norm`,
+  `phone_norm`, `source`, `event_source`, `submitted_by`, `created_at`, `updated_at`
+- `emails`: `status`, `attempts`, `last_error`, `contact_id`, `event_source`, `sent_at`
+- new table `card_scans` (one row per captured card: attribution, email status, review audit)
+- indexes on the normalised/lookup columns
+
+**New Render environment variables required:** none. The scanner reuses the
+existing `SMTP_HOST/PORT/SECURE/USER/PASS` + `EMAIL_FROM` (already documented in
+§2). If they are unset, thank-you emails queue in the outbox instead of sending.
+On-device OCR needs internet at the venue for its first load but no credentials.
+
+**Files added:** `server/admin/scan.html`, `server/admin/scan.js`.
+**Files changed:** `server/db.js` (role + migrations), `server/server.js` (lockdown,
+scan API, settings, scans list/export, email retry), `server/admin/admin.js`
+(scanner redirect, Scanned Cards + Event Scanner views), `server/test/run-tests.mjs`.
+
+**Tests:** grew to **196 assertions** — scanner access lockdown, capture/validation,
+CRM create + de-duplication + record preservation, event/source attribution,
+follow-up task, email sent/queued/failed/duplicate-prevented/no-consent, scanner
+CANNOT view or export CRM, audit logging, and mobile capture-UI/OCR structure
+(image never uploaded). `npm audit --omit=dev`: **0 vulnerabilities**.
