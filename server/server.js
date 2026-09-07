@@ -15,6 +15,7 @@ const bcrypt = require('bcryptjs');
 const { db, ROLES, COLLECTIONS, CONTENT_COLLECTIONS, seed, nowISO } = require('./db');
 const mailer = require('./mailer');
 const { cleanHtml, safeUrl, stripText, cleanByKind } = require('./sanitize');
+const { normEmail, normPhone, phoneComparable, orgDomain } = require('./normalize');
 const APP_BASE_URL = (process.env.APP_BASE_URL || '').replace(/\/$/, '');
 
 seed(); // idempotent
@@ -24,9 +25,47 @@ const PORT = process.env.PORT || 4000;
 const PRODUCTION = process.env.NODE_ENV === 'production';
 app.set('trust proxy', 1);
 app.disable('x-powered-by');
-app.use(helmet({ contentSecurityPolicy: false, crossOriginResourcePolicy: { policy: 'cross-origin' } }));
+// Restrictive Content Security Policy, compatible with the app:
+// - scripts, styles, images, fonts, connections, workers all restricted to 'self'
+//   (plus Google Fonts, and blob:/data: for the on-device OCR worker/images);
+// - NO third-party script origins — the OCR runtime is self-hosted under /vendor;
+// - 'unsafe-inline' is retained for the few inline <script>/<style> the static
+//   pages use (stored-XSS is separately blocked by server-side sanitisation).
+app.use(helmet({
+  contentSecurityPolicy: {
+    useDefaults: true,
+    directives: {
+      'default-src': ["'self'"],
+      'script-src': ["'self'", "'unsafe-inline'", "'wasm-unsafe-eval'"],
+      'worker-src': ["'self'", 'blob:'],
+      'child-src': ["'self'", 'blob:'],
+      'style-src': ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+      'font-src': ["'self'", 'https://fonts.gstatic.com'],
+      'img-src': ["'self'", 'data:', 'blob:'],
+      'connect-src': ["'self'", 'blob:'],
+      'object-src': ["'none'"],
+      'frame-ancestors': ["'self'"],
+      'base-uri': ["'self'"],
+      'form-action': ["'self'"],
+      'upgrade-insecure-requests': null,   // don't force https on localhost / the test harness
+    },
+  },
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+  crossOriginEmbedderPolicy: false,
+}));
 app.use(express.json({ limit: '2mb' }));
 app.use(cookieParser());
+
+// Self-hosted Tesseract OCR assets (runtime + worker + wasm core + language model),
+// all pinned via package.json and served same-origin — no third-party/CDN at runtime.
+try {
+  const tjs = path.dirname(require.resolve('tesseract.js/package.json'));
+  const tcore = path.dirname(require.resolve('tesseract.js-core/package.json'));
+  const tlang = path.dirname(require.resolve('@tesseract.js-data/eng/package.json'));
+  app.use('/vendor/tesseract/js', express.static(path.join(tjs, 'dist'), { immutable: true, maxAge: '7d' }));
+  app.use('/vendor/tesseract/core', express.static(tcore, { immutable: true, maxAge: '7d' }));
+  app.use('/vendor/tesseract/lang', express.static(path.join(tlang, '4.0.0'), { immutable: true, maxAge: '7d' }));
+} catch (e) { console.warn('OCR assets not resolved — run npm install:', e.message); }
 
 // Strict limits in production; relaxed off-production so local dev and the test suite aren't throttled.
 const publicWriteLimit = rateLimit({ windowMs: 15 * 60 * 1000, limit: PRODUCTION ? 60 : 100000, standardHeaders: 'draft-7', legacyHeaders: false });
@@ -125,14 +164,38 @@ function isScanner(user)   { return !!(user && ROLES[user.role] && ROLES[user.ro
 function canScan(user)     { return isScanner(user) || canCRMWrite(user); }
 const forbid = (res) => res.status(403).json({ error: 'Forbidden' });
 
-/* Anti-CSRF for cookie-authenticated state changes: require same-origin. */
-function sameOrigin(req) {
-  const o = req.headers.origin; if (!o) return true;
-  try { return new URL(o).host === req.headers.host; } catch (e) { return false; }
+/* Robust CSRF defence for cookie-authenticated, state-changing API requests:
+   strict verified same-origin using the Origin header (falling back to Referer).
+   - Foreign or malformed origins are rejected.
+   - A MISSING Origin AND Referer is rejected for any request that carries the
+     session cookie (never silently accepted for an authenticated mutation).
+   - Only req.headers.host (what the trusted proxy forwards) and an explicitly
+     configured APP_BASE_URL are accepted — arbitrary X-Forwarded-* is not trusted.
+   - Public (unauthenticated) POSTs and the pre-cookie login flow are unaffected. */
+function allowedHosts(req) {
+  const set = new Set();
+  if (req.headers.host) set.add(String(req.headers.host).toLowerCase());
+  if (APP_BASE_URL) { try { set.add(new URL(APP_BASE_URL).host.toLowerCase()); } catch (e) {} }
+  return set;
+}
+function hostOf(url) { try { return new URL(url).host.toLowerCase(); } catch (e) { return null; } }
+function csrfOk(req) {
+  if (!['POST', 'PUT', 'DELETE', 'PATCH'].includes(req.method)) return true;
+  const hosts = allowedHosts(req);
+  const origin = req.headers.origin;
+  if (origin !== undefined) {                       // Origin present → must match exactly
+    if (origin === 'null' || origin === '') return false;
+    const oh = hostOf(origin);
+    return !!oh && hosts.has(oh);
+  }
+  const ref = req.headers.referer || req.headers.referrer;   // no Origin → try Referer
+  if (ref) { const rh = hostOf(ref); return !!rh && hosts.has(rh); }
+  // Neither Origin nor Referer. Reject for cookie-authenticated requests.
+  if (req.cookies && req.cookies.mc_session) return false;
+  return true;                                      // unauthenticated (public form / pre-login)
 }
 app.use((req, res, next) => {
-  if (['POST','PUT','DELETE','PATCH'].includes(req.method) && req.path.startsWith('/api/') && !sameOrigin(req))
-    return res.status(403).json({ error: 'Bad origin' });
+  if (req.path.startsWith('/api/') && !csrfOk(req)) return res.status(403).json({ error: 'Bad origin' });
   next();
 });
 
@@ -750,9 +813,13 @@ app.post('/api/upload', requireAuth, upload.single('file'), (req, res) => {
   res.json({ url: '/uploads/' + req.file.filename, id: info.lastInsertRowid });
 });
 
-/* ==================== Event card scanner (GFF) ==================== */
+/* ==================== Event card scanner (reusable for any event) ==================== */
+// A permanent, always-available source so the scanner is never tied to one event.
+const PERMANENT_EVENT = 'General Meeting';
 const SCAN_DEFAULTS = {
-  event_sources: ['GFF 2026'],
+  // event sources are {name, active}. Historical scans keep their own string label,
+  // so deactivating a source never detaches past scans.
+  event_sources: [{ name: PERMANENT_EVENT, active: true }, { name: 'GFF 2026', active: true }],
   email_subject: 'Thank you for meeting MSME Catalyst at {{event}}',
   email_body: 'Dear {{first_name}},\n\nThank you for connecting with {{rep}} of MSME Catalyst at {{event}}. It was a pleasure to meet you. We would be glad to stay in touch and explore how MSME Catalyst can be useful to you and your organisation.\n\nWe will follow up shortly. In the meantime, feel free to reply to this email with anything you would like to discuss.',
   email_from_name: 'MSME Catalyst',
@@ -764,11 +831,30 @@ function scanSetting(key) {
   if (!row) return SCAN_DEFAULTS[key];
   try { return JSON.parse(row.value); } catch (e) { return row.value; }
 }
+// Normalise stored sources to {name, active}; migrate old string arrays; ensure the
+// permanent "General Meeting" source is always present and active.
+function eventSources() {
+  let raw = scanSetting('event_sources');
+  if (!Array.isArray(raw)) raw = SCAN_DEFAULTS.event_sources;
+  const out = [];
+  const seen = new Set();
+  for (const s of raw) {
+    const name = (typeof s === 'string' ? s : (s && s.name) || '').trim();
+    if (!name || seen.has(name.toLowerCase())) continue;
+    seen.add(name.toLowerCase());
+    out.push({ name, active: typeof s === 'object' && s ? s.active !== false : true });
+  }
+  if (!seen.has(PERMANENT_EVENT.toLowerCase())) out.unshift({ name: PERMANENT_EVENT, active: true });
+  else out.forEach(s => { if (s.name.toLowerCase() === PERMANENT_EVENT.toLowerCase()) s.active = true; });
+  return out;
+}
+function activeEventNames() { return eventSources().filter(s => s.active).map(s => s.name); }
 function scanConfig() {
-  const sources = scanSetting('event_sources');
+  const active = activeEventNames();
   return {
-    event_sources: Array.isArray(sources) && sources.length ? sources : SCAN_DEFAULTS.event_sources,
-    default_event: (Array.isArray(sources) && sources[0]) || 'GFF 2026',
+    event_sources: eventSources(),
+    active_events: active,
+    default_event: active[0] || PERMANENT_EVENT,
     email_subject: scanSetting('email_subject'), email_body: scanSetting('email_body'),
     email_from_name: scanSetting('email_from_name'), email_signature: scanSetting('email_signature'),
     representatives: scanSetting('representatives') || [],
@@ -778,41 +864,62 @@ function scanConfig() {
 function personalise(tmpl, vars) {
   return String(tmpl || '').replace(/\{\{\s*(first_name|event|rep|from_name)\s*\}\}/g, (_, k) => vars[k] != null ? vars[k] : '');
 }
-const normEmail = e => String(e || '').trim().toLowerCase();
-const normPhone = p => { const d = String(p || '').replace(/[^0-9]/g, ''); return d.length > 10 ? d.slice(-10) : d; };
-function domainOf(website, email) {
-  let d = '';
-  const w = String(website || '').trim();
-  if (w) { try { d = new URL(/^https?:/i.test(w) ? w : 'https://' + w).hostname.replace(/^www\./, '').toLowerCase(); } catch (e) {} }
-  if (!d && email && email.includes('@')) d = email.split('@')[1].toLowerCase();
-  const free = new Set(['gmail.com','yahoo.com','yahoo.co.in','outlook.com','hotmail.com','rediffmail.com','icloud.com','proton.me','protonmail.com','live.com','aol.com']);
-  return free.has(d) ? '' : d;
-}
 const validEmail = e => !e || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(e).trim());
-const validPhone = p => !p || /^[0-9+()\-.\s]{6,20}$/.test(String(p).trim());   // international-friendly
+const validPhone = p => !p || /^[+0-9()\-.\s]{6,24}$/.test(String(p).trim());   // international-friendly
 const scanMsg = s => ({
-  sent: 'Saved to CRM and thank-you email sent.',
-  queued: 'Saved to CRM; email queued/not yet sent (email service not configured).',
-  failed: 'Saved to CRM; email queued for retry (sending failed).',
-  skipped_duplicate: 'Saved to CRM; a thank-you was already sent to this contact for this event.',
-  skipped: 'Saved to CRM. No thank-you email was requested.',
+  sent: 'Saved and thank-you email sent.',
+  queued: 'Saved; thank-you email queued — not yet sent.',
+  failed: 'Saved; thank-you email failed and is available for retry.',
+  skipped_duplicate: 'Saved; a thank-you already exists for this contact at this event.',
+  skipped: 'Saved without a thank-you email (consent not provided).',
 }[s] || 'Saved to CRM.');
 
-// Config for the capture form (scanner + admin).
+/* Thank-you email idempotency key: at most one record per recipient (or contact)
+   per event. A durable UNIQUE index on this key enforces it even under concurrency. */
+function thankyouIdemKey(event, emailNorm, contactId) {
+  return 'thankyou|' + String(event) + '|' + (emailNorm || ('c' + contactId));
+}
+// Reset any email stuck in 'sending' (a process died mid-send) back to 'queued' so
+// it can be retried — but only after a safety delay, and never a terminal status.
+function recoverStaleSending(maxAgeMs = 5 * 60 * 1000) {
+  const cutoff = new Date(Date.now() - maxAgeMs).toISOString();
+  db.prepare("UPDATE emails SET status='queued' WHERE status='sending' AND (sent_at IS NULL) AND (created_at < ? OR created_at IS NULL)").run(cutoff);
+}
+/* Atomically claim a sendable email (queued/failed → sending), send it, then settle
+   to sent/failed/queued. Only ONE caller can claim a given row, so concurrent card
+   submits or concurrent retries can never send the same message twice. Historical
+   'legacy_unsent' and already-'sent'/'sending' rows are never claimed. */
+async function sendClaimed(emailId, testMode) {
+  const claimed = db.prepare("UPDATE emails SET status='sending', attempts=attempts+1 WHERE id=? AND status IN ('queued','failed')").run(emailId).changes === 1;
+  if (!claimed) { const r = db.prepare('SELECT status FROM emails WHERE id=?').get(emailId); return { claimed: false, status: r ? r.status : 'unknown' }; }
+  const e = db.prepare('SELECT * FROM emails WHERE id=?').get(emailId);
+  const sent = testMode ? { ok: testMode === 'sent', configured: true, error: testMode === 'fail' ? 'simulated failure' : undefined }
+    : await mailer.sendMail({ to: e.to_addr, subject: e.subject, text: e.body });
+  let status;
+  if (sent.ok) { status = 'sent'; db.prepare('UPDATE emails SET status=?,sent_at=?,last_error=NULL WHERE id=?').run(status, nowISO(), emailId); }
+  else if (sent.configured) { status = 'failed'; db.prepare('UPDATE emails SET status=?,last_error=? WHERE id=?').run(status, String(sent.error || 'send failed').slice(0, 300), emailId); }
+  else { status = 'queued'; db.prepare('UPDATE emails SET status=?,last_error=? WHERE id=?').run(status, 'SMTP not configured', emailId); }
+  return { claimed: true, status };
+}
+
+// Config for the capture form (scanner + admin). Only ACTIVE event sources and
+// the (validated) representative list are exposed to the capture UI.
 app.get('/api/scan/config', requireAuth, (req, res) => {
   if (!canScan(req.user)) return forbid(res);
   const c = scanConfig();
-  res.json({ event_sources: c.event_sources, default_event: c.default_event,
-    email_configured: c.email_configured, me: { name: req.user.name, email: req.user.email } });
+  res.json({ event_sources: c.active_events, default_event: c.default_event,
+    representatives: c.representatives, email_configured: c.email_configured,
+    me: { id: req.user.id, name: req.user.name, email: req.user.email } });
 });
 
 // Submit a reviewed card. The image is NEVER uploaded — only reviewed fields.
 app.post('/api/scan/card', requireAuth, scanLimit, async (req, res) => {
   if (!canScan(req.user)) return forbid(res);
   const b = req.body || {};
+  // 1) Validate + sanitise every submitted value.
   const T = (v, n = 500) => stripText(v).slice(0, n);
   const name = T(b.full_name), designation = T(b.designation), org = T(b.organisation);
-  const email = stripText(b.email).trim();
+  const email = stripText(b.email).trim().slice(0, 200);
   const mobile = T(b.mobile, 40), alt = T(b.alternate, 40);
   const city = T(b.city), state = T(b.state), country = T(b.country);
   const address = T(b.address, 1000), notes = T(b.notes, 2000), interests = T(b.areas_of_interest, 500);
@@ -825,85 +932,128 @@ app.post('/api/scan/card', requireAuth, scanLimit, async (req, res) => {
   if (!name && !org && !email) return res.status(400).json({ error: 'Enter at least a name, organisation or email.' });
 
   const cfg = scanConfig();
-  let event = T(b.event_source, 80) || cfg.default_event;
-  if (!cfg.event_sources.includes(event)) event = cfg.default_event;   // only configured sources
+  const active = cfg.active_events;
+  let event = T(b.event_source, 80);
+  if (!active.includes(event)) event = cfg.default_event;              // only ACTIVE configured sources
   const consent = b.consent === true || b.consent === 'true' || b.consent === 1;
-  const followOwner = T(b.follow_up_owner, 120) || (req.user.name || '');
   const followDate = /^\d{4}-\d{2}-\d{2}$/.test(b.follow_up_date || '') ? b.follow_up_date : null;
-  const emailNorm = normEmail(email), phoneNorm = normPhone(mobile), domain = domainOf(website, email);
+  // Follow-up owner: validate against configured representatives (or the submitter).
+  // A scanner cannot assign work to an arbitrary unvalidated value.
+  const reps = (cfg.representatives || []).map(r => String(r));
+  const proposedOwner = T(b.follow_up_owner, 120);
+  const ownerAllowed = proposedOwner && (reps.some(r => r.toLowerCase() === proposedOwner.toLowerCase()) || proposedOwner.toLowerCase() === (req.user.name || '').toLowerCase());
+  const ownerName = ownerAllowed ? proposedOwner : (req.user.name || req.user.email);
+  const ownerUser = ownerAllowed ? db.prepare('SELECT id FROM users WHERE lower(name)=? OR lower(email)=?').get(ownerName.toLowerCase(), ownerName.toLowerCase()) : { id: req.user.id };
+  const ownerId = ownerUser ? ownerUser.id : req.user.id;
 
-  // ---- de-duplication (email → phone → org domain/name); never silently overwrite ----
-  let contact = null;
-  if (emailNorm) contact = db.prepare('SELECT * FROM contacts WHERE email_norm=?').get(emailNorm);
-  if (!contact && phoneNorm) contact = db.prepare("SELECT * FROM contacts WHERE phone_norm=? AND phone_norm<>''").get(phoneNorm);
-  let org_id = null, isDup = !!contact;
-  if (contact) org_id = contact.org_id;
-  else {
-    let orgRow = null;
-    if (domain) orgRow = db.prepare("SELECT * FROM organisations WHERE domain=? AND domain<>''").get(domain);
-    if (!orgRow && org) orgRow = db.prepare('SELECT * FROM organisations WHERE lower(legal_name)=? OR lower(brand_name)=?').get(org.toLowerCase(), org.toLowerCase());
-    if (orgRow) {
-      org_id = orgRow.id;
-      const upd = {}; const cand = { website: website || '', address, city, state, country, domain };
-      Object.keys(cand).forEach(k => { if (cand[k] && !orgRow[k]) upd[k] = cand[k]; });   // fill blanks only
-      const keys = Object.keys(upd);
-      if (keys.length) db.prepare(`UPDATE organisations SET ${keys.map(k => k + '=?').join(',')},updated_at=? WHERE id=?`).run(...keys.map(k => upd[k]), nowISO(), orgRow.id);
-    } else {
-      const info = db.prepare('INSERT INTO organisations(legal_name,brand_name,website,address,city,state,country,domain,category,membership_status,application_date,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)')
-        .run(org || name || '(from card)', org || '', website || '', address, city, state, country, domain, 'Prospect', 'Prospect', nowISO().slice(0, 10), nowISO(), nowISO());
-      org_id = info.lastInsertRowid;
-    }
-  }
-  // ---- contact upsert: enrich blanks, append the event interaction to notes ----
-  let contact_id;
-  if (contact) {
-    const upd = {}; const cand = { name, designation, email, phone: mobile, phone_alt: alt, linkedin: linkedin || '', areas_of_interest: interests };
-    Object.keys(cand).forEach(k => { if (cand[k] && !contact[k]) upd[k] = cand[k]; });
-    const line = `[${event} · ${nowISO().slice(0, 10)}${req.user.name ? ' · ' + req.user.name : ''}] ${notes || 'card re-scanned'}`;
-    upd.notes = (contact.notes ? contact.notes + '\n' : '') + line;
-    upd.email_norm = contact.email_norm || emailNorm; upd.phone_norm = contact.phone_norm || phoneNorm;
-    upd.event_source = contact.event_source || event; upd.updated_at = nowISO();
-    const keys = Object.keys(upd);
-    db.prepare(`UPDATE contacts SET ${keys.map(k => k + '=?').join(',')} WHERE id=?`).run(...keys.map(k => upd[k]), contact.id);
-    contact_id = contact.id;
-  } else {
-    const info = db.prepare(`INSERT INTO contacts(org_id,type,name,designation,email,phone,phone_alt,linkedin,notes,areas_of_interest,email_norm,phone_norm,source,event_source,submitted_by,is_primary,created_at,updated_at)
-      VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,?,?)`).run(org_id, 'Event contact', name, designation, email, mobile, alt, linkedin || '', notes, interests, emailNorm, phoneNorm, 'card_scan', event, req.user.id, nowISO(), nowISO());
-    contact_id = info.lastInsertRowid;
-  }
-  // ---- follow-up task ----
-  db.prepare('INSERT INTO tasks(title,due,org_id,created_at) VALUES(?,?,?,?)')
-    .run(`Follow up: ${name || org || email || 'contact'} (${event})` + (followOwner ? ` — ${followOwner}` : ''), followDate || '', org_id, nowISO());
+  const emailNorm = normEmail(email), phoneNorm = normPhone(mobile), domain = orgDomain(website, email);
+  const wantEmail = consent && !!email && validEmail(email);
+  const failAt = process.env.ALLOW_TEST_HOOKS === '1' ? req.headers['x-test-fail'] : null;
+  const idemKey = wantEmail ? thankyouIdemKey(event, emailNorm, 0) : null;   // recipient+event (contact filled after upsert)
 
-  // ---- thank-you email: only on consent + valid email; prevent duplicates; queue on failure ----
-  let emailStatus = 'skipped', emailErr = null;
-  const wantEmail = consent && email && validEmail(email);
-  if (wantEmail) {
-    const already = db.prepare("SELECT 1 FROM emails WHERE template='thankyou' AND event_source=? AND lower(to_addr)=? AND status='sent'").get(event, emailNorm);
-    if (already) emailStatus = 'skipped_duplicate';
-    else {
-      const first = (name || '').split(/\s+/)[0] || 'there';
-      const rep = followOwner || req.user.name || cfg.email_from_name;
-      const subject = personalise(cfg.email_subject, { first_name: first, event, rep, from_name: cfg.email_from_name });
-      const bodyText = personalise(cfg.email_body, { first_name: first, event, rep, from_name: cfg.email_from_name }) + '\n\n' + cfg.email_signature;
-      const eInfo = db.prepare('INSERT INTO emails(to_addr,subject,body,template,org_id,contact_id,event_source,status,attempts,created_at) VALUES(?,?,?,?,?,?,?,?,?,?)')
-        .run(email, subject, bodyText, 'thankyou', org_id, contact_id, event, 'queued', 0, nowISO());
-      const emailId = eInfo.lastInsertRowid;
-      // Test-only hook (never active in production) to exercise sent/failed paths deterministically.
-      const tm = process.env.ALLOW_TEST_HOOKS === '1' ? req.headers['x-test-mail'] : null;
-      const sent = tm ? { ok: tm === 'sent', configured: true, error: tm === 'fail' ? 'simulated failure' : undefined }
-        : await mailer.sendMail({ to: email, subject, text: bodyText });
-      if (sent.ok) { emailStatus = 'sent'; db.prepare('UPDATE emails SET status=?,attempts=1,sent_at=? WHERE id=?').run('sent', nowISO(), emailId); }
-      else { emailStatus = sent.configured ? 'failed' : 'queued'; emailErr = sent.error || (sent.configured ? 'send failed' : 'SMTP not configured');
-        db.prepare('UPDATE emails SET status=?,attempts=1,last_error=? WHERE id=?').run(emailStatus, emailErr, emailId); }
-    }
+  // 2) & 3) Resolve de-duplication and write ALL CRM rows in ONE transaction.
+  let result;
+  try {
+    result = db.transaction(() => {
+      // -- de-duplication: email_norm → comparable phone_norm → org domain/name --
+      let contact = null;
+      if (emailNorm) contact = db.prepare('SELECT * FROM contacts WHERE email_norm=?').get(emailNorm);
+      if (!contact && phoneComparable(phoneNorm)) contact = db.prepare("SELECT * FROM contacts WHERE phone_norm=? AND phone_norm<>''").get(phoneNorm);
+      const isDup = !!contact;
+      let org_id = contact ? contact.org_id : null;
+      if (!contact) {
+        let orgRow = null;
+        if (domain) orgRow = db.prepare("SELECT * FROM organisations WHERE domain=? AND domain<>''").get(domain);
+        if (!orgRow && org) orgRow = db.prepare('SELECT * FROM organisations WHERE lower(legal_name)=? OR lower(brand_name)=?').get(org.toLowerCase(), org.toLowerCase());
+        if (orgRow) {
+          org_id = orgRow.id;
+          const upd = {}; const cand = { website: website || '', address, city, state, country, domain };
+          Object.keys(cand).forEach(k => { if (cand[k] && !orgRow[k]) upd[k] = cand[k]; });
+          const keys = Object.keys(upd);
+          if (keys.length) db.prepare(`UPDATE organisations SET ${keys.map(k => k + '=?').join(',')},updated_at=? WHERE id=?`).run(...keys.map(k => upd[k]), nowISO(), orgRow.id);
+        } else {
+          const info = db.prepare('INSERT INTO organisations(legal_name,brand_name,website,address,city,state,country,domain,category,membership_status,application_date,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)')
+            .run(org || name || '(from card)', org || '', website || '', address, city, state, country, domain, 'Prospect', 'Prospect', nowISO().slice(0, 10), nowISO(), nowISO());
+          org_id = info.lastInsertRowid;
+        }
+      }
+      if (failAt === 'org') throw new Error('injected failure: org');
+
+      // -- contact: enrich blanks only, append the event interaction --
+      let contact_id;
+      if (contact) {
+        const upd = {}; const cand = { name, designation, email, phone: mobile, phone_alt: alt, linkedin: linkedin || '', areas_of_interest: interests };
+        Object.keys(cand).forEach(k => { if (cand[k] && !contact[k]) upd[k] = cand[k]; });
+        const line = `[${event} · ${nowISO().slice(0, 10)}${req.user.name ? ' · ' + req.user.name : ''}] ${notes || 'card re-scanned'}`;
+        upd.notes = (contact.notes ? contact.notes + '\n' : '') + line;
+        upd.email_norm = contact.email_norm || emailNorm; upd.phone_norm = contact.phone_norm || phoneNorm;
+        upd.event_source = contact.event_source || event; upd.updated_at = nowISO();
+        const keys = Object.keys(upd);
+        db.prepare(`UPDATE contacts SET ${keys.map(k => k + '=?').join(',')} WHERE id=?`).run(...keys.map(k => upd[k]), contact.id);
+        contact_id = contact.id;
+      } else {
+        const info = db.prepare(`INSERT INTO contacts(org_id,type,name,designation,email,phone,phone_alt,linkedin,notes,areas_of_interest,email_norm,phone_norm,source,event_source,submitted_by,is_primary,created_at,updated_at)
+          VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,?,?)`).run(org_id, 'Event contact', name, designation, email, mobile, alt, linkedin || '', notes, interests, emailNorm, phoneNorm, 'card_scan', event, req.user.id, nowISO(), nowISO());
+        contact_id = info.lastInsertRowid;
+      }
+      if (failAt === 'contact') throw new Error('injected failure: contact');
+
+      // -- follow-up task (stable owner id + readable name) --
+      db.prepare('INSERT INTO tasks(title,due,org_id,owner_id,owner_name,event_source,created_at) VALUES(?,?,?,?,?,?,?)')
+        .run(`Follow up: ${name || org || email || 'contact'} (${event})`, followDate || '', org_id, ownerId, ownerName, event, nowISO());
+      if (failAt === 'task') throw new Error('injected failure: task');
+
+      // -- exactly one queued thank-you record (idempotent via unique idem_key) --
+      let emailId = null, emailState = 'skipped';
+      if (wantEmail) {
+        const key = thankyouIdemKey(event, emailNorm, contact_id);
+        const existing = db.prepare('SELECT id,status FROM emails WHERE idem_key=?').get(key);
+        if (existing) {
+          emailId = existing.id;
+          emailState = (existing.status === 'sent' || existing.status === 'sending') ? 'skipped_duplicate' : 'reuse';
+        } else {
+          const first = (name || '').split(/\s+/)[0] || 'there';
+          const rep = ownerName || cfg.email_from_name;
+          const subject = personalise(cfg.email_subject, { first_name: first, event, rep, from_name: cfg.email_from_name });
+          const bodyText = personalise(cfg.email_body, { first_name: first, event, rep, from_name: cfg.email_from_name }) + '\n\n' + cfg.email_signature;
+          try {
+            const eInfo = db.prepare('INSERT INTO emails(to_addr,subject,body,template,org_id,contact_id,event_source,status,attempts,idem_key,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)')
+              .run(email, subject, bodyText, 'thankyou', org_id, contact_id, event, 'queued', 0, key, nowISO());
+            emailId = eInfo.lastInsertRowid; emailState = 'new';
+          } catch (e) {
+            // Lost a concurrent race on the unique index → reuse the row the winner created.
+            const row = db.prepare('SELECT id,status FROM emails WHERE idem_key=?').get(key);
+            if (row) { emailId = row.id; emailState = (row.status === 'sent' || row.status === 'sending') ? 'skipped_duplicate' : 'reuse'; }
+          }
+        }
+      }
+      if (failAt === 'email') throw new Error('injected failure: email');
+
+      const initialStatus = !wantEmail ? 'skipped' : (emailState === 'skipped_duplicate' ? 'skipped_duplicate' : 'pending');
+      const scanInfo = db.prepare(`INSERT INTO card_scans(submitter_id,submitter_email,submitter_name,org_id,contact_id,event_source,follow_up_owner,follow_up_owner_id,follow_up_date,consent,is_duplicate,email_status,email_id,email_attempts,raw_json,ip,created_at)
+        VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).run(req.user.id, req.user.email, req.user.name || '', org_id, contact_id, event, ownerName, ownerId, followDate, consent ? 1 : 0, isDup ? 1 : 0,
+          initialStatus, emailId, 0, JSON.stringify({ name, designation, org, email, mobile, alt, website, linkedin, city, state, country, address, interests, notes }), clientIp(req), nowISO());
+      return { org_id, contact_id, scan_id: scanInfo.lastInsertRowid, isDup, emailId, emailState };
+    })();
+  } catch (e) {
+    // Transaction rolled back — nothing partial persisted. Never leak internals.
+    if (String(e.message || '').startsWith('injected failure')) return res.status(500).json({ error: 'Could not save the card (test-injected failure). Nothing was saved.' });
+    console.error('scan/card transaction failed:', e.message);
+    return res.status(500).json({ error: 'Could not save the card. Please try again.' });
   }
-  const scanInfo = db.prepare(`INSERT INTO card_scans(submitter_id,submitter_email,submitter_name,org_id,contact_id,event_source,follow_up_owner,follow_up_date,consent,is_duplicate,email_status,email_attempts,email_last_error,email_sent_at,raw_json,ip,created_at)
-    VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).run(req.user.id, req.user.email, req.user.name || '', org_id, contact_id, event, followOwner, followDate, consent ? 1 : 0, isDup ? 1 : 0,
-      emailStatus, wantEmail && emailStatus !== 'skipped_duplicate' ? 1 : 0, emailErr, emailStatus === 'sent' ? nowISO() : null,
-      JSON.stringify({ name, designation, org, email, mobile, alt, website, linkedin, city, state, country, address, interests, notes }), clientIp(req), nowISO());
-  audit(req, 'card_captured', 'card_scan', scanInfo.lastInsertRowid, `${event} · ${email || name || org}${isDup ? ' · duplicate' : ''} · email:${emailStatus}`);
-  res.json({ ok: true, duplicate: isDup, contact_id, org_id, email_status: emailStatus, message: scanMsg(emailStatus) });
+
+  // 4)–6) CRM is committed. Now attempt SMTP for a fresh/queued email and settle status.
+  let emailStatus = result.emailState === 'skipped_duplicate' ? 'skipped_duplicate' : (wantEmail ? 'queued' : 'skipped');
+  if (wantEmail && (result.emailState === 'new' || result.emailState === 'reuse') && result.emailId) {
+    const tm = process.env.ALLOW_TEST_HOOKS === '1' ? req.headers['x-test-mail'] : null;
+    recoverStaleSending();
+    const r = await sendClaimed(result.emailId, tm);
+    emailStatus = r.claimed ? r.status : (r.status === 'sent' ? 'skipped_duplicate' : r.status);
+  }
+  db.prepare('UPDATE card_scans SET email_status=?, email_attempts=(SELECT COALESCE(attempts,0) FROM emails WHERE id=?), email_sent_at=? WHERE id=?')
+    .run(emailStatus, result.emailId, emailStatus === 'sent' ? nowISO() : null, result.scan_id);
+  audit(req, 'card_captured', 'card_scan', result.scan_id, `${event} · ${email || name || org}${result.isDup ? ' · duplicate' : ''} · email:${emailStatus}`);
+  res.json({ ok: true, duplicate: result.isDup, contact_id: result.contact_id, org_id: result.org_id, email_status: emailStatus, message: scanMsg(emailStatus) });
 });
 
 // Super Admin: scanner settings (event sources + editable email template).
@@ -916,8 +1066,18 @@ app.put('/api/settings/scan', requireAuth, (req, res) => {
   const b = req.body || {};
   const save = (k, v) => db.prepare('INSERT INTO settings(key,value,updated_at,updated_by) VALUES(?,?,?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at,updated_by=excluded.updated_by')
     .run('scan.' + k, JSON.stringify(v), nowISO(), req.user.id);
-  if (Array.isArray(b.event_sources)) save('event_sources', b.event_sources.map(s => stripText(s).slice(0, 80)).filter(Boolean).slice(0, 50));
-  if (Array.isArray(b.representatives)) save('representatives', b.representatives.map(s => stripText(s).slice(0, 120)).filter(Boolean).slice(0, 50));
+  if (Array.isArray(b.event_sources)) {
+    const cleaned = b.event_sources.map(s => {
+      const name = stripText(typeof s === 'string' ? s : (s && s.name) || '').slice(0, 80);
+      const activeFlag = typeof s === 'object' && s ? s.active !== false : true;
+      return name ? { name, active: activeFlag } : null;
+    }).filter(Boolean).slice(0, 100);
+    // Never allow the permanent source to be dropped or deactivated.
+    if (!cleaned.some(s => s.name.toLowerCase() === PERMANENT_EVENT.toLowerCase())) cleaned.unshift({ name: PERMANENT_EVENT, active: true });
+    else cleaned.forEach(s => { if (s.name.toLowerCase() === PERMANENT_EVENT.toLowerCase()) s.active = true; });
+    save('event_sources', cleaned);
+  }
+  if (Array.isArray(b.representatives)) save('representatives', b.representatives.map(s => stripText(s).slice(0, 120)).filter(Boolean).slice(0, 100));
   ['email_subject', 'email_from_name', 'email_signature'].forEach(k => { if (typeof b[k] === 'string') save(k, stripText(b[k]).slice(0, 400)); });
   if (typeof b.email_body === 'string') save('email_body', stripText(b.email_body).slice(0, 4000));
   audit(req, 'scan_settings_updated', 'settings', 'scan', null);
@@ -927,7 +1087,7 @@ app.put('/api/settings/scan', requireAuth, (req, res) => {
 app.post('/api/settings/scan/test-email', requireAuth, async (req, res) => {
   if (!ROLES[req.user.role]?.all) return forbid(res);
   const to = stripText((req.body && req.body.email) || '').trim();
-  if (!validEmail(to) || !to) return res.status(400).json({ error: 'Enter a valid test recipient email.' });
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) return res.status(400).json({ error: 'Enter a valid test recipient email.' });
   const cfg = scanConfig();
   const subject = personalise(cfg.email_subject, { first_name: 'there', event: cfg.default_event, rep: req.user.name || cfg.email_from_name, from_name: cfg.email_from_name });
   const bodyText = personalise(cfg.email_body, { first_name: 'there', event: cfg.default_event, rep: req.user.name || cfg.email_from_name, from_name: cfg.email_from_name }) + '\n\n' + cfg.email_signature;
@@ -937,7 +1097,8 @@ app.post('/api/settings/scan/test-email', requireAuth, async (req, res) => {
   res.status(sent.configured ? 502 : 200).json({ ok: false, configured: sent.configured, message: sent.configured ? ('Send failed: ' + (sent.error || 'unknown')) : 'Email is not configured (SMTP env vars not set). Nothing was sent.' });
 });
 
-// CRM roles: browse / filter / export captured cards. Scanners are blocked (lockdown above).
+// CRM roles: browse / filter captured cards. Scanners are blocked (lockdown above).
+// EXPLICIT column list — never returns raw_json, ip or internal error details.
 app.get('/api/crm/scans', requireAuth, (req, res) => {
   if (!canCRMRead(req.user)) return forbid(res);
   const { event, user, from, to, email_status } = req.query;
@@ -947,10 +1108,26 @@ app.get('/api/crm/scans', requireAuth, (req, res) => {
   if (email_status) { where.push('s.email_status=?'); args.push(email_status); }
   if (from) { where.push('s.created_at>=?'); args.push(from); }
   if (to) { where.push('s.created_at<=?'); args.push(to + 'T23:59:59'); }
-  const sql = `SELECT s.*, c.name AS contact_name, c.email AS contact_email, o.legal_name AS org_name
+  const sql = `SELECT s.id, s.created_at, s.event_source, s.submitter_id, s.submitter_email, s.submitter_name,
+      s.follow_up_owner, s.follow_up_date, s.consent, s.is_duplicate, s.email_status, s.email_attempts,
+      c.name AS contact_name, c.email AS contact_email, c.phone AS contact_phone, o.legal_name AS org_name
     FROM card_scans s LEFT JOIN contacts c ON c.id=s.contact_id LEFT JOIN organisations o ON o.id=s.org_id
     ${where.length ? 'WHERE ' + where.join(' AND ') : ''} ORDER BY s.id DESC LIMIT 1000`;
   res.json({ scans: db.prepare(sql).all(...args) });
+});
+// Authorized detail (CRM writers / Super Admin only): the full reviewed snapshot.
+// raw_json is retained ONLY as a per-card audit of exactly what the representative
+// confirmed; it is never in the list or CSV, and never reachable by a scanner.
+app.get('/api/crm/scans/:id', requireAuth, (req, res) => {
+  if (!canCRMWrite(req.user)) return forbid(res);
+  const s = db.prepare(`SELECT s.id,s.created_at,s.event_source,s.submitter_email,s.submitter_name,s.follow_up_owner,s.follow_up_date,
+      s.consent,s.is_duplicate,s.email_status,s.email_attempts,s.raw_json, c.name AS contact_name, c.email AS contact_email, o.legal_name AS org_name
+    FROM card_scans s LEFT JOIN contacts c ON c.id=s.contact_id LEFT JOIN organisations o ON o.id=s.org_id WHERE s.id=?`).get(req.params.id);
+  if (!s) return res.status(404).json({ error: 'Not found' });
+  let reviewed = {}; try { reviewed = JSON.parse(s.raw_json || '{}'); } catch (e) {}
+  delete s.raw_json;
+  audit(req, 'scan_detail_viewed', 'card_scan', s.id, null);
+  res.json({ scan: s, reviewed });
 });
 app.get('/api/crm/scans.csv', requireAuth, (req, res) => {
   if (!canCRMRead(req.user)) return forbid(res);
@@ -964,37 +1141,35 @@ app.get('/api/crm/scans.csv', requireAuth, (req, res) => {
   res.setHeader('Content-Type', 'text/csv'); res.setHeader('Content-Disposition', 'attachment; filename="card-scans.csv"');
   res.send(csv);
 });
-// Retry a failed/queued thank-you email (Super Admin / CRM writers).
+// Retry a failed/queued thank-you email (Super Admin / CRM writers). Uses the
+// atomic claim so two admins retrying at once cannot send twice. 'legacy_unsent'
+// historical rows are never retriable (they are not queued/failed).
+async function retryEmailRow(req, res, e) {
+  if (e.status === 'sent') return res.json({ ok: true, status: 'sent', message: 'Already sent.' });
+  if (!['queued', 'failed'].includes(e.status)) return res.status(400).json({ error: 'This email is not eligible for retry.' });
+  recoverStaleSending();
+  const tm = process.env.ALLOW_TEST_HOOKS === '1' ? req.headers['x-test-mail'] : null;
+  const r = await sendClaimed(e.id, tm);
+  if (e.contact_id) db.prepare("UPDATE card_scans SET email_status=?, email_attempts=(SELECT COALESCE(attempts,0) FROM emails WHERE id=?), email_sent_at=? WHERE email_id=?")
+    .run(r.status, e.id, r.status === 'sent' ? nowISO() : null, e.id);
+  audit(req, 'email_retried', 'email', e.id, r.claimed ? r.status : ('noop:' + r.status));
+  res.json({ ok: r.status === 'sent', status: r.status, claimed: r.claimed,
+    message: r.status === 'sent' ? 'Email sent.' : (r.claimed ? 'Kept for retry.' : 'Another process is handling this email.') });
+}
 app.post('/api/crm/emails/:id/retry', requireAuth, async (req, res) => {
   if (!canCRMWrite(req.user)) return forbid(res);
   const e = db.prepare('SELECT * FROM emails WHERE id=?').get(req.params.id);
   if (!e) return res.status(404).json({ error: 'Not found' });
-  if (e.status === 'sent') return res.json({ ok: true, status: 'sent', message: 'Already sent.' });
-  const sent = await mailer.sendMail({ to: e.to_addr, subject: e.subject, text: e.body });
-  const attempts = (e.attempts || 0) + 1;
-  const status = sent.ok ? 'sent' : (sent.configured ? 'failed' : 'queued');
-  db.prepare('UPDATE emails SET status=?,attempts=?,last_error=?,sent_at=? WHERE id=?')
-    .run(status, attempts, sent.ok ? null : (sent.error || 'SMTP not configured'), sent.ok ? nowISO() : null, e.id);
-  if (e.contact_id) db.prepare('UPDATE card_scans SET email_status=?,email_attempts=email_attempts+1,email_sent_at=? WHERE contact_id=? AND event_source=?')
-    .run(status, sent.ok ? nowISO() : null, e.contact_id, e.event_source);
-  audit(req, 'email_retried', 'email', e.id, status);
-  res.json({ ok: sent.ok, status, message: sent.ok ? 'Email sent.' : (sent.configured ? 'Send failed; kept for retry.' : 'Email not configured; still queued.') });
+  return retryEmailRow(req, res, e);
 });
-
-// Retry the thank-you email for a specific captured card.
 app.post('/api/crm/scans/:id/retry-email', requireAuth, async (req, res) => {
   if (!canCRMWrite(req.user)) return forbid(res);
   const s = db.prepare('SELECT * FROM card_scans WHERE id=?').get(req.params.id);
   if (!s) return res.status(404).json({ error: 'Not found' });
-  const e = db.prepare("SELECT * FROM emails WHERE template='thankyou' AND contact_id=? AND event_source=? AND status<>'sent' ORDER BY id DESC").get(s.contact_id, s.event_source);
-  if (!e) return res.status(400).json({ error: 'No queued email to retry for this card.' });
-  const sent = await mailer.sendMail({ to: e.to_addr, subject: e.subject, text: e.body });
-  const status = sent.ok ? 'sent' : (sent.configured ? 'failed' : 'queued');
-  db.prepare('UPDATE emails SET status=?,attempts=?,last_error=?,sent_at=? WHERE id=?')
-    .run(status, (e.attempts || 0) + 1, sent.ok ? null : (sent.error || 'SMTP not configured'), sent.ok ? nowISO() : null, e.id);
-  db.prepare('UPDATE card_scans SET email_status=?,email_attempts=email_attempts+1,email_sent_at=? WHERE id=?').run(status, sent.ok ? nowISO() : null, s.id);
-  audit(req, 'email_retried', 'card_scan', s.id, status);
-  res.json({ ok: sent.ok, status });
+  const e = s.email_id ? db.prepare('SELECT * FROM emails WHERE id=?').get(s.email_id)
+    : db.prepare("SELECT * FROM emails WHERE template='thankyou' AND contact_id=? AND event_source=? AND status IN ('queued','failed') ORDER BY id DESC").get(s.contact_id, s.event_source);
+  if (!e) return res.status(400).json({ error: 'No queued or failed email to retry for this card.' });
+  return retryEmailRow(req, res, e);
 });
 
 /* ---------------- static ---------------- */
