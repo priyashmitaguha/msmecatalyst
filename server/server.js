@@ -630,7 +630,10 @@ catch (e) { console.warn('content-registry.json not found — run `python3 build
 app.get('/api/public/pagecopy', (req, res) => {
   const rows = db.prepare('SELECT key,value FROM pagecopy').all();
   const copy = {}; rows.forEach(r => { copy[r.key] = r.value; });
-  res.json({ copy });
+  // Tell the client which overridden fields are multiline, so paragraph breaks are
+  // preserved as semantic <p> elements when rendered.
+  const multiline = Object.keys(copy).filter(k => REGISTRY[k] && REGISTRY[k].multiline);
+  res.json({ copy, multiline });
 });
 // Admin: registry (labels + defaults) merged with current overrides, grouped by page.
 app.get('/api/pagecopy', requireAuth, (req, res) => {
