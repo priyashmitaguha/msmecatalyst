@@ -1609,60 +1609,53 @@
     "multiline": true,
     "page": "membership"
   },
-  "membership.c22": {
+  "membership.c23": {
     "default": "Fund the infrastructure that makes MSME growth support usable.",
     "kind": "html",
     "label": "Heading: Fund the infrastructure that makes MSME growth…",
     "multiline": false,
     "page": "membership"
   },
-  "membership.c23": {
+  "membership.c24": {
     "default": "Donor and CSR funding supports cluster capability centres, enterprise readiness, local coordination, payment-friction support, monitoring, evaluation and reusable execution playbooks.",
     "kind": "html",
     "label": "Paragraph: Donor and CSR funding supports cluster capabil…",
     "multiline": true,
     "page": "membership"
   },
-  "membership.c24": {
+  "membership.c25": {
     "default": "Cluster capability centres",
     "kind": "html",
     "label": "Subheading: Cluster capability centres",
     "multiline": false,
     "page": "membership"
   },
-  "membership.c25": {
+  "membership.c26": {
     "default": "The physical and human infrastructure that makes support reachable.",
     "kind": "html",
     "label": "Paragraph: The physical and human infrastructure that mak…",
     "multiline": true,
     "page": "membership"
   },
-  "membership.c26": {
+  "membership.c27": {
     "default": "Local coordination",
     "kind": "html",
     "label": "Subheading: Local coordination",
     "multiline": false,
     "page": "membership"
   },
-  "membership.c27": {
+  "membership.c28": {
     "default": "The convening capacity that keeps participants aligned.",
     "kind": "html",
     "label": "Paragraph: The convening capacity that keeps participants…",
     "multiline": true,
     "page": "membership"
   },
-  "membership.c28": {
+  "membership.c29": {
     "default": "Enterprise readiness",
     "kind": "html",
     "label": "Subheading: Enterprise readiness",
     "multiline": false,
-    "page": "membership"
-  },
-  "membership.c29": {
-    "default": "Preparation and documentation that let support land.",
-    "kind": "html",
-    "label": "Paragraph: Preparation and documentation that let support…",
-    "multiline": true,
     "page": "membership"
   },
   "membership.c3": {
@@ -1673,80 +1666,73 @@
     "page": "membership"
   },
   "membership.c30": {
+    "default": "Preparation and documentation that let support land.",
+    "kind": "html",
+    "label": "Paragraph: Preparation and documentation that let support…",
+    "multiline": true,
+    "page": "membership"
+  },
+  "membership.c31": {
     "default": "Payment-friction support",
     "kind": "html",
     "label": "Subheading: Payment-friction support",
     "multiline": false,
     "page": "membership"
   },
-  "membership.c31": {
+  "membership.c32": {
     "default": "Case preparation and neutral referral for receivables.",
     "kind": "html",
     "label": "Paragraph: Case preparation and neutral referral for rece…",
     "multiline": true,
     "page": "membership"
   },
-  "membership.c32": {
+  "membership.c33": {
     "default": "Monitoring &amp; evaluation",
     "kind": "html",
     "label": "Subheading: Monitoring & evaluation",
     "multiline": false,
     "page": "membership"
   },
-  "membership.c33": {
+  "membership.c34": {
     "default": "Scorecards, dashboards and honest measurement of outcomes.",
     "kind": "html",
     "label": "Paragraph: Scorecards, dashboards and honest measurement…",
     "multiline": true,
     "page": "membership"
   },
-  "membership.c34": {
+  "membership.c35": {
     "default": "Reusable execution playbooks",
     "kind": "html",
     "label": "Subheading: Reusable execution playbooks",
     "multiline": false,
     "page": "membership"
   },
-  "membership.c35": {
+  "membership.c36": {
     "default": "Learning packaged so the next cluster starts ahead.",
     "kind": "html",
     "label": "Paragraph: Learning packaged so the next cluster starts a…",
     "multiline": true,
     "page": "membership"
   },
-  "membership.c36": {
+  "membership.c37": {
     "default": "Safeguards",
     "kind": "html",
     "label": "Subheading: Safeguards",
     "multiline": false,
     "page": "membership"
   },
-  "membership.c37": {
+  "membership.c38": {
     "default": "Funding does not buy influence over individual lending decisions, ODR referrals, policy positions or case outcomes",
     "kind": "html",
     "label": "List item: Funding does not buy influence over individual…",
     "multiline": true,
     "page": "membership"
   },
-  "membership.c38": {
+  "membership.c39": {
     "default": "Donors receive outcome and learning reporting, not operational control",
     "kind": "html",
     "label": "List item: Donors receive outcome and learning reporting,…",
     "multiline": true,
-    "page": "membership"
-  },
-  "membership.c39": {
-    "default": "Talk to us about funding",
-    "kind": "html",
-    "label": "Link: Talk to us about funding",
-    "multiline": false,
-    "page": "membership"
-  },
-  "membership.c39_href": {
-    "default": "contact.html",
-    "kind": "url",
-    "label": "Link URL: Talk to us about funding",
-    "multiline": false,
     "page": "membership"
   },
   "membership.c4": {
@@ -1754,6 +1740,20 @@
     "kind": "html",
     "label": "List item: Fintechs, TSPs, LSPs, data and infrastructure…",
     "multiline": true,
+    "page": "membership"
+  },
+  "membership.c40": {
+    "default": "Talk to us about funding",
+    "kind": "html",
+    "label": "Link: Talk to us about funding",
+    "multiline": false,
+    "page": "membership"
+  },
+  "membership.c40_href": {
+    "default": "contact.html",
+    "kind": "url",
+    "label": "Link URL: Talk to us about funding",
+    "multiline": false,
     "page": "membership"
   },
   "membership.c5": {

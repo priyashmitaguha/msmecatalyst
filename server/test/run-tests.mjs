@@ -586,6 +586,36 @@ const waitHealth = async () => { for (let i = 0; i < 50; i++) { try { const r = 
     ok('internal CRM/developer note is absent from the public membership page', !/In production these tiles/.test(readFileSync(join(PUBLIC, 'membership.html'), 'utf8')));
     ok('member eligibility is still enforced server-side (endpoint returns members)', (await api('/api/public/members')).data.members.length >= 1);
 
+    console.log('\nDATA PRESERVATION ACROSS RESTART + MIGRATION');
+    // Save distinctive CMS content on the running server: a page-copy override on a
+    // stable membership key (proves the note-removal did not renumber it) and a
+    // published collection entry with multi-paragraph content.
+    const preserveVal = 'PRESERVED-c23-' + Date.now();
+    await api('/api/pagecopy/membership.c23', { method: 'PUT', body: { value: preserveVal } }, admin2);
+    const preserveBio = 'Preserved para one.\n\nPreserved para two.';
+    await api('/api/collections/council', { method: 'POST', body: { data: { name: 'Preserved Person', bio: preserveBio }, status: 'published' } }, admin2);
+    ok('membership.c23 exists as a stable CMS key (not renumbered by note removal)', (await api('/api/public/pagecopy')).data.copy['membership.c23'] === preserveVal);
+    // TRUE restart: stop this server, start a fresh one on the SAME data dir (re-runs
+    // migrations + seed against the existing database), exactly like a redeploy.
+    child.kill('SIGKILL');
+    await new Promise(r => setTimeout(r, 400));
+    const PORT2 = PORT + 1000, BASE2 = `http://127.0.0.1:${PORT2}`;
+    let out2 = '';
+    const child2 = spawn('node', ['server.js'], { env: { ...env, PORT: String(PORT2) }, stdio: ['ignore', 'pipe', 'pipe'] });
+    child2.stdout.on('data', d => { out2 += d.toString(); });
+    let up2 = false;
+    for (let i = 0; i < 60; i++) { try { const r = await fetch(BASE2 + '/api/health'); if (r.ok) { up2 = true; break; } } catch (e) {} await new Promise(r => setTimeout(r, 200)); }
+    ok('server restarts cleanly on the existing data directory', up2);
+    const pc2 = await (await fetch(BASE2 + '/api/public/pagecopy')).json();
+    ok('saved page-copy override is byte-identical after restart + migration', pc2.copy['membership.c23'] === preserveVal);
+    const col2 = await (await fetch(BASE2 + '/api/public/collection/council')).json();
+    const kept = (col2.items || []).find(i => i.name === 'Preserved Person');
+    ok('saved multi-paragraph collection content is unchanged after restart', !!kept && kept.bio === preserveBio);
+    ok('seeded governance data still present after restart', (col2.items || []).length >= 10);
+    ok('startup SKIPS seeding when data is already present', /Seed skipped — data already present\./.test(out2));
+    ok('startup re-runs migrations idempotently (additive; existing data preserved)', /Migrations applied \(additive; existing data preserved\)\./.test(out2));
+    child2.kill('SIGKILL');
+
     console.log('\nPRODUCTION DEPENDENCY AUDIT');
     {
       const res = spawnSync('npm', ['audit', '--omit=dev', '--audit-level=high', '--json'], { cwd: join(__dirname, '..'), encoding: 'utf8' });

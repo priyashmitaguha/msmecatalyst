@@ -434,6 +434,7 @@ def build(g):
     <div class="lw" data-cat="lenders"><span>Member logo</span></div>
     <div class="lw" data-cat="fintechs"><span>Member logo</span></div>
   </div>
+  <p data-cms-strip="1"></p><!-- removed public developer note; slot reserved so following CMS keys keep their numbers -->
 </div></section>
 
 <section class="section bg-sand" id="donors"><div class="wrap">

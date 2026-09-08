@@ -70,6 +70,14 @@ def annotate(body_html, page):
     n = 0
     for el in soup.find_all(True):
         name = el.name
+        # A data-cms-strip element (must be empty) is removed from the public output but
+        # still CONSUMES its key number, so removing on-page content leaves a stable
+        # numbering GAP instead of renumbering every following key — which would otherwise
+        # misalign existing saved CMS overrides for this page.
+        if el.has_attr("data-cms-strip"):
+            n += 1
+            el.decompose()
+            continue
         if name in _SKIP:
             continue
         if el.has_attr("data-cms") or el.has_attr("data-cms-list") or el.has_attr("data-cms-src"):
