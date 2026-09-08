@@ -434,7 +434,7 @@ def build(g):
     <div class="lw" data-cat="lenders"><span>Member logo</span></div>
     <div class="lw" data-cat="fintechs"><span>Member logo</span></div>
   </div>
-  <p class="notice mt-m">In production these tiles are populated by the CRM API (<code>GET /api/members</code>) — see the back-end. A logo appears when status is <em>Active</em> and website display is <em>Paid and Live</em>, and disappears automatically on expiry, overdue payment or Secretariat override.</p>
+  <p data-cms-strip="1"></p><!-- removed public developer note; slot reserved so following CMS keys keep their numbers -->
 </div></section>
 
 <section class="section bg-sand" id="donors"><div class="wrap">

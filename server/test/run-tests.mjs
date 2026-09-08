@@ -524,6 +524,100 @@ const waitHealth = async () => { for (let i = 0; i < 50; i++) { try { const r = 
     ok('OCR runtime is served from /vendor (same-origin)', (await fetch(BASE + '/vendor/tesseract/js/tesseract.min.js')).status === 200);
     ok('OCR language model is served from /vendor (same-origin)', (await fetch(BASE + '/vendor/tesseract/lang/eng.traineddata.gz')).status === 200);
 
+    console.log('\nCMS PARAGRAPH PRESERVATION');
+    // Collection textarea field (council bio): multi-paragraph survives save + DB retrieval + render.
+    const bio3 = 'Paragraph one.\n\nParagraph two.\n\nParagraph three.';
+    const cb = await api('/api/collections/council', { method: 'POST', body: { data: { name: 'Para Person', bio: bio3 }, status: 'published' } }, admin2);
+    const savedBio = (await api('/api/collections/council', {}, admin2)).data.items.find(i => i.id === cb.data.id).data.bio;
+    ok('multi-paragraph bio survives save + DB retrieval (newlines intact)', savedBio === bio3);
+    ok('public rendering splits blank lines into separate <p>', (MCVis.toParagraphs(savedBio).match(/<p /g) || []).length === 3);
+    // ODR provider description (the named field) — same reusable path, Windows endings.
+    const cp = await api('/api/collections/odr_providers', { method: 'POST', body: { data: { name: 'Prov X', description: 'Desc one.\r\n\r\nDesc two.', url: 'https://provx.example' }, status: 'active' } }, admin2);
+    const savedDesc = (await api('/api/collections/odr_providers', {}, admin2)).data.items.find(i => i.id === cp.data.id).data.description;
+    ok('ODR provider description preserves Windows (\\r\\n) blank lines', (MCVis.toParagraphs(savedDesc).match(/<p /g) || []).length === 2);
+    ok('both Unix and Windows line endings render two paragraphs', (MCVis.toParagraphs('A\n\nB').match(/<p /g) || []).length === 2 && (MCVis.toParagraphs('A\r\n\r\nB').match(/<p /g) || []).length === 2);
+    ok('a single intentional line break becomes <br> inside the paragraph', /Line1<br>Line2/.test(MCVis.toParagraphs('Line1\nLine2')));
+    ok('existing single-paragraph content is unchanged (one <p>)', (MCVis.toParagraphs('Just one paragraph, no blank lines.').match(/<p /g) || []).length === 1);
+    // User HTML/scripts are escaped on the plain-text path (never executed, no bullets/dashes inserted).
+    const xb = await api('/api/collections/council', { method: 'POST', body: { data: { name: 'XSS', bio: '<script>alert(1)</script>\n\nSafe line' }, status: 'published' } }, admin2);
+    const xbio = (await api('/api/collections/council', {}, admin2)).data.items.find(i => i.id === xb.data.id).data.bio;
+    ok('user HTML/scripts are escaped when rendered (not executed)', !/<script>/.test(MCVis.toParagraphs(xbio)) && /&lt;script&gt;/.test(MCVis.toParagraphs(xbio)));
+    ok('no bullets/dashes/symbols are auto-inserted', !/[•—]/.test(MCVis.toParagraphs(bio3)));
+    // Page-copy multiline field: paragraphs preserved, sanitised, no invalid <p>-in-<p>.
+    const pcGroups = (await api('/api/pagecopy', {}, admin2)).data.groups;
+    const mlField = Object.values(pcGroups).flat().find(f => f.multiline && !/Link URL|Image/.test(f.label));
+    ok('a multiline page-copy field exists to test', !!mlField);
+    await api('/api/pagecopy/' + encodeURIComponent(mlField.key), { method: 'PUT', body: { value: 'Pc one.\n\nPc two.\n\n<script>bad()</script>' } }, admin2);
+    const pubcopy2 = await api('/api/public/pagecopy');
+    ok('server marks the overridden field as multiline for the client', (pubcopy2.data.multiline || []).includes(mlField.key));
+    ok('page-copy value stays server-sanitised (script stripped)', !/<script/i.test(pubcopy2.data.copy[mlField.key]));
+    {
+      const dom = new JSDOM('<!doctype html><body><p data-cms="k">x</p></body>');
+      const el = dom.window.document.querySelector('[data-cms]');
+      MCVis.renderParagraphsInto(el, pubcopy2.data.copy[mlField.key], { escape: false });
+      ok('multiline page-copy renders multiple <p> with NO nested <p>', dom.window.document.querySelectorAll('p').length >= 2 && dom.window.document.querySelectorAll('p p').length === 0);
+      ok('no <script> element results from rendered page-copy', dom.window.document.querySelectorAll('script').length === 0);
+    }
+
+    console.log('\nMEMBER LOGO WALL');
+    for (const n of [1, 2, 3, 4, 5, 6, 7, 8, 9, 12]) {
+      const dom = new JSDOM('<div id="w" class="logowall"></div>');
+      const members = Array.from({ length: n }, (_, i) => ({ legal_name: 'Org ' + i, logo: '/uploads/' + i + '.png', website: 'https://x' + i + '.org', category: ['lenders', 'fintechs', 'anchors'][i % 3] }));
+      MCVis.renderMemberWall(dom.window.document.getElementById('w'), members);
+      ok('logo wall renders exactly ' + n + ' tiles, no empty placeholder cells', dom.window.document.querySelectorAll('#w .lw').length === n && dom.window.document.querySelectorAll('#w .lw > span').length === 0);
+    }
+    {
+      const dom = new JSDOM('<div id="w" class="logowall"></div>');
+      MCVis.renderMemberWall(dom.window.document.getElementById('w'), [
+        { legal_name: 'Aspect Co', logo: '/u/a.png', website: 'https://a.org', category: 'lenders' },
+        { legal_name: 'No Logo Co', category: 'fintechs' }]);
+      const img = dom.window.document.querySelector('#w .lw-img');
+      ok('logo image preserves aspect (lw-img/object-fit) and has org-name alt', img && img.getAttribute('alt') === 'Aspect Co' && img.className.indexOf('lw-img') > -1);
+      ok('every tile carries data-cat so category filters keep working', dom.window.document.querySelector('#w .lw').getAttribute('data-cat') === 'lenders');
+      ok('CRM categories map to the filter-button keys (Infrastructure→infra, ODR Providers→odr, Ecosystem Institutions→ecosystem)', MCVis.catKey('Infrastructure') === 'infra' && MCVis.catKey('ODR Providers') === 'odr' && MCVis.catKey('Ecosystem Institutions') === 'ecosystem' && MCVis.catKey('Lenders') === 'lenders');
+      ok('a member without a logo falls back to its name (no broken tile)', /No Logo Co/.test(dom.window.document.querySelectorAll('#w .lw')[1].textContent));
+    }
+    {
+      const css = readFileSync(join(PUBLIC, 'assets', 'css', 'styles.css'), 'utf8').replace(/\s+/g, '');
+      ok('logo layout is a centred wrapping flex (even rows, centred last row)', css.includes('display:flex;flex-wrap:wrap;justify-content:center'));
+      ok('logos use object-fit:contain (never stretched/cropped/distorted)', css.includes('object-fit:contain'));
+      ok('mobile shows two columns where space allows (flex-basis 50%)', css.includes('flex:11calc(50%-7px)'));
+      ok('very narrow screens collapse to one column', css.includes('@media(max-width:359px)') && css.includes('flex-basis:100%'));
+      ok('tablet/desktop logo bounds ≈200/240px wide', css.includes('width:200px;height:105px') && css.includes('width:240px;height:120px'));
+    }
+    ok('internal CRM/developer note is absent from the public membership page', !/In production these tiles/.test(readFileSync(join(PUBLIC, 'membership.html'), 'utf8')));
+    ok('member eligibility is still enforced server-side (endpoint returns members)', (await api('/api/public/members')).data.members.length >= 1);
+
+    console.log('\nDATA PRESERVATION ACROSS RESTART + MIGRATION');
+    // Save distinctive CMS content on the running server: a page-copy override on a
+    // stable membership key (proves the note-removal did not renumber it) and a
+    // published collection entry with multi-paragraph content.
+    const preserveVal = 'PRESERVED-c23-' + Date.now();
+    await api('/api/pagecopy/membership.c23', { method: 'PUT', body: { value: preserveVal } }, admin2);
+    const preserveBio = 'Preserved para one.\n\nPreserved para two.';
+    await api('/api/collections/council', { method: 'POST', body: { data: { name: 'Preserved Person', bio: preserveBio }, status: 'published' } }, admin2);
+    ok('membership.c23 exists as a stable CMS key (not renumbered by note removal)', (await api('/api/public/pagecopy')).data.copy['membership.c23'] === preserveVal);
+    // TRUE restart: stop this server, start a fresh one on the SAME data dir (re-runs
+    // migrations + seed against the existing database), exactly like a redeploy.
+    child.kill('SIGKILL');
+    await new Promise(r => setTimeout(r, 400));
+    const PORT2 = PORT + 1000, BASE2 = `http://127.0.0.1:${PORT2}`;
+    let out2 = '';
+    const child2 = spawn('node', ['server.js'], { env: { ...env, PORT: String(PORT2) }, stdio: ['ignore', 'pipe', 'pipe'] });
+    child2.stdout.on('data', d => { out2 += d.toString(); });
+    let up2 = false;
+    for (let i = 0; i < 60; i++) { try { const r = await fetch(BASE2 + '/api/health'); if (r.ok) { up2 = true; break; } } catch (e) {} await new Promise(r => setTimeout(r, 200)); }
+    ok('server restarts cleanly on the existing data directory', up2);
+    const pc2 = await (await fetch(BASE2 + '/api/public/pagecopy')).json();
+    ok('saved page-copy override is byte-identical after restart + migration', pc2.copy['membership.c23'] === preserveVal);
+    const col2 = await (await fetch(BASE2 + '/api/public/collection/council')).json();
+    const kept = (col2.items || []).find(i => i.name === 'Preserved Person');
+    ok('saved multi-paragraph collection content is unchanged after restart', !!kept && kept.bio === preserveBio);
+    ok('seeded governance data still present after restart', (col2.items || []).length >= 10);
+    ok('startup SKIPS seeding when data is already present', /Seed skipped — data already present\./.test(out2));
+    ok('startup re-runs migrations idempotently (additive; existing data preserved)', /Migrations applied \(additive; existing data preserved\)\./.test(out2));
+    child2.kill('SIGKILL');
+
     console.log('\nPRODUCTION DEPENDENCY AUDIT');
     {
       const res = spawnSync('npm', ['audit', '--omit=dev', '--audit-level=high', '--json'], { cwd: join(__dirname, '..'), encoding: 'utf8' });

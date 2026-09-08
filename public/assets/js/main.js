@@ -29,13 +29,13 @@
     var buttons = group.querySelectorAll('[data-filter]');
     var itemsWrap = document.querySelector(group.getAttribute('data-target'));
     if (!itemsWrap) return;
-    var items = itemsWrap.querySelectorAll('[data-cat]');
     buttons.forEach(function (b) {
       b.addEventListener('click', function () {
         buttons.forEach(function (x) { x.classList.remove('active'); });
         b.classList.add('active');
         var f = b.getAttribute('data-filter');
-        items.forEach(function (it) {
+        // Re-query on each click so filtering also covers tiles rendered later from the CRM.
+        itemsWrap.querySelectorAll('[data-cat]').forEach(function (it) {
           var show = f === 'all' || (it.getAttribute('data-cat') || '').split(' ').indexOf(f) > -1;
           it.style.display = show ? '' : 'none';
         });
@@ -72,16 +72,8 @@
   var wall = document.getElementById('member-wall');
   if (wall) {
     fetch('/api/public/members').then(function (r) { return r.json(); }).then(function (d) {
-      if (!d.members || !d.members.length) return;
-      wall.innerHTML = d.members.map(function (m) {
-        var label = m.brand_name || m.legal_name || 'Member';
-        var inner = m.logo
-          ? '<img src="' + m.logo + '" alt="' + label + '" style="max-height:60px;max-width:82%;object-fit:contain" onerror="this.replaceWith(document.createTextNode(\'' + label.replace(/'/g, '') + '\'))">'
-          : '<span>' + label + '</span>';
-        var cat = (m.category || '').toLowerCase().replace(/[^a-z]+/g, '');
-        return m.website ? '<a class="lw" data-cat="' + cat + '" href="' + m.website + '" target="_blank" rel="noopener">' + inner + '</a>'
-                         : '<div class="lw" data-cat="' + cat + '">' + inner + '</div>';
-      }).join('');
+      if (!d.members || !d.members.length) return;              // no eligible members → keep static fallback
+      if (typeof MCVis !== 'undefined') MCVis.renderMemberWall(wall, d.members);
     }).catch(function () {});
   }
 
@@ -139,15 +131,23 @@
 (function () {
   function esc(s){return (s==null?'':String(s)).replace(/[&<>"]/g,function(m){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]);});}
   function initials(n){return (n||'?').split(/\s+/).map(function(w){return w[0]||'';}).join('').slice(0,2).toUpperCase();}
+  // Reusable, XSS-safe paragraph rendering for plain-text CMS fields (bios, summaries,
+  // descriptions). Blank lines → separate <p>; single line breaks → <br>.
+  function paras(text, className){ return (typeof MCVis!=='undefined') ? MCVis.toParagraphs(text,{className:className}) : (text?'<p class="'+className+'">'+esc(text)+'</p>':''); }
 
   // 1) Page-copy overrides: replace default text / links / images with admin-edited values.
   var cmsEls = document.querySelectorAll('[data-cms],[data-cms-href],[data-cms-src],[data-cms-alt]');
   if (cmsEls.length) {
     fetch('/api/public/pagecopy').then(function(r){return r.json();}).then(function(d){
       var map = d.copy || {};
+      var multiline = {}; (d.multiline || []).forEach(function(k){ multiline[k] = true; });
       document.querySelectorAll('[data-cms]').forEach(function(el){
         var k = el.getAttribute('data-cms');
-        if (map[k] != null && map[k] !== '') el.innerHTML = map[k];
+        if (map[k] == null || map[k] === '') return;
+        // Multi-paragraph text in a multiline field → render semantic paragraphs
+        // (value is already sanitised server-side, so inline formatting/links survive).
+        if (multiline[k] && typeof MCVis !== 'undefined' && MCVis.hasBlankLine(map[k])) MCVis.renderParagraphsInto(el, map[k], { escape: false });
+        else el.innerHTML = map[k];
       });
       document.querySelectorAll('[data-cms-href]').forEach(function(el){
         var k = el.getAttribute('data-cms-href');
@@ -170,7 +170,7 @@
     var head = it.photo ? '<img src="'+esc(it.photo)+'" alt="'+esc(name)+'" style="width:100%;height:100%;object-fit:cover" onerror="this.replaceWith(document.createTextNode(\''+initials(name)+'\'))">' : initials(name);
     return '<article class="profile"><div class="ph">'+head+'</div><div class="pb"><h3>'+esc(name)+'</h3>'+
       (role?'<div class="role">'+esc(role)+'</div>':'')+(org?'<div class="org">'+esc(org)+'</div>':'')+
-      (bio?'<p class="bio">'+esc(bio)+'</p>':'')+(li?'<a class="li" href="'+esc(li)+'" target="_blank" rel="noopener">in · LinkedIn</a>':'')+'</div></article>';
+      paras(bio,'bio')+(li?'<a class="li" href="'+esc(li)+'" target="_blank" rel="noopener">in · LinkedIn</a>':'')+'</div></article>';
   }
   function rcardCard(it){
     var title=it.title||'Untitled', summary=it.summary||it.description||'', cat=it.category||'', date=it.publish_date||'', author=it.author||it.guest||'';
@@ -178,7 +178,7 @@
     var thumb = it.cover ? ' style="background-image:url('+esc(it.cover)+');background-size:cover;background-position:center"' : '';
     var titleHtml = link ? '<a href="'+esc(link)+'" target="_blank" rel="noopener">'+esc(title)+'</a>' : esc(title);
     return '<article class="rcard"><div class="thumb"'+thumb+'>'+(cat?'<span class="badge tag">'+esc(cat)+'</span>':'')+'</div>'+
-      '<div class="rb"><h3>'+titleHtml+'</h3>'+(summary?'<p class="muted" style="font-size:.9rem">'+esc(summary)+'</p>':'')+
+      '<div class="rb"><h3>'+titleHtml+'</h3>'+paras(summary,'muted rcard-sum')+
       '<div class="meta">'+esc(author)+(date?' · '+esc(date):'')+'</div></div></article>';
   }
   var renderers = { profile: profileCard, rcard: rcardCard };

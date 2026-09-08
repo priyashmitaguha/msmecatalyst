@@ -311,13 +311,30 @@ table.tbl{width:100%;border-collapse:collapse;font-size:.92rem;min-width:560px}
 .filters button.active,.filters button:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
 
 /* ---------- Logo wall ---------- */
-.logowall{display:grid;gap:1px;background:var(--line-2);border:1px solid var(--line-2);border-radius:14px;overflow:hidden;
-  grid-template-columns:repeat(2,1fr)}
-@media(min-width:640px){.logowall{grid-template-columns:repeat(3,1fr)}}
-@media(min-width:900px){.logowall{grid-template-columns:repeat(4,1fr)}}
-.logowall .lw{background:#fff;aspect-ratio:16/9;display:grid;place-items:center;padding:22px;transition:background .15s}
+/* A centred wrapping flex layout: rows fill and centre evenly, incomplete final
+   rows are centred (no empty placeholder cells), and the layout adapts to any
+   number of logos added/removed through the CRM. Logos are shown large with their
+   aspect ratio preserved (object-fit:contain — never stretched, cropped or distorted). */
+.logowall{display:flex;flex-wrap:wrap;justify-content:center;align-items:stretch;gap:14px;
+  background:none;border:0;border-radius:0;overflow:visible}
+/* Mobile default: two columns where space allows … */
+.logowall .lw{background:#fff;border:1px solid var(--line-2);border-radius:14px;
+  display:flex;align-items:center;justify-content:center;padding:12px;
+  flex:1 1 calc(50% - 7px);max-width:220px;height:96px;transition:background .15s,box-shadow .15s}
 .logowall .lw:hover{background:var(--sand)}
-.logowall .lw span{font-family:var(--font-display);font-weight:700;color:var(--ink-2);font-size:.95rem;text-align:center}
+.logowall .lw span{font-family:var(--font-display);font-weight:700;color:var(--ink-2);font-size:.9rem;text-align:center}
+.logowall .lw .lw-img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;display:block}
+/* … and only one column on very narrow screens. */
+@media(max-width:359px){.logowall .lw{flex-basis:100%;max-width:none}}
+/* Tablet: fixed-size tiles, 2–3 per row as width allows. */
+@media(min-width:640px){.logowall .lw{flex:0 1 auto;width:200px;height:105px;max-width:none}}
+/* Desktop: up to 4 per row. */
+@media(min-width:900px){.logowall .lw{width:240px;height:120px}}
+
+/* ---------- CMS paragraphs (reusable) ---------- */
+.cms-p{margin:0 0 .8em;line-height:1.6}
+.cms-p:last-child{margin-bottom:0}
+.rcard-sum{font-size:.9rem}
 
 /* ---------- CTA band ---------- */
 .cta-band{background:linear-gradient(135deg,var(--ink),#22332a);color:#fff;border-radius:var(--radius-lg);

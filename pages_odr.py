@@ -209,9 +209,9 @@ def build(g):
 {journey("choose-provider.html")}
 <section class="section"><div class="wrap">
   <div class="grid g3">
-    <div class="card hoverable reveal"><div class="ico orange">A</div><h3>Provider A</h3><p>Short description managed in the CMS (name, logo, areas of support, website, display order, status).</p><div class="pill-row mt-s"><span class="badge neutral">Mediation</span><span class="badge neutral">Conciliation</span></div></div>
-    <div class="card hoverable reveal"><div class="ico">B</div><h3>Provider B</h3><p>Short description managed in the CMS.</p><div class="pill-row mt-s"><span class="badge neutral">Arbitration</span><span class="badge neutral">ODR</span></div></div>
-    <div class="card hoverable reveal"><div class="ico orange">C</div><h3>Provider C</h3><p>Short description managed in the CMS.</p><div class="pill-row mt-s"><span class="badge neutral">Mediation</span><span class="badge neutral">Arbitration</span></div></div>
+    <div class="card hoverable reveal"><div class="ico orange">A</div><h3>Provider A</h3><p>Short description managed in the CMS (name, logo, areas of support, website, display order, status).</p></div>
+    <div class="card hoverable reveal"><div class="ico">B</div><h3>Provider B</h3><p>Short description managed in the CMS.</p></div>
+    <div class="card hoverable reveal"><div class="ico orange">C</div><h3>Provider C</h3><p>Short description managed in the CMS.</p></div>
   </div>
 
   <div class="form-card mt-l reveal" style="max-width:640px;margin-inline:auto">
