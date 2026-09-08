@@ -560,7 +560,7 @@ const waitHealth = async () => { for (let i = 0; i < 50; i++) { try { const r = 
     }
 
     console.log('\nMEMBER LOGO WALL');
-    for (const n of [1, 2, 3, 4, 5, 6, 7, 8, 12]) {
+    for (const n of [1, 2, 3, 4, 5, 6, 7, 8, 9, 12]) {
       const dom = new JSDOM('<div id="w" class="logowall"></div>');
       const members = Array.from({ length: n }, (_, i) => ({ legal_name: 'Org ' + i, logo: '/uploads/' + i + '.png', website: 'https://x' + i + '.org', category: ['lenders', 'fintechs', 'anchors'][i % 3] }));
       MCVis.renderMemberWall(dom.window.document.getElementById('w'), members);
@@ -581,7 +581,9 @@ const waitHealth = async () => { for (let i = 0; i < 50; i++) { try { const r = 
       const css = readFileSync(join(PUBLIC, 'assets', 'css', 'styles.css'), 'utf8').replace(/\s+/g, '');
       ok('logo layout is a centred wrapping flex (even rows, centred last row)', css.includes('display:flex;flex-wrap:wrap;justify-content:center'));
       ok('logos use object-fit:contain (never stretched/cropped/distorted)', css.includes('object-fit:contain'));
-      ok('responsive logo bounds ≈160/200/240px wide across mobile/tablet/desktop', css.includes('width:160px;height:90px') && css.includes('width:200px;height:105px') && css.includes('width:240px;height:120px'));
+      ok('mobile shows two columns where space allows (flex-basis 50%)', css.includes('flex:11calc(50%-7px)'));
+      ok('very narrow screens collapse to one column', css.includes('@media(max-width:359px)') && css.includes('flex-basis:100%'));
+      ok('tablet/desktop logo bounds ≈200/240px wide', css.includes('width:200px;height:105px') && css.includes('width:240px;height:120px'));
     }
     ok('internal CRM/developer note is absent from the public membership page', !/In production these tiles/.test(readFileSync(join(PUBLIC, 'membership.html'), 'utf8')));
     ok('member eligibility is still enforced server-side (endpoint returns members)', (await api('/api/public/members')).data.members.length >= 1);

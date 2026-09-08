@@ -317,13 +317,18 @@ table.tbl{width:100%;border-collapse:collapse;font-size:.92rem;min-width:560px}
    aspect ratio preserved (object-fit:contain — never stretched, cropped or distorted). */
 .logowall{display:flex;flex-wrap:wrap;justify-content:center;align-items:stretch;gap:14px;
   background:none;border:0;border-radius:0;overflow:visible}
+/* Mobile default: two columns where space allows … */
 .logowall .lw{background:#fff;border:1px solid var(--line-2);border-radius:14px;
   display:flex;align-items:center;justify-content:center;padding:12px;
-  flex:0 1 auto;width:160px;height:90px;transition:background .15s,box-shadow .15s}
+  flex:1 1 calc(50% - 7px);max-width:220px;height:96px;transition:background .15s,box-shadow .15s}
 .logowall .lw:hover{background:var(--sand)}
 .logowall .lw span{font-family:var(--font-display);font-weight:700;color:var(--ink-2);font-size:.9rem;text-align:center}
 .logowall .lw .lw-img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;display:block}
-@media(min-width:640px){.logowall .lw{width:200px;height:105px}}
+/* … and only one column on very narrow screens. */
+@media(max-width:359px){.logowall .lw{flex-basis:100%;max-width:none}}
+/* Tablet: fixed-size tiles, 2–3 per row as width allows. */
+@media(min-width:640px){.logowall .lw{flex:0 1 auto;width:200px;height:105px;max-width:none}}
+/* Desktop: up to 4 per row. */
 @media(min-width:900px){.logowall .lw{width:240px;height:120px}}
 
 /* ---------- CMS paragraphs (reusable) ---------- */
