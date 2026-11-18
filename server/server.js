@@ -1233,8 +1233,13 @@ if (process.env.ALLOW_TEST_HOOKS === '1') {
 }
 
 /* ---------------- static ---------------- */
+// Make code assets (JS/CSS/HTML) always revalidate so a new deploy is picked up
+// on a normal refresh — no hard-refresh needed. Media keeps default caching.
+function revalidateCode(res, filePath) {
+  if (/\.(js|css|html?)$/i.test(filePath)) res.setHeader('Cache-Control', 'no-cache, must-revalidate');
+}
 app.use('/uploads', express.static(UP));
-app.use('/admin', express.static(path.join(__dirname, 'admin')));
+app.use('/admin', express.static(path.join(__dirname, 'admin'), { setHeaders: revalidateCode }));
 
 // Server-side enforcement: a hidden page returns 404 even via a direct URL.
 // (ODR pages are NOT exempt — each /odr/* page can be hidden individually.)
@@ -1248,7 +1253,7 @@ app.get(/.*/, (req, res, next) => {
   next();
 });
 
-app.use('/', express.static(path.join(__dirname, '..', 'public'))); // serve the public site
+app.use('/', express.static(path.join(__dirname, '..', 'public'), { setHeaders: revalidateCode })); // serve the public site
 
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 

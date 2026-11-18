@@ -138,6 +138,15 @@
   // read all of them, or just the first, so single-URL callers stay correct.
   function urlList(v){ return String(v==null?'':v).split(/[\r\n,]+/).map(function(s){return s.trim();}).filter(Boolean); }
   function firstUrl(v){ return urlList(v)[0] || ''; }
+  // Render a write-up / minutes body: keep it as-is if it already has block
+  // structure (HTML), otherwise turn its blank-line / line-break separated plain
+  // text into real paragraphs so it doesn't render as one wall of text.
+  function renderBody(b){
+    b = String(b==null?'':b);
+    if (typeof MCVis === 'undefined') return b;
+    if (/<(p|br|div|ul|ol|li|h[1-6]|table|blockquote)\b/i.test(b)) return b;
+    return MCVis.toParagraphs(b, { escape: false, className: 'cm-p' });
+  }
 
   // 1) Page-copy overrides: replace default text / links / images with admin-edited values.
   var cmsEls = document.querySelectorAll('[data-cms],[data-cms-href],[data-cms-src],[data-cms-alt]');
@@ -248,7 +257,7 @@
     // ad-blocker / privacy extension / network).
     var watch = hasYoutube ? '<a class="textlink" style="display:inline-block;margin-top:8px" href="'+esc(it.youtube)+'" target="_blank" rel="noopener">▶ Watch on YouTube →</a>' : '';
     // Full minutes / write-up on demand (body is sanitised server-side).
-    var writeup = hasBody ? '<details class="cm-details"><summary>Read the write-up / minutes</summary><div class="cm-body">'+it.body+'</div></details>' : '';
+    var writeup = hasBody ? '<details class="cm-details"><summary>Read the write-up / minutes</summary><div class="cm-body">'+renderBody(it.body)+'</div></details>' : '';
     // Document links (several per meeting).
     var docs = files.length
       ? files.map(function(u,i){ return '<a class="textlink" style="display:block;margin-top:6px" href="'+esc(u)+'" target="_blank" rel="noopener">📄 Open document'+(files.length>1?' '+(i+1):'')+' →</a>'; }).join('')
