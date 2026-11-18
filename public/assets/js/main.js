@@ -213,41 +213,50 @@
     if (it.link) return 'document';
     return 'writeup';
   }
+  // One meeting = one card that shows everything it has: the recording, the
+  // written minutes, and any documents. It is tagged with every content type it
+  // contains, so it appears under each relevant filter (Videos / Write-ups /
+  // Documents), not just one.
   function meetingCard(it){
-    var kind = meetingType(it);
     var title = it.title||'Untitled';
     var date = it.meeting_date||it.publish_date||'';
     var summary = it.summary||'';
     var meta = 'Governing Council'+(date?' · '+esc(date):'');
-    if (kind === 'video'){
-      var id = ytId(it.youtube);
-      var media = id
-        ? '<div class="video-embed"><iframe src="https://www.youtube-nocookie.com/embed/'+id+'?rel=0" title="'+esc(title)+'" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>'
-        : (it.cover ? '<div class="thumb" style="background-image:url('+esc(it.cover)+');background-size:cover;background-position:center"><span class="badge tag">Video</span></div>'
-                    : '<div class="thumb"><span class="badge tag">Video</span></div>');
-      return '<article class="rcard" data-cat="video">'+media+
-        '<div class="rb"><h3>'+esc(title)+'</h3>'+paras(summary,'muted rcard-sum')+
-        '<div class="meta">'+meta+'</div></div></article>';
+    var vid = ytId(it.youtube);
+    var hasYoutube = !!(it.youtube && String(it.youtube).trim());
+    var hasBody = !!(it.body && String(it.body).trim());
+    var files = urlList(it.file);
+    // Which filter categories this meeting belongs to.
+    var cats = [];
+    if (hasYoutube) cats.push('video');
+    if (hasBody) cats.push('writeup');
+    if (files.length) cats.push('document');
+    if (!cats.length) cats.push('writeup');
+    // Media area: embedded recording, else a cover image, else nothing.
+    var media = '';
+    if (vid) {
+      media = '<div class="video-embed"><iframe src="https://www.youtube-nocookie.com/embed/'+vid+'?rel=0" title="'+esc(title)+'" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>';
+    } else if (firstUrl(it.cover)) {
+      media = '<div class="thumb" style="background-image:url('+esc(firstUrl(it.cover))+');background-size:cover;background-position:center"></div>';
     }
-    if (kind === 'document'){
-      // A meeting can carry several documents (one URL per line in the file field).
-      var files = urlList(it.file);
-      var primary = files[0] || it.link || '';
-      var thumb = it.cover ? ' style="background-image:url('+esc(firstUrl(it.cover))+');background-size:cover;background-position:center"' : '';
-      var titleHtml = primary ? '<a href="'+esc(primary)+'" target="_blank" rel="noopener">'+esc(title)+'</a>' : esc(title);
-      var open = files.length
-        ? files.map(function(u, i){ return '<a class="textlink" style="display:block;margin-top:6px" href="'+esc(u)+'" target="_blank" rel="noopener">Open document'+(files.length>1?' '+(i+1):'')+' →</a>'; }).join('')
-        : (it.link ? '<a class="textlink" style="display:inline-block;margin-top:8px" href="'+esc(it.link)+'" target="_blank" rel="noopener">Open →</a>' : '');
-      return '<article class="rcard" data-cat="document"><div class="thumb"'+thumb+'><span class="badge tag">Document</span></div>'+
-        '<div class="rb"><h3>'+titleHtml+'</h3>'+paras(summary,'muted rcard-sum')+open+
-        '<div class="meta">'+meta+'</div></div></article>';
-    }
-    // write-up: show the summary, with the full (server-sanitised) body inline on demand
-    var body = it.body
-      ? '<details class="cm-details"><summary>Read the write-up</summary><div class="cm-body">'+it.body+'</div></details>'
-      : (it.link ? '<a class="textlink" style="display:inline-block;margin-top:8px" href="'+esc(it.link)+'" target="_blank" rel="noopener">Read more →</a>' : '');
-    return '<article class="rcard" data-cat="writeup"><div class="thumb o"><span class="badge orange tag">Write-up</span></div>'+
-      '<div class="rb"><h3>'+esc(title)+'</h3>'+paras(summary,'muted rcard-sum')+body+
+    // Little badges showing what's inside.
+    var badges = cats.map(function(c){
+      var lbl = c==='video'?'Video':(c==='document'?'Document':'Write-up');
+      return '<span class="badge '+(c==='writeup'?'orange ':'')+'tag">'+lbl+'</span>';
+    }).join(' ');
+    // A reliable link to the recording (works even if the embed is blocked by an
+    // ad-blocker / privacy extension / network).
+    var watch = hasYoutube ? '<a class="textlink" style="display:inline-block;margin-top:8px" href="'+esc(it.youtube)+'" target="_blank" rel="noopener">▶ Watch on YouTube →</a>' : '';
+    // Full minutes / write-up on demand (body is sanitised server-side).
+    var writeup = hasBody ? '<details class="cm-details"><summary>Read the write-up / minutes</summary><div class="cm-body">'+it.body+'</div></details>' : '';
+    // Document links (several per meeting).
+    var docs = files.length
+      ? files.map(function(u,i){ return '<a class="textlink" style="display:block;margin-top:6px" href="'+esc(u)+'" target="_blank" rel="noopener">📄 Open document'+(files.length>1?' '+(i+1):'')+' →</a>'; }).join('')
+      : '';
+    var extraLink = (!hasYoutube && it.link) ? '<a class="textlink" style="display:inline-block;margin-top:8px" href="'+esc(it.link)+'" target="_blank" rel="noopener">Open link →</a>' : '';
+    return '<article class="rcard" data-cat="'+cats.join(' ')+'">'+media+
+      '<div class="rb"><div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:2px">'+badges+'</div>'+
+      '<h3>'+esc(title)+'</h3>'+paras(summary,'muted rcard-sum')+writeup+watch+extraLink+docs+
       '<div class="meta">'+meta+'</div></div></article>';
   }
   var renderers = { profile: profileCard, rcard: rcardCard, meeting: meetingCard };
