@@ -143,6 +143,7 @@ NAV = [
         ("Convergence Model", "approach.html#convergence"),
         ("Cluster Capability Centres", "approach.html#capability-centres"),
         ("Programmes", "programmes.html"),
+        ("Governing Council Meetings", "council-meetings.html"),
     ]),
     ("Membership", "membership.html", [
         ("Membership", "membership.html#membership"),
@@ -152,8 +153,7 @@ NAV = [
     ("Knowledge Hub", "knowledge.html", [
         ("Reports & Papers", "reports.html"),
         ("Blogs", "blogs.html"),
-        ("Podcasts", "podcasts.html"),
-        ("Events & Labs", "events.html"),
+        ("Events", "events.html"),
     ]),
     ("Contact Us", "contact.html"),
 ]
@@ -249,8 +249,8 @@ def footer(prefix=""):
         <p data-cms="global.footer_tagline" style="margin-top:16px;max-width:34ch;font-size:.92rem;color:#9aa8a0">{_reg("global.footer_tagline", "India's neutral convergence layer for MSME growth. A not-for-profit platform operated by Digital Growth Infrastructure Foundation (Section 8).", "Footer tagline", True)}</p>
         <div class="socials">{socials}</div>
       </div>
-      {col("Platform", [("Our Approach","approach.html"),("Programmes","programmes.html"),("ODR Support","odr-support.html"),("Membership","membership.html"),("Donors & Funding Partners","membership.html#donors")])}
-      {col("Knowledge Hub", [("Reports & Papers","reports.html"),("Blogs","blogs.html"),("Podcasts","podcasts.html"),("Events & Labs","events.html"),("Contact Us","contact.html")])}
+      {col("Platform", [("Our Approach","approach.html"),("Programmes","programmes.html"),("Governing Council Meetings","council-meetings.html"),("ODR Support","odr-support.html"),("Membership","membership.html"),("Donors & Funding Partners","membership.html#donors")])}
+      {col("Knowledge Hub", [("Reports & Papers","reports.html"),("Blogs","blogs.html"),("Events","events.html"),("Contact Us","contact.html")])}
       {col("Governance", [("Who We Are","about.html#who"),("Governing Council","about.html#council"),("Advisory Body","about.html#advisory"),("Secretariat","about.html#secretariat"),("Why Neutrality","about.html#neutrality")])}
     </div>
     <div class="foot-disclaimer" data-cms="global.footer_disclaimer">

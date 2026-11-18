@@ -181,12 +181,87 @@
       '<div class="rb"><h3>'+titleHtml+'</h3>'+paras(summary,'muted rcard-sum')+
       '<div class="meta">'+esc(author)+(date?' · '+esc(date):'')+'</div></div></article>';
   }
-  var renderers = { profile: profileCard, rcard: rcardCard };
+  // Extract a YouTube video ID (strict). Shared with visibility-lib so the exact
+  // same validated logic is unit-tested; a local fallback keeps the page working
+  // if the lib failed to load. Only an [A-Za-z0-9_-]{11} id is ever returned, so a
+  // malformed/hostile value can never inject markup or a foreign src.
+  function ytId(u){
+    if (typeof MCVis !== 'undefined' && MCVis.youtubeId) return MCVis.youtubeId(u);
+    if (u == null) return '';
+    var s = String(u).trim();
+    var m = s.match(/(?:youtube(?:-nocookie)?\.com\/(?:watch\?(?:[^#]*&)?v=|embed\/|shorts\/|live\/|v\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+    if (m) return m[1];
+    if (/^[A-Za-z0-9_-]{11}$/.test(s)) return s;
+    return '';
+  }
+  // Decide a meeting's type: explicit `type` field wins; otherwise infer from
+  // which content field is present (video → document → write-up).
+  function meetingType(it){
+    var t = (it.type||'').toLowerCase();
+    if (t.indexOf('video')>-1 || t.indexOf('recording')>-1) return 'video';
+    if (t.indexOf('write')>-1 || t.indexOf('minute')>-1 || t.indexOf('note')>-1) return 'writeup';
+    if (t.indexOf('doc')>-1) return 'document';
+    if (ytId(it.youtube)) return 'video';
+    if (it.file) return 'document';
+    if (it.body) return 'writeup';
+    if (it.link) return 'document';
+    return 'writeup';
+  }
+  function meetingCard(it){
+    var kind = meetingType(it);
+    var title = it.title||'Untitled';
+    var date = it.meeting_date||it.publish_date||'';
+    var summary = it.summary||'';
+    var meta = 'Governing Council'+(date?' · '+esc(date):'');
+    if (kind === 'video'){
+      var id = ytId(it.youtube);
+      var media = id
+        ? '<div class="video-embed"><iframe src="https://www.youtube-nocookie.com/embed/'+id+'?rel=0" title="'+esc(title)+'" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>'
+        : (it.cover ? '<div class="thumb" style="background-image:url('+esc(it.cover)+');background-size:cover;background-position:center"><span class="badge tag">Video</span></div>'
+                    : '<div class="thumb"><span class="badge tag">Video</span></div>');
+      return '<article class="rcard" data-cat="video">'+media+
+        '<div class="rb"><h3>'+esc(title)+'</h3>'+paras(summary,'muted rcard-sum')+
+        '<div class="meta">'+meta+'</div></div></article>';
+    }
+    if (kind === 'document'){
+      var href = it.file||it.link||'';
+      var thumb = it.cover ? ' style="background-image:url('+esc(it.cover)+');background-size:cover;background-position:center"' : '';
+      var titleHtml = href ? '<a href="'+esc(href)+'" target="_blank" rel="noopener">'+esc(title)+'</a>' : esc(title);
+      var open = href ? '<a class="textlink" style="display:inline-block;margin-top:8px" href="'+esc(href)+'" target="_blank" rel="noopener">Open document →</a>' : '';
+      return '<article class="rcard" data-cat="document"><div class="thumb"'+thumb+'><span class="badge tag">Document</span></div>'+
+        '<div class="rb"><h3>'+titleHtml+'</h3>'+paras(summary,'muted rcard-sum')+open+
+        '<div class="meta">'+meta+'</div></div></article>';
+    }
+    // write-up: show the summary, with the full (server-sanitised) body inline on demand
+    var body = it.body
+      ? '<details class="cm-details"><summary>Read the write-up</summary><div class="cm-body">'+it.body+'</div></details>'
+      : (it.link ? '<a class="textlink" style="display:inline-block;margin-top:8px" href="'+esc(it.link)+'" target="_blank" rel="noopener">Read more →</a>' : '');
+    return '<article class="rcard" data-cat="writeup"><div class="thumb o"><span class="badge orange tag">Write-up</span></div>'+
+      '<div class="rb"><h3>'+esc(title)+'</h3>'+paras(summary,'muted rcard-sum')+body+
+      '<div class="meta">'+meta+'</div></div></article>';
+  }
+  var renderers = { profile: profileCard, rcard: rcardCard, meeting: meetingCard };
+  // Optional per-container category filtering (used to group one collection into
+  // labelled sections, e.g. Events → Flagship / Roundtables). Matches a comma-
+  // separated list of substrings against each item's category (or type).
+  function catTerms(box, attr){
+    return (box.getAttribute(attr)||'').toLowerCase().split(',').map(function(s){return s.trim();}).filter(Boolean);
+  }
+  function catMatch(it, terms){
+    var c = ((it.category||it.type||'')+'').toLowerCase();
+    for (var i=0;i<terms.length;i++){ if (c.indexOf(terms[i])>-1) return true; }
+    return false;
+  }
   document.querySelectorAll('[data-cms-list]').forEach(function(box){
     var name = box.getAttribute('data-cms-list');
     var render = renderers[box.getAttribute('data-cms-render')] || rcardCard;
+    var inc = catTerms(box, 'data-cms-filter');
+    var exc = catTerms(box, 'data-cms-filter-exclude');
     fetch('/api/public/collection/'+name).then(function(r){return r.json();}).then(function(d){
-      if (d.items && d.items.length) box.innerHTML = d.items.map(render).join('');
+      var items = d.items || [];
+      if (inc.length) items = items.filter(function(it){ return catMatch(it, inc); });
+      if (exc.length) items = items.filter(function(it){ return !catMatch(it, exc); });
+      if (items.length) box.innerHTML = items.map(render).join('');
       // empty → keep the built-in placeholder cards as a graceful fallback
     }).catch(function(){ /* static hosting: keep placeholders */ });
   });

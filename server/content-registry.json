@@ -713,10 +713,192 @@
     "multiline": true,
     "page": "contact"
   },
+  "council-meetings.c1": {
+    "default": "Home",
+    "kind": "html",
+    "label": "Link: Home",
+    "multiline": false,
+    "page": "council-meetings"
+  },
+  "council-meetings.c1_href": {
+    "default": "index.html",
+    "kind": "url",
+    "label": "Link URL: Home",
+    "multiline": false,
+    "page": "council-meetings"
+  },
+  "council-meetings.c2": {
+    "default": "← Back to Our Approach",
+    "kind": "html",
+    "label": "Link: ← Back to Our Approach",
+    "multiline": false,
+    "page": "council-meetings"
+  },
+  "council-meetings.c2_href": {
+    "default": "approach.html",
+    "kind": "url",
+    "label": "Link URL: ← Back to Our Approach",
+    "multiline": false,
+    "page": "council-meetings"
+  },
+  "council-meetings.c3": {
+    "default": "Each entry is managed in the CMS (Governing Council Meetings collection): title, meeting date, a YouTube recording, written minutes / write-up, an uploaded document, summary, tags and visibility status. The type (video, write-up or document) is detected automatically.",
+    "kind": "html",
+    "label": "Paragraph: Each entry is managed in the CMS (Governing Co…",
+    "multiline": true,
+    "page": "council-meetings"
+  },
+  "council-meetings.c4": {
+    "default": "Join MSME Catalyst",
+    "kind": "html",
+    "label": "Link: Join MSME Catalyst",
+    "multiline": false,
+    "page": "council-meetings"
+  },
+  "council-meetings.c4_href": {
+    "default": "membership.html",
+    "kind": "url",
+    "label": "Link URL: Join MSME Catalyst",
+    "multiline": false,
+    "page": "council-meetings"
+  },
+  "council-meetings.c5": {
+    "default": "Apply for ODR Support",
+    "kind": "html",
+    "label": "Link: Apply for ODR Support",
+    "multiline": false,
+    "page": "council-meetings"
+  },
+  "council-meetings.c5_href": {
+    "default": "odr-support.html",
+    "kind": "url",
+    "label": "Link URL: Apply for ODR Support",
+    "multiline": false,
+    "page": "council-meetings"
+  },
+  "council-meetings.c6": {
+    "default": "Fund the infrastructure",
+    "kind": "html",
+    "label": "Link: Fund the infrastructure",
+    "multiline": false,
+    "page": "council-meetings"
+  },
+  "council-meetings.c6_href": {
+    "default": "membership.html#donors",
+    "kind": "url",
+    "label": "Link URL: Fund the infrastructure",
+    "multiline": false,
+    "page": "council-meetings"
+  },
+  "council-meetings.heading": {
+    "default": "Our deliberations, published openly.",
+    "kind": "html",
+    "label": "Hero heading",
+    "multiline": false,
+    "page": "council-meetings"
+  },
+  "council-meetings.kicker": {
+    "default": "Governing Council Meetings",
+    "kind": "html",
+    "label": "Hero kicker",
+    "multiline": false,
+    "page": "council-meetings"
+  },
+  "council-meetings.lead": {
+    "default": "A public record of Governing Council meetings — recorded sessions, written minutes and supporting documents — so our governance stays transparent and accountable.",
+    "kind": "html",
+    "label": "Hero intro",
+    "multiline": true,
+    "page": "council-meetings"
+  },
   "events.c1": {
     "default": "Home",
     "kind": "html",
     "label": "Link: Home",
+    "multiline": false,
+    "page": "events"
+  },
+  "events.c10": {
+    "default": "Closed-door working sessions with institutions and practitioners.",
+    "kind": "html",
+    "label": "Paragraph: Closed-door working sessions with institutions…",
+    "multiline": true,
+    "page": "events"
+  },
+  "events.c11": {
+    "default": "Working Labs &amp; Convenings",
+    "kind": "html",
+    "label": "Heading: Working Labs & Convenings",
+    "multiline": false,
+    "page": "events"
+  },
+  "events.c12": {
+    "default": "Hands-on labs and other convenings across the ecosystem.",
+    "kind": "html",
+    "label": "Paragraph: Hands-on labs and other convenings across the…",
+    "multiline": true,
+    "page": "events"
+  },
+  "events.c13": {
+    "default": "Podcasts",
+    "kind": "html",
+    "label": "Heading: Podcasts",
+    "multiline": false,
+    "page": "events"
+  },
+  "events.c14": {
+    "default": "Conversations with practitioners, institutions and policymakers.",
+    "kind": "html",
+    "label": "Paragraph: Conversations with practitioners, institutions…",
+    "multiline": true,
+    "page": "events"
+  },
+  "events.c15": {
+    "default": "Events are CMS entries (Events &amp; Labs collection) grouped by category — set the category to <strong>Flagship</strong>, <strong>Roundtable</strong> or <strong>Working lab</strong>. Podcasts are managed in the Podcasts collection. Each has title, summary, thumbnail, date, tags, links and visibility status.",
+    "kind": "html",
+    "label": "Paragraph: Events are CMS entries (Events & Labs collecti…",
+    "multiline": true,
+    "page": "events"
+  },
+  "events.c16": {
+    "default": "Join MSME Catalyst",
+    "kind": "html",
+    "label": "Link: Join MSME Catalyst",
+    "multiline": false,
+    "page": "events"
+  },
+  "events.c16_href": {
+    "default": "membership.html",
+    "kind": "url",
+    "label": "Link URL: Join MSME Catalyst",
+    "multiline": false,
+    "page": "events"
+  },
+  "events.c17": {
+    "default": "Apply for ODR Support",
+    "kind": "html",
+    "label": "Link: Apply for ODR Support",
+    "multiline": false,
+    "page": "events"
+  },
+  "events.c17_href": {
+    "default": "odr-support.html",
+    "kind": "url",
+    "label": "Link URL: Apply for ODR Support",
+    "multiline": false,
+    "page": "events"
+  },
+  "events.c18": {
+    "default": "Fund the infrastructure",
+    "kind": "html",
+    "label": "Link: Fund the infrastructure",
+    "multiline": false,
+    "page": "events"
+  },
+  "events.c18_href": {
+    "default": "membership.html#donors",
+    "kind": "url",
+    "label": "Link URL: Fund the infrastructure",
     "multiline": false,
     "page": "events"
   },
@@ -742,10 +924,52 @@
     "page": "events"
   },
   "events.c3": {
-    "default": "Each item is a CMS entry (Events &amp; Labs collection): title, summary, thumbnail, category, date, tags, external link and visibility status.",
+    "default": "Flagship Event",
     "kind": "html",
-    "label": "Paragraph: Each item is a CMS entry (Events & Labs collec…",
+    "label": "Link: Flagship Event",
+    "multiline": false,
+    "page": "events"
+  },
+  "events.c4": {
+    "default": "Roundtables",
+    "kind": "html",
+    "label": "Link: Roundtables",
+    "multiline": false,
+    "page": "events"
+  },
+  "events.c5": {
+    "default": "Working Labs",
+    "kind": "html",
+    "label": "Link: Working Labs",
+    "multiline": false,
+    "page": "events"
+  },
+  "events.c6": {
+    "default": "Podcasts",
+    "kind": "html",
+    "label": "Link: Podcasts",
+    "multiline": false,
+    "page": "events"
+  },
+  "events.c7": {
+    "default": "Flagship Event",
+    "kind": "html",
+    "label": "Heading: Flagship Event",
+    "multiline": false,
+    "page": "events"
+  },
+  "events.c8": {
+    "default": "Our marquee annual convening.",
+    "kind": "html",
+    "label": "Paragraph: Our marquee annual convening.",
     "multiline": true,
+    "page": "events"
+  },
+  "events.c9": {
+    "default": "Roundtables",
+    "kind": "html",
+    "label": "Heading: Roundtables",
+    "multiline": false,
     "page": "events"
   },
   "events.heading": {
@@ -756,14 +980,14 @@
     "page": "events"
   },
   "events.kicker": {
-    "default": "Events &amp; Labs",
+    "default": "Events",
     "kind": "html",
     "label": "Hero kicker",
     "multiline": false,
     "page": "events"
   },
   "events.lead": {
-    "default": "Working labs, roundtables and convenings that turn shared intent into shared execution.",
+    "default": "Our flagship gathering, roundtables, working labs and conversations — the convenings that turn shared intent into shared execution.",
     "kind": "html",
     "label": "Hero intro",
     "multiline": true,
@@ -902,10 +1126,17 @@
     "multiline": false,
     "page": "global"
   },
-  "global.nav_events": {
-    "default": "Events & Labs",
+  "global.nav_council_meetings": {
+    "default": "Governing Council Meetings",
     "kind": "html",
-    "label": "Nav: Events & Labs",
+    "label": "Nav: Governing Council Meetings",
+    "multiline": false,
+    "page": "global"
+  },
+  "global.nav_events": {
+    "default": "Events",
+    "kind": "html",
+    "label": "Nav: Events",
     "multiline": false,
     "page": "global"
   },
@@ -962,13 +1193,6 @@
     "default": "ODR Support",
     "kind": "html",
     "label": "Nav: ODR Support",
-    "multiline": false,
-    "page": "global"
-  },
-  "global.nav_podcasts": {
-    "default": "Podcasts",
-    "kind": "html",
-    "label": "Nav: Podcasts",
     "multiline": false,
     "page": "global"
   },
@@ -1414,30 +1638,30 @@
     "page": "knowledge"
   },
   "knowledge.c4": {
-    "default": "<div class=\"ico\">🎙️</div><h3>Podcasts</h3><p>Conversations with practitioners, institutions and policymakers.</p><span class=\"textlink mt-s\" style=\"display:inline-block\">Listen →</span>",
+    "default": "<div class=\"ico orange\">🗓️</div><h3>Events</h3><p>Flagship event, roundtables, working labs and podcasts.</p><span class=\"textlink mt-s\" style=\"display:inline-block\">Explore →</span>",
     "kind": "html",
-    "label": "Link: 🎙️ Podcasts Conversations with practitioners,…",
+    "label": "Link: 🗓️ Events Flagship event, roundtables, working…",
     "multiline": false,
     "page": "knowledge"
   },
   "knowledge.c4_href": {
-    "default": "podcasts.html",
+    "default": "events.html",
     "kind": "url",
-    "label": "Link URL: 🎙️ Podcasts Conversations with pra",
+    "label": "Link URL: 🗓️ Events Flagship event, roundtab",
     "multiline": false,
     "page": "knowledge"
   },
   "knowledge.c5": {
-    "default": "<div class=\"ico orange\">🗓️</div><h3>Events &amp; Labs</h3><p>Working labs, roundtables and convenings.</p><span class=\"textlink mt-s\" style=\"display:inline-block\">Explore →</span>",
+    "default": "<div class=\"ico\">🏛️</div><h3>Governing Council Meetings</h3><p>Recorded sessions, minutes and documents — published openly.</p><span class=\"textlink mt-s\" style=\"display:inline-block\">View →</span>",
     "kind": "html",
-    "label": "Link: 🗓️ Events & Labs Working labs, roundtables and…",
+    "label": "Link: 🏛️ Governing Council Meetings Recorded session…",
     "multiline": false,
     "page": "knowledge"
   },
   "knowledge.c5_href": {
-    "default": "events.html",
+    "default": "council-meetings.html",
     "kind": "url",
-    "label": "Link URL: 🗓️ Events & Labs Working labs, rou",
+    "label": "Link URL: 🏛️ Governing Council Meetings Reco",
     "multiline": false,
     "page": "knowledge"
   },

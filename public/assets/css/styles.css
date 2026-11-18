@@ -303,6 +303,17 @@ table.tbl{width:100%;border-collapse:collapse;font-size:.92rem;min-width:560px}
 .rcard .rb{padding:20px;display:flex;flex-direction:column;gap:8px;flex:1}
 .rcard h3{font-size:1.08rem;line-height:1.25}
 .rcard .meta{font-size:.8rem;color:var(--muted);margin-top:auto}
+/* Governing Council Meetings — embedded video + write-up disclosure */
+.video-embed{position:relative;width:100%;aspect-ratio:16/9;background:#000;overflow:hidden}
+.video-embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
+.cm-details{margin-top:4px}
+.cm-details>summary{cursor:pointer;color:var(--green);font-weight:600;font-size:.9rem;list-style:none}
+.cm-details>summary::-webkit-details-marker{display:none}
+.cm-details>summary::before{content:"▸ ";color:var(--orange)}
+.cm-details[open]>summary::before{content:"▾ "}
+.cm-details .cm-body{margin-top:10px;font-size:.92rem;line-height:1.6;color:var(--ink)}
+.cm-details .cm-body p{margin:0 0 .7em}
+.cm-details .cm-body p:last-child{margin-bottom:0}
 
 /* ---------- Filters ---------- */
 .filters{display:flex;flex-wrap:wrap;gap:8px}

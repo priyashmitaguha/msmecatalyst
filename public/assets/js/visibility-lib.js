@@ -129,9 +129,30 @@
     wall.innerHTML = (members || []).map(memberTileHtml).join('');   // exactly N tiles, no empty placeholders
   }
 
+  /* ---------- YouTube embedding (security-critical) ----------
+     Extract a video ID from any common YouTube URL form (or a bare 11-char id).
+     ONLY an id matching the strict [A-Za-z0-9_-]{11} character set is ever
+     returned, so a malformed or hostile value (javascript:, an onerror payload,
+     a foreign host, extra path segments) yields '' and can never be used to
+     build an embed URL or inject markup. youtubeEmbed() returns a fixed
+     privacy-mode (youtube-nocookie) embed URL for a valid id, else ''. */
+  function youtubeId(u) {
+    if (u == null) return '';
+    var s = String(u).trim();
+    var m = s.match(/(?:youtube(?:-nocookie)?\.com\/(?:watch\?(?:[^#]*&)?v=|embed\/|shorts\/|live\/|v\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+    if (m) return m[1];
+    if (/^[A-Za-z0-9_-]{11}$/.test(s)) return s;
+    return '';
+  }
+  function youtubeEmbed(u) {
+    var id = youtubeId(u);
+    return id ? 'https://www.youtube-nocookie.com/embed/' + id + '?rel=0' : '';
+  }
+
   return {
     slugFromPath: slugFromPath, applyHiddenPages: applyHiddenPages, applyHiddenSections: applyHiddenSections,
     escapeHtml: escapeHtml, hasBlankLine: hasBlankLine, toParagraphs: toParagraphs, renderParagraphsInto: renderParagraphsInto,
     memberTileHtml: memberTileHtml, renderMemberWall: renderMemberWall, catKey: catKey,
+    youtubeId: youtubeId, youtubeEmbed: youtubeEmbed,
   };
 });

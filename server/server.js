@@ -698,6 +698,7 @@ app.put('/api/settings/visibility/:key', requireAuth, (req, res) => {
 /* ---------------- Page-level publish / hide (server-enforced) ---------------- */
 const PAGES = [
   ['index','Home'], ['about','About Us'], ['approach','Our Approach'], ['programmes','Programmes'],
+  ['council-meetings','Governing Council Meetings'],
   ['membership','Membership'], ['odr-support','ODR Support'], ['knowledge','Knowledge Hub'],
   ['reports','Reports & Papers'], ['blogs','Blogs'], ['podcasts','Podcasts'], ['events','Events & Labs'],
   ['contact','Contact'], ['privacy','Privacy'], ['terms','Terms'],

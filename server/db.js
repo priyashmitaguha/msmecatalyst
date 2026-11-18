@@ -22,7 +22,7 @@ db.pragma('foreign_keys = ON');
      users      → may manage admin users (Super Admin only)
      odr        → may manage ODR applications
    Legacy roles are retained so existing accounts keep working. */
-const CONTENT_COLLECTIONS = ['council','advisory','secretariat','blogs','reports','events','podcasts','odr_providers','odr_resources','pages','media','social'];
+const CONTENT_COLLECTIONS = ['council','advisory','secretariat','blogs','reports','events','podcasts','council_meetings','odr_providers','odr_resources','pages','media','social'];
 const ROLES = {
   super_admin: { label: 'Super Admin', all: true, users: true, crm: true, crmWrite: true, odr: true },
   cms_admin:   { label: 'CMS Admin',   content: true, odr: true, collections: CONTENT_COLLECTIONS },
@@ -76,6 +76,19 @@ const COLLECTIONS = {
     ['spotify','Spotify link','url'],['youtube','YouTube link','url'],['apple','Apple Podcasts link','url'],
     ['embed','Audio/video embed','textarea'],['transcript','Transcript','textarea'],['tags','Tags','text'],
     ['related','Related blogs & papers','text'],['publish_date','Publication date','date'] ] },
+  council_meetings: { label: 'Governing Council Meetings', status_set: 'publish', fields: [
+    ['cover','Cover image (optional — video uses its YouTube thumbnail)','file'],
+    ['title','Meeting title','text',true],
+    ['meeting_date','Meeting date','date'],
+    ['type','Type: Video / Write-up / Document (optional — auto-detected from the fields below)','text'],
+    ['summary','Short summary','textarea'],
+    ['youtube','YouTube video URL (for a recorded meeting)','url'],
+    ['body','Write-up / minutes (full text)','richtext'],
+    ['file','Uploaded document (PDF / minutes / resolution)','file'],
+    ['link','External link (optional)','url'],
+    ['tags','Tags (comma separated)','text'],
+    ['featured','Featured','bool'],
+    ['seo_title','SEO title','text'],['meta_desc','Meta description','textarea'] ] },
   odr_providers: { label: 'ODR Providers', status_set: 'active', order: true, fields: [
     ['logo','Provider logo','file'],['name','Provider name','text',true],['description','Description','textarea'],
     ['url','Website redirect URL','url'],['support','Areas of support','text'] ] },

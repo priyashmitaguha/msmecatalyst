@@ -322,6 +322,44 @@ def build(g):
         "Four programme pillars: Awareness & Readiness, Receivables & ODR Support, Capital & Market Pathways, and Cluster Intelligence.",
         programmes, active="programmes.html"))
 
+    # ===================== GOVERNING COUNCIL MEETINGS =====================
+    # Public record of Governing Council meetings for transparency: recorded
+    # videos (embedded), written minutes / write-ups, and uploaded documents.
+    # All items are CMS entries in the `council_meetings` collection; the client
+    # renders each by type and the filter bar narrows by type.
+    cm_placeholder = """
+      <article class="rcard reveal" data-cat="video">
+        <div class="thumb"><span class="badge tag">Video</span></div>
+        <div class="rb"><h3>Recorded meeting title to be added</h3><p class="muted" style="font-size:.9rem">Paste a YouTube link in the CMS and the recording embeds here. Add a short summary, date and tags.</p><div class="meta">Governing Council · 2026</div></div>
+      </article>
+      <article class="rcard reveal" data-cat="writeup">
+        <div class="thumb o"><span class="badge orange tag">Write-up</span></div>
+        <div class="rb"><h3>Meeting note / minutes title to be added</h3><p class="muted" style="font-size:.9rem">Write the minutes or a summary directly in the CMS; the full text opens inline for readers.</p><div class="meta">Governing Council · 2026</div></div>
+      </article>
+      <article class="rcard reveal" data-cat="document">
+        <div class="thumb"><span class="badge tag">Document</span></div>
+        <div class="rb"><h3>Uploaded document title to be added</h3><p class="muted" style="font-size:.9rem">Upload a PDF — agenda, minutes or resolution — and readers can open or download it.</p><div class="meta">Governing Council · 2026</div></div>
+      </article>"""
+    council_meetings = f"""
+{page_hero("Governing Council Meetings", "Our deliberations, published openly.",
+  "A public record of Governing Council meetings — recorded sessions, written minutes and supporting documents — so our governance stays transparent and accountable.", "Our Approach &middot; Governing Council Meetings", key="council-meetings")}
+<section class="section"><div class="wrap">
+  <div class="crumb" style="margin-bottom:20px"><a href="approach.html">&larr; Back to Our Approach</a></div>
+  <div class="filters reveal" data-filter-group data-target="#cm-grid">
+    <button data-filter="all" class="active">All</button>
+    <button data-filter="video">Videos</button>
+    <button data-filter="writeup">Write-ups</button>
+    <button data-filter="document">Documents</button>
+  </div>
+  <div class="grid g3 mt-l" id="cm-grid" data-cms-list="council_meetings" data-cms-render="meeting">{cm_placeholder}</div>
+  <p class="notice mt-l">Each entry is managed in the CMS (Governing Council Meetings collection): title, meeting date, a YouTube recording, written minutes / write-up, an uploaded document, summary, tags and visibility status. The type (video, write-up or document) is detected automatically.</p>
+</div></section>
+{cta_band()}
+"""
+    write("council-meetings.html", doc("Governing Council Meetings | MSME Catalyst",
+        "A public, transparent record of MSME Catalyst Governing Council meetings — recordings, minutes and documents.",
+        council_meetings, active="council-meetings.html"))
+
     # ===================== ODR SUPPORT (redirect page) =====================
     odr_support = f"""
 {page_hero("ODR Support", "Resolve payment friction before it becomes business failure.",
@@ -513,31 +551,57 @@ def build(g):
         "The MSME Catalyst podcast — conversations on making MSME support converge.",
         podcasts, active="podcasts.html"))
 
-    # ===================== EVENTS & LABS =====================
-    ev_cats = ["Working labs","Roundtables","Events"]
-    ev_filters = "".join(f'<button data-filter="{c.lower().replace(" ","-")}">{c}</button>' for c in ev_cats)
-    ev_sample = [("Working lab","working-labs"),("Roundtable","roundtables"),("Event","events"),("Working lab","working-labs")]
-    ev_items = ""
-    for i,(label,cat) in enumerate(ev_sample):
-        ev_items += f"""
+    # ===================== EVENTS (hub: Flagship / Roundtables / Working Labs / Podcasts) =====================
+    def _ev_card(label, cat, orange=False):
+        return f"""
       <article class="rcard reveal" data-cat="{cat}">
-        <div class="thumb {'o' if i%2 else ''}"><span class="badge {'orange' if i%2 else ''} tag">{label}</span></div>
-        <div class="rb"><h3>Event / lab title to be added</h3><p class="muted" style="font-size:.9rem">Working labs, roundtables and events — managed in the CMS with date, summary, tags and links.</p><div class="meta">Category: {label} · 2026</div></div>
+        <div class="thumb {'o' if orange else ''}"><span class="badge {'orange' if orange else ''} tag">{label}</span></div>
+        <div class="rb"><h3>{label} title to be added</h3><p class="muted" style="font-size:.9rem">Managed in the CMS (Events &amp; Labs collection): title, summary, thumbnail, category, date, tags and links.</p><div class="meta">Category: {label} · 2026</div></div>
       </article>"""
+    flagship_ph = _ev_card("Flagship", "flagship", False)
+    round_ph = _ev_card("Roundtable", "roundtables", True)
+    labs_ph = _ev_card("Working lab", "working-labs", False) + _ev_card("Event", "events", True)
+    _subnav = ('<a class="btn btn-ghost" style="padding:8px 14px;font-size:.88rem" href="#flagship">Flagship Event</a>'
+               '<a class="btn btn-ghost" style="padding:8px 14px;font-size:.88rem" href="#roundtables">Roundtables</a>'
+               '<a class="btn btn-ghost" style="padding:8px 14px;font-size:.88rem" href="#labs">Working Labs</a>'
+               '<a class="btn btn-ghost" style="padding:8px 14px;font-size:.88rem" href="#podcasts">Podcasts</a>')
     events = f"""
-{page_hero("Events &amp; Labs", "Where the ecosystem does the work together.",
-  "Working labs, roundtables and convenings that turn shared intent into shared execution.", "Knowledge Hub · Events &amp; Labs", key="events")}
+{page_hero("Events", "Where the ecosystem does the work together.",
+  "Our flagship gathering, roundtables, working labs and conversations — the convenings that turn shared intent into shared execution.", "Knowledge Hub · Events", key="events")}
 <section class="section"><div class="wrap">
   <div class="crumb" style="margin-bottom:20px"><a href="knowledge.html">← Back to Knowledge Hub</a></div>
-  <div class="filters reveal" data-filter-group data-target="#ev-grid">
-    <button data-filter="all" class="active">All</button>{ev_filters}
+  <div class="filters reveal" style="margin-bottom:28px">{_subnav}</div>
+
+  <div id="flagship" style="scroll-margin-top:90px">
+    <h2 class="h2 reveal">Flagship Event</h2>
+    <p class="muted reveal" style="margin:6px 0 0">Our marquee annual convening.</p>
+    <div class="grid g3 mt-m" data-cms-list="events" data-cms-filter="flagship" data-cms-render="rcard">{flagship_ph}</div>
   </div>
-  <div class="grid g3 mt-l" id="ev-grid" data-cms-list="events" data-cms-render="rcard">{ev_items}</div>
-  <p class="notice mt-l">Each item is a CMS entry (Events &amp; Labs collection): title, summary, thumbnail, category, date, tags, external link and visibility status.</p>
+
+  <div id="roundtables" style="scroll-margin-top:90px;margin-top:52px">
+    <h2 class="h2 reveal">Roundtables</h2>
+    <p class="muted reveal" style="margin:6px 0 0">Closed-door working sessions with institutions and practitioners.</p>
+    <div class="grid g3 mt-m" data-cms-list="events" data-cms-filter="roundtable" data-cms-render="rcard">{round_ph}</div>
+  </div>
+
+  <div id="labs" style="scroll-margin-top:90px;margin-top:52px">
+    <h2 class="h2 reveal">Working Labs &amp; Convenings</h2>
+    <p class="muted reveal" style="margin:6px 0 0">Hands-on labs and other convenings across the ecosystem.</p>
+    <div class="grid g3 mt-m" data-cms-list="events" data-cms-filter-exclude="flagship,roundtable" data-cms-render="rcard">{labs_ph}</div>
+  </div>
+
+  <div id="podcasts" data-section="podcasts" style="scroll-margin-top:90px;margin-top:52px">
+    <h2 class="h2 reveal">Podcasts</h2>
+    <p class="muted reveal" style="margin:6px 0 0">Conversations with practitioners, institutions and policymakers.</p>
+    <div class="grid g3 mt-m" data-cms-list="podcasts" data-cms-render="rcard">{pod_items}</div>
+  </div>
+
+  <p class="notice mt-l">Events are CMS entries (Events &amp; Labs collection) grouped by category — set the category to <strong>Flagship</strong>, <strong>Roundtable</strong> or <strong>Working lab</strong>. Podcasts are managed in the Podcasts collection. Each has title, summary, thumbnail, date, tags, links and visibility status.</p>
 </div></section>
+{cta_band()}
 """
-    write("events.html", doc("Events & Labs | MSME Catalyst",
-        "Working labs, roundtables and convenings from MSME Catalyst.",
+    write("events.html", doc("Events | MSME Catalyst",
+        "Flagship event, roundtables, working labs and podcasts from MSME Catalyst.",
         events, active="events.html"))
 
     # ===================== KNOWLEDGE HUB (landing) =====================
@@ -548,14 +612,14 @@ def build(g):
   <div class="grid g2">
     <a class="card hoverable reveal" href="reports.html" data-section="reports" style="display:block"><div class="ico">📊</div><h3>Reports &amp; Papers</h3><p>Reports, white papers, cluster maps, scorecards and research.</p><span class="textlink mt-s" style="display:inline-block">Browse →</span></a>
     <a class="card hoverable reveal" href="blogs.html" data-section="blogs" style="display:block"><div class="ico orange">✍️</div><h3>Blogs</h3><p>Short, practical writing on convergence, receivables, capability and capital.</p><span class="textlink mt-s" style="display:inline-block">Read →</span></a>
-    <a class="card hoverable reveal" href="podcasts.html" data-section="podcasts" style="display:block"><div class="ico">🎙️</div><h3>Podcasts</h3><p>Conversations with practitioners, institutions and policymakers.</p><span class="textlink mt-s" style="display:inline-block">Listen →</span></a>
-    <a class="card hoverable reveal" href="events.html" data-section="events" style="display:block"><div class="ico orange">🗓️</div><h3>Events &amp; Labs</h3><p>Working labs, roundtables and convenings.</p><span class="textlink mt-s" style="display:inline-block">Explore →</span></a>
+    <a class="card hoverable reveal" href="events.html" data-section="events" style="display:block"><div class="ico orange">🗓️</div><h3>Events</h3><p>Flagship event, roundtables, working labs and podcasts.</p><span class="textlink mt-s" style="display:inline-block">Explore →</span></a>
+    <a class="card hoverable reveal" href="council-meetings.html" style="display:block"><div class="ico">🏛️</div><h3>Governing Council Meetings</h3><p>Recorded sessions, minutes and documents — published openly.</p><span class="textlink mt-s" style="display:inline-block">View →</span></a>
   </div>
 </div></section>
 {cta_band()}
 """
     write("knowledge.html", doc("Knowledge Hub | MSME Catalyst",
-        "The MSME Catalyst Knowledge Hub — Reports & Papers, Blogs, Podcasts, and Events & Labs.",
+        "The MSME Catalyst Knowledge Hub — Reports & Papers, Blogs, and Events (flagship event, roundtables, working labs and podcasts).",
         knowledge, active="knowledge.html"))
 
     # ===================== BLOGS =====================

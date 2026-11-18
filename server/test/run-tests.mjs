@@ -588,6 +588,31 @@ const waitHealth = async () => { for (let i = 0; i < 50; i++) { try { const r = 
     ok('internal CRM/developer note is absent from the public membership page', !/In production these tiles/.test(readFileSync(join(PUBLIC, 'membership.html'), 'utf8')));
     ok('member eligibility is still enforced server-side (endpoint returns members)', (await api('/api/public/members')).data.members.length >= 1);
 
+    console.log('\nGOVERNING COUNCIL MEETINGS — COLLECTION API & SANITISATION');
+    {
+      // Collection is registered and manageable by the CMS admin role.
+      const meRes = await api('/api/auth/me', {}, admin2);
+      ok('council_meetings is an available collection', !!(meRes.data.collections && 'council_meetings' in meRes.data.collections));
+      // Create + publish a video meeting entry.
+      const create = await api('/api/collections/council_meetings', { method: 'POST', body: { status: 'published', data: {
+        title: 'Governing Council — Q1 2026', meeting_date: '2026-03-01',
+        youtube: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', summary: 'Quarterly review.' } } }, admin2);
+      ok('admin can create & publish a council-meeting entry', create.status === 200 && !!create.data.id);
+      const pub = await api('/api/public/collection/council_meetings');
+      ok('published meeting appears on the public endpoint', pub.status === 200 && pub.data.items.some(i => i.title === 'Governing Council — Q1 2026'));
+      // Server-side URL validation on the new collection: a javascript: URL is refused.
+      const bad = await api('/api/collections/council_meetings', { method: 'POST', body: { status: 'draft', data: {
+        title: 'Hostile', youtube: 'javascript:alert(document.cookie)' } } }, admin2);
+      ok('server rejects a dangerous youtube URL (safeUrl)', bad.status === 400);
+      // Richtext write-up body is HTML-sanitised (script stripped) before storage.
+      const wu = await api('/api/collections/council_meetings', { method: 'POST', body: { status: 'published', data: {
+        title: 'Minutes', body: '<p>Agreed.</p><script>steal()</script>' } } }, admin2);
+      ok('admin can create a write-up entry', wu.status === 200);
+      const pub2 = await api('/api/public/collection/council_meetings');
+      const minutes = pub2.data.items.find(i => i.title === 'Minutes');
+      ok('stored write-up body has no <script> (sanitised)', !!minutes && !/<script/i.test(minutes.body || ''));
+    }
+
     console.log('\nDATA PRESERVATION ACROSS RESTART + MIGRATION');
     // Save distinctive CMS content on the running server: a page-copy override on a
     // stable membership key (proves the note-removal did not renumber it) and a
@@ -617,6 +642,45 @@ const waitHealth = async () => { for (let i = 0; i < 50; i++) { try { const r = 
     ok('startup SKIPS seeding when data is already present', /Seed skipped — data already present\./.test(out2));
     ok('startup re-runs migrations idempotently (additive; existing data preserved)', /Migrations applied \(additive; existing data preserved\)\./.test(out2));
     child2.kill('SIGKILL');
+
+    console.log('\nGOVERNING COUNCIL MEETINGS — YOUTUBE EMBED SAFETY');
+    {
+      // Valid URL forms all resolve to the SAME 11-char id.
+      const vid = 'dQw4w9WgXcQ';
+      ok('extracts id from watch?v= URL', MCVis.youtubeId('https://www.youtube.com/watch?v=' + vid) === vid);
+      ok('extracts id from youtu.be short URL', MCVis.youtubeId('https://youtu.be/' + vid) === vid);
+      ok('extracts id from /embed/ URL', MCVis.youtubeId('https://www.youtube.com/embed/' + vid) === vid);
+      ok('extracts id from /shorts/ and /live/ URLs', MCVis.youtubeId('https://youtube.com/shorts/' + vid) === vid && MCVis.youtubeId('https://www.youtube.com/live/' + vid) === vid);
+      ok('extracts id when extra query params precede v=', MCVis.youtubeId('https://www.youtube.com/watch?feature=share&v=' + vid) === vid);
+      ok('accepts a bare 11-char id', MCVis.youtubeId(vid) === vid);
+      // Hostile / malformed inputs must yield '' (never an embed, never markup).
+      ok('rejects a javascript: URI', MCVis.youtubeId('javascript:alert(1)') === '' && MCVis.youtubeEmbed('javascript:alert(1)') === '');
+      ok('rejects an HTML-injection payload', MCVis.youtubeId('"><img src=x onerror=alert(1)>') === '');
+      ok('rejects a foreign host posing as embed', MCVis.youtubeId('https://evil.example.com/embed/' + vid + '">x') === '' || !MCVis.youtubeEmbed('https://evil.example.com/embed/' + vid + '">x').includes('evil'));
+      ok('rejects an over-long id-ish token', MCVis.youtubeId('AAAAAAAAAAAA_extra') === '');
+      ok('rejects null/empty', MCVis.youtubeId(null) === '' && MCVis.youtubeId('') === '');
+      // The embed URL is always the fixed privacy host + validated id, or empty.
+      const emb = MCVis.youtubeEmbed('https://youtu.be/' + vid);
+      ok('embed URL uses youtube-nocookie host with the validated id', emb === 'https://www.youtube-nocookie.com/embed/' + vid + '?rel=0');
+    }
+
+    console.log('\nGOVERNING COUNCIL MEETINGS — BUILT PAGES & NAV');
+    {
+      const cm = new JSDOM(readFileSync(join(PUBLIC, 'council-meetings.html'), 'utf8')).window.document;
+      const grid = cm.querySelector('[data-cms-list="council_meetings"]');
+      ok('council-meetings page has the meetings list container', !!grid && grid.getAttribute('data-cms-render') === 'meeting');
+      ok('council-meetings page has type filters (video/writeup/document)', ['video','writeup','document'].every(f => cm.querySelector('[data-filter="' + f + '"]')));
+      // Linked in the main nav under "Our Approach".
+      const home = new JSDOM(readFileSync(join(PUBLIC, 'index.html'), 'utf8')).window.document;
+      ok('nav links to the Governing Council Meetings page', !!home.querySelector('a[href="council-meetings.html"]'));
+      ok('Our Approach dropdown contains the meetings link', Array.from(home.querySelectorAll('.dropdown a, .mobile-menu a, nav a')).some(a => a.getAttribute('href') === 'council-meetings.html'));
+      // Events hub: four grouped lists, podcasts reused, no data migration.
+      const ev = new JSDOM(readFileSync(join(PUBLIC, 'events.html'), 'utf8')).window.document;
+      ok('events page groups Flagship via category filter', !!ev.querySelector('[data-cms-list="events"][data-cms-filter="flagship"]'));
+      ok('events page groups Roundtables via category filter', !!ev.querySelector('[data-cms-list="events"][data-cms-filter="roundtable"]'));
+      ok('events page keeps Working Labs (exclude flagship/roundtable)', !!ev.querySelector('[data-cms-list="events"][data-cms-filter-exclude="flagship,roundtable"]'));
+      ok('events page hosts Podcasts from the existing podcasts collection', !!ev.querySelector('#podcasts [data-cms-list="podcasts"]'));
+    }
 
     console.log('\nPRODUCTION DEPENDENCY AUDIT');
     {
