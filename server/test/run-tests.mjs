@@ -680,6 +680,11 @@ const waitHealth = async () => { for (let i = 0; i < 50; i++) { try { const r = 
       ok('events page groups Roundtables via category filter', !!ev.querySelector('[data-cms-list="events"][data-cms-filter="roundtable"]'));
       ok('events page keeps Working Labs (exclude flagship/roundtable)', !!ev.querySelector('[data-cms-list="events"][data-cms-filter-exclude="flagship,roundtable"]'));
       ok('events page hosts Podcasts from the existing podcasts collection', !!ev.querySelector('#podcasts [data-cms-list="podcasts"]'));
+      // Meetings list auto-sorts by meeting date, newest first.
+      ok('council-meetings list sorts by meeting_date desc', grid.getAttribute('data-cms-sort') === 'meeting_date:desc');
+      // The admin sidebar exposes the new collection (hardcoded content nav must include it).
+      const adminJs = readFileSync(join(PUBLIC, '..', 'server', 'admin', 'admin.js'), 'utf8');
+      ok('admin sidebar Content nav includes council_meetings', /const content = \[[^\]]*'council_meetings'[^\]]*\]/.test(adminJs));
     }
 
     console.log('\nPRODUCTION DEPENDENCY AUDIT');

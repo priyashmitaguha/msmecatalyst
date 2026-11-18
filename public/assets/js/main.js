@@ -257,10 +257,22 @@
     var render = renderers[box.getAttribute('data-cms-render')] || rcardCard;
     var inc = catTerms(box, 'data-cms-filter');
     var exc = catTerms(box, 'data-cms-filter-exclude');
+    // Optional sort: data-cms-sort="field:desc" (or ":asc"). Dates/strings compare fine.
+    var sortSpec = (box.getAttribute('data-cms-sort') || '').split(':');
+    var sortField = sortSpec[0].trim();
+    var sortDesc = (sortSpec[1] || 'desc').trim().toLowerCase() !== 'asc';
     fetch('/api/public/collection/'+name).then(function(r){return r.json();}).then(function(d){
       var items = d.items || [];
       if (inc.length) items = items.filter(function(it){ return catMatch(it, inc); });
       if (exc.length) items = items.filter(function(it){ return !catMatch(it, exc); });
+      if (sortField) {
+        items = items.slice().sort(function(a, b){
+          var av = (a[sortField] || ''), bv = (b[sortField] || '');
+          if (av < bv) return sortDesc ? 1 : -1;
+          if (av > bv) return sortDesc ? -1 : 1;
+          return 0;
+        });
+      }
       if (items.length) box.innerHTML = items.map(render).join('');
       // empty → keep the built-in placeholder cards as a graceful fallback
     }).catch(function(){ /* static hosting: keep placeholders */ });

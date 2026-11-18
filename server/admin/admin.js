@@ -59,7 +59,7 @@ async function boot() {
   const gov = ['council', 'advisory', 'secretariat'].filter(c => allowed(c));
   if (gov.length) { groupLabel('Governance'); gov.forEach(c => add('col:' + c, DEF[c].label)); }
   // Content
-  const content = ['blogs', 'reports', 'events', 'podcasts', 'social'].filter(c => allowed(c));
+  const content = ['blogs', 'reports', 'events', 'podcasts', 'council_meetings', 'social'].filter(c => allowed(c));
   const hasPages = allowed('pages') || CAPS.settings;
   if (content.length || hasPages) {
     groupLabel('Content');
