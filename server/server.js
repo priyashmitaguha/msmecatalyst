@@ -81,7 +81,11 @@ const upload = multer({
   }),
   limits: { fileSize: 10 * 1024 * 1024, files: 10 },
   fileFilter: (req, file, cb) => {
-    const allowed = new Set(['image/png','image/jpeg','image/webp','image/svg+xml','application/pdf']);
+    const allowed = new Set(['image/png','image/jpeg','image/webp','image/svg+xml','application/pdf',
+      'application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.ms-powerpoint','application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      'application/vnd.ms-excel','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'text/plain','text/csv']);
     cb(allowed.has(file.mimetype) ? null : new Error('Unsupported file type'), allowed.has(file.mimetype));
   },
 });

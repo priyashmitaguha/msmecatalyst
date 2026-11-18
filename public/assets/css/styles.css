@@ -303,6 +303,12 @@ table.tbl{width:100%;border-collapse:collapse;font-size:.92rem;min-width:560px}
 .rcard .rb{padding:20px;display:flex;flex-direction:column;gap:8px;flex:1}
 .rcard h3{font-size:1.08rem;line-height:1.25}
 .rcard .meta{font-size:.8rem;color:var(--muted);margin-top:auto}
+/* Governing Council Meetings — a single readable column, one card per meeting */
+.cm-list{display:flex;flex-direction:column;gap:24px;max-width:720px}
+.cm-list .rcard{width:100%}
+.cm-list .rcard .rb{padding:22px 24px}
+.cm-list .rcard-sum{font-size:.98rem;line-height:1.65}
+.cm-list .rcard h3{font-size:1.25rem}
 /* Governing Council Meetings — embedded video + write-up disclosure */
 .video-embed{position:relative;width:100%;aspect-ratio:16/9;background:#000;overflow:hidden}
 .video-embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}

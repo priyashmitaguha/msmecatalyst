@@ -351,7 +351,7 @@ def build(g):
     <button data-filter="writeup">Write-ups</button>
     <button data-filter="document">Documents</button>
   </div>
-  <div class="grid g3 mt-l" id="cm-grid" data-cms-list="council_meetings" data-cms-render="meeting" data-cms-sort="meeting_date:desc">{cm_placeholder}</div>
+  <div class="cm-list mt-l" id="cm-grid" data-cms-list="council_meetings" data-cms-render="meeting" data-cms-sort="meeting_date:desc">{cm_placeholder}</div>
   <p class="notice mt-l">Each entry is managed in the CMS (Governing Council Meetings collection): title, meeting date, a YouTube recording, written minutes / write-up, an uploaded document, summary, tags and visibility status. The type (video, write-up or document) is detected automatically.</p>
 </div></section>
 {cta_band()}
