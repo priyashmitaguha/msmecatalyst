@@ -134,6 +134,10 @@
   // Reusable, XSS-safe paragraph rendering for plain-text CMS fields (bios, summaries,
   // descriptions). Blank lines → separate <p>; single line breaks → <br>.
   function paras(text, className){ return (typeof MCVis!=='undefined') ? MCVis.toParagraphs(text,{className:className}) : (text?'<p class="'+className+'">'+esc(text)+'</p>':''); }
+  // A file field may hold several URLs (one per line, or comma-separated). These
+  // read all of them, or just the first, so single-URL callers stay correct.
+  function urlList(v){ return String(v==null?'':v).split(/[\r\n,]+/).map(function(s){return s.trim();}).filter(Boolean); }
+  function firstUrl(v){ return urlList(v)[0] || ''; }
 
   // 1) Page-copy overrides: replace default text / links / images with admin-edited values.
   var cmsEls = document.querySelectorAll('[data-cms],[data-cms-href],[data-cms-src],[data-cms-alt]');
@@ -167,15 +171,17 @@
   // 2) Live list rendering from CMS collections.
   function profileCard(it){
     var name=it.name||'—', role=it.role||it.designation||'', org=it.organisation||it.department||'', bio=it.bio||'', li=it.linkedin;
-    var head = it.photo ? '<img src="'+esc(it.photo)+'" alt="'+esc(name)+'" style="width:100%;height:100%;object-fit:cover" onerror="this.replaceWith(document.createTextNode(\''+initials(name)+'\'))">' : initials(name);
+    var photo=firstUrl(it.photo);
+    var head = photo ? '<img src="'+esc(photo)+'" alt="'+esc(name)+'" style="width:100%;height:100%;object-fit:cover" onerror="this.replaceWith(document.createTextNode(\''+initials(name)+'\'))">' : initials(name);
     return '<article class="profile"><div class="ph">'+head+'</div><div class="pb"><h3>'+esc(name)+'</h3>'+
       (role?'<div class="role">'+esc(role)+'</div>':'')+(org?'<div class="org">'+esc(org)+'</div>':'')+
       paras(bio,'bio')+(li?'<a class="li" href="'+esc(li)+'" target="_blank" rel="noopener">in · LinkedIn</a>':'')+'</div></article>';
   }
   function rcardCard(it){
     var title=it.title||'Untitled', summary=it.summary||it.description||'', cat=it.category||'', date=it.publish_date||'', author=it.author||it.guest||'';
-    var link=it.link||it.file;
-    var thumb = it.cover ? ' style="background-image:url('+esc(it.cover)+');background-size:cover;background-position:center"' : '';
+    var link=it.link||firstUrl(it.file);
+    var cover=firstUrl(it.cover);
+    var thumb = cover ? ' style="background-image:url('+esc(cover)+');background-size:cover;background-position:center"' : '';
     var titleHtml = link ? '<a href="'+esc(link)+'" target="_blank" rel="noopener">'+esc(title)+'</a>' : esc(title);
     return '<article class="rcard"><div class="thumb"'+thumb+'>'+(cat?'<span class="badge tag">'+esc(cat)+'</span>':'')+'</div>'+
       '<div class="rb"><h3>'+titleHtml+'</h3>'+paras(summary,'muted rcard-sum')+
@@ -224,10 +230,14 @@
         '<div class="meta">'+meta+'</div></div></article>';
     }
     if (kind === 'document'){
-      var href = it.file||it.link||'';
-      var thumb = it.cover ? ' style="background-image:url('+esc(it.cover)+');background-size:cover;background-position:center"' : '';
-      var titleHtml = href ? '<a href="'+esc(href)+'" target="_blank" rel="noopener">'+esc(title)+'</a>' : esc(title);
-      var open = href ? '<a class="textlink" style="display:inline-block;margin-top:8px" href="'+esc(href)+'" target="_blank" rel="noopener">Open document →</a>' : '';
+      // A meeting can carry several documents (one URL per line in the file field).
+      var files = urlList(it.file);
+      var primary = files[0] || it.link || '';
+      var thumb = it.cover ? ' style="background-image:url('+esc(firstUrl(it.cover))+');background-size:cover;background-position:center"' : '';
+      var titleHtml = primary ? '<a href="'+esc(primary)+'" target="_blank" rel="noopener">'+esc(title)+'</a>' : esc(title);
+      var open = files.length
+        ? files.map(function(u, i){ return '<a class="textlink" style="display:block;margin-top:6px" href="'+esc(u)+'" target="_blank" rel="noopener">Open document'+(files.length>1?' '+(i+1):'')+' →</a>'; }).join('')
+        : (it.link ? '<a class="textlink" style="display:inline-block;margin-top:8px" href="'+esc(it.link)+'" target="_blank" rel="noopener">Open →</a>' : '');
       return '<article class="rcard" data-cat="document"><div class="thumb"'+thumb+'><span class="badge tag">Document</span></div>'+
         '<div class="rb"><h3>'+titleHtml+'</h3>'+paras(summary,'muted rcard-sum')+open+
         '<div class="meta">'+meta+'</div></div></article>';

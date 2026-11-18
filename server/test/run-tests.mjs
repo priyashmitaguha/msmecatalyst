@@ -611,6 +611,17 @@ const waitHealth = async () => { for (let i = 0; i < 50; i++) { try { const r = 
       const pub2 = await api('/api/public/collection/council_meetings');
       const minutes = pub2.data.items.find(i => i.title === 'Minutes');
       ok('stored write-up body has no <script> (sanitised)', !!minutes && !/<script/i.test(minutes.body || ''));
+      // Multiple documents on one meeting: several upload paths, one per line.
+      const multi = await api('/api/collections/council_meetings', { method: 'POST', body: { status: 'published', data: {
+        title: 'Docs meeting', file: '/uploads/a.pdf\n/uploads/b.pdf' } } }, admin2);
+      ok('admin can save a meeting with multiple documents', multi.status === 200);
+      const pub3 = await api('/api/public/collection/council_meetings');
+      const docs = pub3.data.items.find(i => i.title === 'Docs meeting');
+      ok('both uploaded documents are stored (one per line)', !!docs && /\/uploads\/a\.pdf/.test(docs.file) && /\/uploads\/b\.pdf/.test(docs.file));
+      // A dangerous URL anywhere in a multi-file field is rejected.
+      const badfile = await api('/api/collections/council_meetings', { method: 'POST', body: { status: 'draft', data: {
+        title: 'Bad doc', file: '/uploads/ok.pdf\njavascript:alert(1)' } } }, admin2);
+      ok('multi-file field rejects a dangerous URL among valid ones', badfile.status === 400);
     }
 
     console.log('\nDATA PRESERVATION ACROSS RESTART + MIGRATION');

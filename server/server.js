@@ -407,9 +407,15 @@ function sanitizeCollectionData(name, data) {
       if (u === null) return { error: `“${k}” is not a valid or safe URL.` };
       out[k] = u;
     } else if (type === 'file') {
-      const u = safeUrl(out[k], { schemes: ['http', 'https'] });
-      if (u === null) return { error: `“${k}” is not a valid or safe URL.` };
-      out[k] = u;
+      // A file field may hold several uploaded files, one URL per line. Validate each.
+      const parts = String(out[k]).split(/[\r\n]+/).map(s => s.trim()).filter(Boolean);
+      const safe = [];
+      for (const p of parts) {
+        const u = safeUrl(p, { schemes: ['http', 'https'] });
+        if (u === null) return { error: `“${k}” has a URL that is not valid or safe.` };
+        safe.push(u);
+      }
+      out[k] = safe.join('\n');
     } else if (type === 'richtext' || k === 'embed') {
       out[k] = cleanHtml(out[k]);
     }

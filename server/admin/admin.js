@@ -750,9 +750,38 @@ function fieldFor(k, label, type, val, req, opts) {
   if (type === 'textarea' || type === 'richtext') ctrl = `<textarea class="textarea" data-k="${k}" id="${id}">${esc(val)}</textarea>`;
   else if (type === 'bool') ctrl = `<label class="checkrow"><input type="checkbox" data-k="${k}" id="${id}" ${val ? 'checked' : ''}> ${esc(label)}</label>`;
   else if (type === 'select') ctrl = `<select class="select" data-k="${k}" id="${id}">${(opts || []).map(o => `<option ${o == val ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select>`;
-  else if (type === 'file') ctrl = `<input class="input" data-k="${k}" id="${id}" value="${esc(val)}" placeholder="/uploads/… or paste a URL"><div class="notice" style="margin-top:6px">Media library / upload endpoint: POST /api/upload</div>`;
+  else if (type === 'file') ctrl = `<textarea class="textarea" data-k="${k}" id="${id}" rows="2" placeholder="/uploads/… — upload below, or paste URL(s); one per line for multiple files">${esc(val)}</textarea>`;
   else ctrl = `<input class="input" type="${type === 'number' ? 'number' : type === 'date' ? 'date' : type === 'email' ? 'email' : type === 'url' ? 'url' : type === 'password' ? 'password' : 'text'}" data-k="${k}" id="${id}" value="${esc(val)}"${type === 'password' ? ' autocomplete="new-password"' : ''}>`;
   f.innerHTML = type === 'bool' ? ctrl : `<label for="${id}">${esc(label)}${req ? ' <span class="req">*</span>' : ''}</label>${ctrl}`;
+  if (type === 'file') {
+    // Real upload button: pick one or more files, upload each via /api/upload,
+    // and append each returned /uploads/ URL to the field (one per line).
+    const ta = f.querySelector(`[data-k="${k}"]`);
+    const picker = el('input', 'input'); picker.type = 'file'; picker.multiple = true;
+    picker.setAttribute('accept', '.pdf,image/*,.doc,.docx,.ppt,.pptx,.xls,.xlsx');
+    picker.style.cssText = 'padding:6px 0';
+    const status = el('span', 'muted'); status.style.cssText = 'font-size:.82rem';
+    picker.addEventListener('change', async () => {
+      const files = Array.from(picker.files || []); if (!files.length) return;
+      let done = 0;
+      for (const fl of files) {
+        status.textContent = 'Uploading ' + (done + 1) + '/' + files.length + '…';
+        const fd = new FormData(); fd.append('file', fl);
+        try {
+          const r = await fetch('/api/upload', { method: 'POST', body: fd });
+          const d = await r.json();
+          if (d && d.url) { ta.value = (ta.value.trim() ? ta.value.trim() + '\n' : '') + d.url; done++; }
+          else { status.textContent = (d && d.error) || 'Upload failed'; return; }
+        } catch (e) { status.textContent = 'Upload failed'; return; }
+      }
+      status.textContent = 'Uploaded ' + done + ' file' + (done === 1 ? '' : 's') + ' ✓';
+      picker.value = '';
+    });
+    const row = el('div', ''); row.style.cssText = 'display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:6px';
+    const note = el('span', 'muted'); note.style.fontSize = '.78rem'; note.textContent = 'PDF, image or document — pick several for multiple files.';
+    row.append(picker, status);
+    f.appendChild(row); f.appendChild(note);
+  }
   return f;
 }
 function statusBadge(s) { const map = { published: 'st-ok', active: 'st-ok', draft: 'st-warn', review: 'st-warn', archived: 'st-off', inactive: 'st-off' }; return `<span class="st ${map[s] || 'st-warn'}">${esc(s || 'draft')}</span>`; }
