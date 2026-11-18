@@ -241,10 +241,14 @@
     if (hasBody) cats.push('writeup');
     if (files.length) cats.push('document');
     if (!cats.length) cats.push('writeup');
-    // Media area: embedded recording, else a cover image, else nothing.
+    // Media area: for a recording, show a poster (the uploaded cover, else the
+    // YouTube thumbnail) with a play button; clicking loads the player. This shows
+    // a real thumbnail and avoids auto-loading an embed that an ad-blocker/privacy
+    // extension may block. Non-video meetings show the cover image if present.
     var media = '';
     if (vid) {
-      media = '<div class="video-embed"><iframe src="https://www.youtube-nocookie.com/embed/'+vid+'?rel=0" title="'+esc(title)+'" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>';
+      var poster = firstUrl(it.cover) || ('https://i.ytimg.com/vi/'+vid+'/hqdefault.jpg');
+      media = '<div class="video-embed cm-poster" data-ytid="'+vid+'" role="button" tabindex="0" title="Play recording" style="background-image:url('+esc(poster)+')"><span class="cm-play" aria-hidden="true">▶</span></div>';
     } else if (firstUrl(it.cover)) {
       media = '<div class="thumb" style="background-image:url('+esc(firstUrl(it.cover))+');background-size:cover;background-position:center"></div>';
     }
@@ -304,6 +308,24 @@
       if (items.length) box.innerHTML = items.map(render).join('');
       // empty → keep the built-in placeholder cards as a graceful fallback
     }).catch(function(){ /* static hosting: keep placeholders */ });
+  });
+  // Click a meeting video poster → load the YouTube player in place (only a
+  // validated 11-char id ever builds the embed URL).
+  function playPoster(poster){
+    var id = poster.getAttribute('data-ytid');
+    if (!/^[A-Za-z0-9_-]{11}$/.test(id||'')) return;
+    var w = document.createElement('div'); w.className = 'video-embed';
+    w.innerHTML = '<iframe src="https://www.youtube-nocookie.com/embed/'+id+'?rel=0&autoplay=1" title="Recording" loading="lazy" allow="autoplay; encrypted-media; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>';
+    poster.replaceWith(w);
+  }
+  document.addEventListener('click', function(e){
+    var poster = e.target && e.target.closest ? e.target.closest('.cm-poster') : null;
+    if (poster) playPoster(poster);
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    var poster = e.target && e.target.classList && e.target.classList.contains('cm-poster') ? e.target : null;
+    if (poster) { e.preventDefault(); playPoster(poster); }
   });
 })();
 
