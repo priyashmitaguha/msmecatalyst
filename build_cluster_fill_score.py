@@ -680,8 +680,16 @@ export default function ClusterFillScore() {
 """
 
 
-def write_canvas():
+def canvas_book():
     book = books()
+    clusters = []
+    for cluster in book["clusters"]:
+        clusters.append({key: value for key, value in cluster.items() if key != "hsn_note"})
+    return {"weights": book["weights"], "clusters": clusters}
+
+
+def write_canvas():
+    book = canvas_book()
     factors = []
     for factor in FACTORS:
         factors.append({

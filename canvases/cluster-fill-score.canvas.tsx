@@ -142,7 +142,6 @@ const SEED: Book = {
       "name": "Pune engineering and auto supplier route",
       "place": "Maharashtra · Pune · Pimpri–Chinchwad / Bhosari first; Chakan as a later spoke",
       "hsn": "8708; 8714; 8409",
-      "hsn_note": "Auto components. Vehicle parts, two-wheeler parts and engine parts, respectively; actual part classification governs.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -200,7 +199,6 @@ const SEED: Book = {
       "name": "Delhi general engineering metal cutting and fabrication",
       "place": "Delhi NCT · Delhi district jurisdiction to validate per unit · Naraina / Mayapuri candidate machining and fabrication belt",
       "hsn": "7308; 7326; 8466",
-      "hsn_note": "Engineering and metals. Structural steelwork, other iron/steel articles, machine-tool parts. Heading 8466 only if the actual part qualifies; a machining service may need SAC.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -258,7 +256,6 @@ const SEED: Book = {
       "name": "Chennai engineering Ambattur fabrication route",
       "place": "Tamil Nadu · Chennai / Tiruvallur jurisdiction to validate per unit · Ambattur / Thirumullaivoyal engineering route",
       "hsn": "7308; 7326; 8466",
-      "hsn_note": "Engineering and metals. Structural steelwork, other iron/steel articles, machine-tool parts. Heading 8466 only if the actual part qualifies; a machining service may need SAC.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -316,7 +313,6 @@ const SEED: Book = {
       "name": "Pune Hadapsar printing and packaging",
       "place": "Maharashtra · Pune · Hadapsar printing and packaging",
       "hsn": "4819; 4821; 4911",
-      "hsn_note": "Printing and packaging. Paper/board packaging, paper labels and other printed matter; contract printing may instead be a service.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -374,7 +370,6 @@ const SEED: Book = {
       "name": "Pune plastics and moulding",
       "place": "Maharashtra · Pune · Pimpri–Chinchwad / Bhosari plastics and moulding enquiry",
       "hsn": "3923; 3926; 6305",
-      "hsn_note": "Plastics and polymer products. Plastic packing articles, other plastic articles, textile-material sacks. Woven polymer sacks require material/construction-specific classification.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -432,7 +427,6 @@ const SEED: Book = {
       "name": "Pune defence supplier ecosystem",
       "place": "Maharashtra · Pune · Pune / Pimpri–Chinchwad defence supplier enquiry",
       "hsn": "8807; 9305; 7326",
-      "hsn_note": "Defence and aerospace suppliers. Aircraft parts, arms parts and generic steel articles are alternative examples, not automatic classifications for all defence supplies.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -490,7 +484,6 @@ const SEED: Book = {
       "name": "Delhi printing and packaging",
       "place": "Delhi NCT · Industrial-area district to be confirmed · Naraina printing / Bawana packaging candidate belts",
       "hsn": "4819; 4821; 4911",
-      "hsn_note": "Printing and packaging. Paper/board packaging, paper labels and other printed matter; contract printing may instead be a service.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -548,7 +541,6 @@ const SEED: Book = {
       "name": "Delhi plastics Bawana Narela enquiry",
       "place": "Delhi NCT · North / North West Delhi jurisdiction to validate · Bawana first; Narela only as a separately coded spoke",
       "hsn": "3923; 3926; 6305",
-      "hsn_note": "Plastics and polymer products. Plastic packing articles, other plastic articles, textile-material sacks. Woven polymer sacks require material/construction-specific classification.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -606,7 +598,6 @@ const SEED: Book = {
       "name": "Gurugram Manesar auto components",
       "place": "Haryana / NCR · Gurugram · IMT Manesar and adjacent supplier estates",
       "hsn": "8708; 8714; 8409",
-      "hsn_note": "Auto components. Vehicle parts, two-wheeler parts and engine parts, respectively; actual part classification governs.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -664,7 +655,6 @@ const SEED: Book = {
       "name": "Bengaluru Peenya metal cutting and fabrication",
       "place": "Karnataka · Bengaluru Urban jurisdiction to validate · Peenya industrial area",
       "hsn": "7308; 7326; 8466",
-      "hsn_note": "Engineering and metals. Structural steelwork, other iron/steel articles, machine-tool parts. Heading 8466 only if the actual part qualifies; a machining service may need SAC.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -722,7 +712,6 @@ const SEED: Book = {
       "name": "Bengaluru plastics precision moulding",
       "place": "Karnataka · Bengaluru Urban · Peenya and nearby precision-moulding enquiry",
       "hsn": "3923; 3926; 6305",
-      "hsn_note": "Plastics and polymer products. Plastic packing articles, other plastic articles, textile-material sacks. Woven polymer sacks require material/construction-specific classification.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -780,7 +769,6 @@ const SEED: Book = {
       "name": "Bengaluru aerospace defence suppliers",
       "place": "Karnataka · Devanahalli district jurisdiction to validate at recruitment · Bengaluru / Devanahalli aerospace supplier ecosystem",
       "hsn": "8807; 9305; 7326",
-      "hsn_note": "Defence and aerospace suppliers. Aircraft parts, arms parts and generic steel articles are alternative examples, not automatic classifications for all defence supplies.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -838,7 +826,6 @@ const SEED: Book = {
       "name": "Hosur auto and engineering suppliers",
       "place": "Tamil Nadu · Krishnagiri · Hosur / adjacent engineering estates",
       "hsn": "8708; 8714; 8409",
-      "hsn_note": "Auto components. Vehicle parts, two-wheeler parts and engine parts, respectively; actual part classification governs.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -896,7 +883,6 @@ const SEED: Book = {
       "name": "Hosur print and pack products",
       "place": "Tamil Nadu · Krishnagiri · Hosur print and pack products",
       "hsn": "4819; 4821; 4911",
-      "hsn_note": "Printing and packaging. Paper/board packaging, paper labels and other printed matter; contract printing may instead be a service.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -954,7 +940,6 @@ const SEED: Book = {
       "name": "Chennai auto components",
       "place": "Tamil Nadu · Chennai / neighbouring district jurisdiction to validate · Guindy / Ambattur automotive supplier enquiry",
       "hsn": "8708; 8714; 8409",
-      "hsn_note": "Auto components. Vehicle parts, two-wheeler parts and engine parts, respectively; actual part classification governs.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -1012,7 +997,6 @@ const SEED: Book = {
       "name": "Chennai Kancheepuram plastic woven sacks",
       "place": "Tamil Nadu · Kancheepuram · Pillaipakkam / Sriperumbudur plastic woven-sack CFC",
       "hsn": "3923; 3926; 6305",
-      "hsn_note": "Plastics and polymer products. Plastic packing articles, other plastic articles, textile-material sacks. Woven polymer sacks require material/construction-specific classification.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -1070,7 +1054,6 @@ const SEED: Book = {
       "name": "Chennai printing and packaging",
       "place": "Tamil Nadu · Chennai · Chennai printing and packaging enquiry",
       "hsn": "4819; 4821; 4911",
-      "hsn_note": "Printing and packaging. Paper/board packaging, paper labels and other printed matter; contract printing may instead be a service.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -1128,7 +1111,6 @@ const SEED: Book = {
       "name": "Chennai Hosur defence corridor suppliers",
       "place": "Tamil Nadu · Chennai / Krishnagiri; additional plant districts to verify · Chennai–Hosur defence-corridor nodes",
       "hsn": "8807; 9305; 7326",
-      "hsn_note": "Defence and aerospace suppliers. Aircraft parts, arms parts and generic steel articles are alternative examples, not automatic classifications for all defence supplies.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -1186,7 +1168,6 @@ const SEED: Book = {
       "name": "Bengaluru — Electronics",
       "place": "Karnataka · Bengaluru Urban · Peenya / Bommasandra electronics production enquiry",
       "hsn": "8534; 8537; 8542",
-      "hsn_note": "Electronics components and assembly. Examples of printed circuits, control panels and integrated circuits; actual product mix unverified.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -1244,7 +1225,6 @@ const SEED: Book = {
       "name": "Mumbai Suburban — Electronics",
       "place": "Maharashtra · Mumbai Suburban · Andheri / Marol electronics enquiry",
       "hsn": "8534; 8537; 8542",
-      "hsn_note": "Electronics components and assembly. Examples of printed circuits, control panels and integrated circuits; actual product mix unverified.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -1302,7 +1282,6 @@ const SEED: Book = {
       "name": "Jaipur — Electronics",
       "place": "Rajasthan · Jaipur jurisdiction to validate after district changes · Sitapura / Vishwakarma candidate electronics belt",
       "hsn": "8534; 8537; 8542",
-      "hsn_note": "Electronics components and assembly. Examples of printed circuits, control panels and integrated circuits; actual product mix unverified.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -1360,7 +1339,6 @@ const SEED: Book = {
       "name": "Gurugram — Engineering",
       "place": "Haryana · Gurugram · Udyog Vihar / Manesar engineering enquiry",
       "hsn": "7308; 7326; 8466",
-      "hsn_note": "Engineering and metals. Structural steelwork, other iron/steel articles, machine-tool parts. Heading 8466 only if the actual part qualifies; a machining service may need SAC.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -1418,7 +1396,6 @@ const SEED: Book = {
       "name": "Tiruppur — Textiles",
       "place": "Tamil Nadu · Tiruppur · Tiruppur knitwear production and ancillary belt",
       "hsn": "6109; 6203; 6204",
-      "hsn_note": "Textile footwear and artisan goods. Examples of knitwear and woven apparel; actual fibre, construction and garment type determine the heading.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -1476,7 +1453,6 @@ const SEED: Book = {
       "name": "Mumbai Suburban — Apparels",
       "place": "Maharashtra · Mumbai Suburban · Andheri / Goregaon / Malad apparel enquiry",
       "hsn": "6109; 6203; 6204",
-      "hsn_note": "Textile footwear and artisan goods. Examples of knitwear and woven apparel; actual fibre, construction and garment type determine the heading.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -1534,7 +1510,6 @@ const SEED: Book = {
       "name": "Coimbatore — Khadi",
       "place": "Tamil Nadu · Coimbatore · Khadi / weaving enterprise catchment to be mapped",
       "hsn": "5208; 5209",
-      "hsn_note": "Textile footwear and artisan goods. Examples of woven cotton fabrics; khadi is not one universal HSN.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -1592,7 +1567,6 @@ const SEED: Book = {
       "name": "Panipat — Carpets",
       "place": "Haryana · Panipat · Panipat carpets / home-textile processing enquiry",
       "hsn": "5701; 5702; 5703",
-      "hsn_note": "Textile footwear and artisan goods. Examples of knotted, woven and tufted carpets.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -1650,7 +1624,6 @@ const SEED: Book = {
       "name": "Jaipur — Garments",
       "place": "Rajasthan · Jaipur jurisdiction to validate · Sitapura / Sanganer garment-production enquiry",
       "hsn": "6109; 6203; 6204",
-      "hsn_note": "Textile footwear and artisan goods. Examples of knitwear and woven apparel; actual fibre, construction and garment type determine the heading.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -1708,7 +1681,6 @@ const SEED: Book = {
       "name": "Kolhapur — Footwear",
       "place": "Maharashtra · Kolhapur · Kolhapuri footwear producer groups; exact workshops to map",
       "hsn": "6403",
-      "hsn_note": "Textile footwear and artisan goods. Example for leather-upper footwear with qualifying soles; actual Kolhapuri construction governs.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -1766,7 +1738,6 @@ const SEED: Book = {
       "name": "Gurugram — Apparels",
       "place": "Haryana · Gurugram · Udyog Vihar / adjoining apparel factories",
       "hsn": "6109; 6203; 6204",
-      "hsn_note": "Textile footwear and artisan goods. Examples of knitwear and woven apparel; actual fibre, construction and garment type determine the heading.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -1824,7 +1795,6 @@ const SEED: Book = {
       "name": "Gautam Buddha Nagar — Garments",
       "place": "Uttar Pradesh · Gautam Buddha Nagar · Noida garment-production sector enquiry",
       "hsn": "6109; 6203; 6204",
-      "hsn_note": "Textile footwear and artisan goods. Examples of knitwear and woven apparel; actual fibre, construction and garment type determine the heading.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -1882,7 +1852,6 @@ const SEED: Book = {
       "name": "Pune — Food processing",
       "place": "Maharashtra · Pune · Pune / Pimpri–Chinchwad food-processing enquiry",
       "hsn": "1905; 2008; 2106",
-      "hsn_note": "Food and marine processing. Examples of bakery goods, prepared fruit/nuts and food preparations; actual food product must be identified.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -1940,7 +1909,6 @@ const SEED: Book = {
       "name": "Bengaluru Urban — Food processing",
       "place": "Karnataka · Bengaluru Urban · Urban food-processing estates enquiry",
       "hsn": "1905; 2008; 2106",
-      "hsn_note": "Food and marine processing. Examples of bakery goods, prepared fruit/nuts and food preparations; actual food product must be identified.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -1998,7 +1966,6 @@ const SEED: Book = {
       "name": "Indore — Food processing",
       "place": "Madhya Pradesh · Indore · Sanwer Road / Palda food-processing enquiry",
       "hsn": "1905; 2008; 2106",
-      "hsn_note": "Food and marine processing. Examples of bakery goods, prepared fruit/nuts and food preparations; actual food product must be identified.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -2056,7 +2023,6 @@ const SEED: Book = {
       "name": "Kolkata — Marine",
       "place": "West Bengal · Kolkata · Kolkata marine-export business / processing-site mapping",
       "hsn": "0306; 1605",
-      "hsn_note": "Food and marine processing. Examples of crustaceans and prepared crustaceans/molluscs; actual species and processing determine heading.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -2114,7 +2080,6 @@ const SEED: Book = {
       "name": "Nagpur — Food processing",
       "place": "Maharashtra · Nagpur · Hingna / Butibori processor enquiry",
       "hsn": "1905; 2008; 2106",
-      "hsn_note": "Food and marine processing. Examples of bakery goods, prepared fruit/nuts and food preparations; actual food product must be identified.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -2172,7 +2137,6 @@ const SEED: Book = {
       "name": "Tiruppur — Food processing",
       "place": "Tamil Nadu · Tiruppur · Food-processing catchment to be mapped independently of knitwear",
       "hsn": "1905; 2008; 2106",
-      "hsn_note": "Food and marine processing. Examples of bakery goods, prepared fruit/nuts and food preparations; actual food product must be identified.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -2230,7 +2194,6 @@ const SEED: Book = {
       "name": "Rangareddi — Food processing",
       "place": "Telangana · Rangareddy · Kattedan / Rajendranagar food-processing enquiry",
       "hsn": "1905; 2008; 2106",
-      "hsn_note": "Food and marine processing. Examples of bakery goods, prepared fruit/nuts and food preparations; actual food product must be identified.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -2288,7 +2251,6 @@ const SEED: Book = {
       "name": "Bikaner — Food processing",
       "place": "Rajasthan · Bikaner · Bichhwal / Karni industrial-area food enquiry",
       "hsn": "1905; 2008; 2106",
-      "hsn_note": "Food and marine processing. Examples of bakery goods, prepared fruit/nuts and food preparations; actual food product must be identified.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -2346,7 +2308,6 @@ const SEED: Book = {
       "name": "Bareilly — Food processing",
       "place": "Uttar Pradesh · Bareilly · Parsakhera / C B Ganj processor enquiry",
       "hsn": "1905; 2008; 2106",
-      "hsn_note": "Food and marine processing. Examples of bakery goods, prepared fruit/nuts and food preparations; actual food product must be identified.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -2404,7 +2365,6 @@ const SEED: Book = {
       "name": "Kolkata — Metals and metal products",
       "place": "West Bengal · Kolkata · Kolkata metal-business and operating-site enquiry",
       "hsn": "7325; 7326; 7616",
-      "hsn_note": "Engineering and metals. Examples of iron/steel cast articles, other steel articles and other aluminium articles; actual casting/part function governs.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -2462,7 +2422,6 @@ const SEED: Book = {
       "name": "Chennai — Metals and metal products",
       "place": "Tamil Nadu · Chennai / Tiruvallur operating-site jurisdiction to verify · Ambattur / adjacent metal-fabrication enquiry",
       "hsn": "7325; 7326; 7616",
-      "hsn_note": "Engineering and metals. Examples of iron/steel cast articles, other steel articles and other aluminium articles; actual casting/part function governs.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -2520,7 +2479,6 @@ const SEED: Book = {
       "name": "Coimbatore — Metals and metal products",
       "place": "Tamil Nadu · Coimbatore · Ganapathy / Peelamedu / SIDCO / Arasur foundry catchment",
       "hsn": "7325; 7326; 7616",
-      "hsn_note": "Engineering and metals. Examples of iron/steel cast articles, other steel articles and other aluminium articles; actual casting/part function governs.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -2578,7 +2536,6 @@ const SEED: Book = {
       "name": "Faridabad — Metals and metal products",
       "place": "Haryana · Faridabad · NIT / DLF / Ballabhgarh engineering-estate enquiry",
       "hsn": "7325; 7326; 7616",
-      "hsn_note": "Engineering and metals. Examples of iron/steel cast articles, other steel articles and other aluminium articles; actual casting/part function governs.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -2636,7 +2593,6 @@ const SEED: Book = {
       "name": "Ghaziabad — Metals and metal products",
       "place": "Uttar Pradesh · Ghaziabad · Bulandshahr Road / Sahibabad metal-processing enquiry",
       "hsn": "7325; 7326; 7616",
-      "hsn_note": "Engineering and metals. Examples of iron/steel cast articles, other steel articles and other aluminium articles; actual casting/part function governs.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -2694,7 +2650,6 @@ const SEED: Book = {
       "name": "Kolhapur — Metals and metal products",
       "place": "Maharashtra · Kolhapur · Shiroli / Gokul Shirgaon foundry enquiry",
       "hsn": "7325; 7326; 7616",
-      "hsn_note": "Engineering and metals. Examples of iron/steel cast articles, other steel articles and other aluminium articles; actual casting/part function governs.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -2752,7 +2707,6 @@ const SEED: Book = {
       "name": "Nashik — Metals and metal products",
       "place": "Maharashtra · Nashik · Ambad / Satpur metal/engineering enquiry",
       "hsn": "7325; 7326; 7616",
-      "hsn_note": "Engineering and metals. Examples of iron/steel cast articles, other steel articles and other aluminium articles; actual casting/part function governs.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -2810,7 +2764,6 @@ const SEED: Book = {
       "name": "Bengaluru — Chemicals",
       "place": "Karnataka · Bengaluru Urban; plant jurisdictions to validate · Peenya / Bommasandra chemical-product enquiry",
       "hsn": "Ch 28/29; 3208; 3402",
-      "hsn_note": "Chemicals. Chemicals span many headings. Chapters 28/29 are broad families, not four-digit codes; 3208 paints and 3402 cleaning/surfactant preparations are examples only; product mix unverified.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -2868,7 +2821,6 @@ const SEED: Book = {
       "name": "Hyderabad — Chemicals",
       "place": "Telangana · Hyderabad; operating-site jurisdictions to verify · Hyderabad chemical supplier / plant-address mapping",
       "hsn": "Ch 28/29; 3208; 3402",
-      "hsn_note": "Chemicals. Chemicals span many headings. Chapters 28/29 are broad families, not four-digit codes; 3208 paints and 3402 cleaning/surfactant preparations are examples only; product mix unverified.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -2926,7 +2878,6 @@ const SEED: Book = {
       "name": "Chennai — Chemicals",
       "place": "Tamil Nadu · Chennai; Kancheepuram/Chengalpattu plant boundaries to check · Chennai chemical supplier and operating-site enquiry",
       "hsn": "Ch 28/29; 3208; 3402",
-      "hsn_note": "Chemicals. Chemicals span many headings. Chapters 28/29 are broad families, not four-digit codes; 3208 paints and 3402 cleaning/surfactant preparations are examples only; product mix unverified.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -2984,7 +2935,6 @@ const SEED: Book = {
       "name": "Nagpur — Chemicals",
       "place": "Maharashtra · Nagpur · Hingna / Butibori chemical-product enquiry",
       "hsn": "Ch 28/29; 3208; 3402",
-      "hsn_note": "Chemicals. Chemicals span many headings. Chapters 28/29 are broad families, not four-digit codes; 3208 paints and 3402 cleaning/surfactant preparations are examples only; product mix unverified.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -3042,7 +2992,6 @@ const SEED: Book = {
       "name": "Kanpur — Chemicals",
       "place": "Uttar Pradesh · Kanpur Nagar · Dada Nagar / Panki chemical-product enquiry",
       "hsn": "Ch 28/29; 3208; 3402",
-      "hsn_note": "Chemicals. Chemicals span many headings. Chapters 28/29 are broad families, not four-digit codes; 3208 paints and 3402 cleaning/surfactant preparations are examples only; product mix unverified.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -3100,7 +3049,6 @@ const SEED: Book = {
       "name": "Madurai — Chemicals",
       "place": "Tamil Nadu · Madurai · Kappalur chemical-product enquiry",
       "hsn": "Ch 28/29; 3208; 3402",
-      "hsn_note": "Chemicals. Chemicals span many headings. Chapters 28/29 are broad families, not four-digit codes; 3208 paints and 3402 cleaning/surfactant preparations are examples only; product mix unverified.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -3158,7 +3106,6 @@ const SEED: Book = {
       "name": "Belagavi — Chemicals",
       "place": "Karnataka · Belagavi · Belagavi operating-site mapping; Udyambag/Macche enquiry",
       "hsn": "Ch 28/29; 3208; 3402",
-      "hsn_note": "Chemicals. Chemicals span many headings. Chapters 28/29 are broad families, not four-digit codes; 3208 paints and 3402 cleaning/surfactant preparations are examples only; product mix unverified.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -3216,7 +3163,6 @@ const SEED: Book = {
       "name": "Kancheepuram — Chemicals",
       "place": "Tamil Nadu · Kancheepuram after district split · Sriperumbudur / Oragadam chemical-product enquiry",
       "hsn": "Ch 28/29; 3208; 3402",
-      "hsn_note": "Chemicals. Chemicals span many headings. Chapters 28/29 are broad families, not four-digit codes; 3208 paints and 3402 cleaning/surfactant preparations are examples only; product mix unverified.",
       "list": "Cluster v4",
       "cells": {
         "count": {
@@ -3274,7 +3220,6 @@ const SEED: Book = {
       "name": "Medical devices",
       "place": "AMTZ Vizag, or Greater Noida / Kanchipuram",
       "hsn": "",
-      "hsn_note": "",
       "list": "National type",
       "cells": {
         "count": {
@@ -3332,7 +3277,6 @@ const SEED: Book = {
       "name": "Semiconductor ancillaries",
       "place": "Sanand and Dholera, Gujarat",
       "hsn": "",
-      "hsn_note": "",
       "list": "National type",
       "cells": {
         "count": {
@@ -3390,7 +3334,6 @@ const SEED: Book = {
       "name": "Toys",
       "place": "Koppal hub, NCR toy park, Channapatna",
       "hsn": "9503",
-      "hsn_note": "HS 9503, the toys line already used on the national desk. Chapter 95 is a wider basket.",
       "list": "National type",
       "cells": {
         "count": {
@@ -3448,7 +3391,6 @@ const SEED: Book = {
       "name": "Footwear",
       "place": "Ambur–Ranipet or Agra — split the row if you work both",
       "hsn": "",
-      "hsn_note": "",
       "list": "National type",
       "cells": {
         "count": {
@@ -3506,7 +3448,6 @@ const SEED: Book = {
       "name": "ACC pack, BMS and recycling",
       "place": "Pune, NCR, and southern pack shops — not the cell plants",
       "hsn": "",
-      "hsn_note": "",
       "list": "National type",
       "cells": {
         "count": {
@@ -3564,7 +3505,6 @@ const SEED: Book = {
       "name": "E-waste",
       "place": "Seelampur (Delhi) and Moradabad",
       "hsn": "",
-      "hsn_note": "",
       "list": "National type",
       "cells": {
         "count": {
@@ -3622,7 +3562,6 @@ const SEED: Book = {
       "name": "Data-centre ancillaries",
       "place": "Navi Mumbai, Chennai, Hyderabad, Noida, Bengaluru",
       "hsn": "",
-      "hsn_note": "",
       "list": "National type",
       "cells": {
         "count": {
@@ -3680,7 +3619,6 @@ const SEED: Book = {
       "name": "EV charging",
       "place": "NCR, Pune, and Gujarat electrical belts",
       "hsn": "",
-      "hsn_note": "",
       "list": "National type",
       "cells": {
         "count": {
@@ -3738,7 +3676,6 @@ const SEED: Book = {
       "name": "Technical textiles",
       "place": "Surat, Panipat, or Coimbatore",
       "hsn": "",
-      "hsn_note": "",
       "list": "National type",
       "cells": {
         "count": {
@@ -3796,7 +3733,6 @@ const SEED: Book = {
       "name": "Space components",
       "place": "Bengaluru and Hyderabad",
       "hsn": "",
-      "hsn_note": "",
       "list": "National type",
       "cells": {
         "count": {
@@ -3854,7 +3790,6 @@ const SEED: Book = {
       "name": "Green hydrogen ancillaries",
       "place": "No MSME belt — plants only",
       "hsn": "",
-      "hsn_note": "",
       "list": "National type",
       "cells": {
         "count": {
@@ -3912,7 +3847,6 @@ const SEED: Book = {
       "name": "Ethanol and feedstock",
       "place": "One belt in UP, Maharashtra, Karnataka, or Bihar",
       "hsn": "",
-      "hsn_note": "",
       "list": "National type",
       "cells": {
         "count": {
@@ -3970,7 +3904,6 @@ const SEED: Book = {
       "name": "Nutraceuticals and AYUSH",
       "place": "Baddi, Uttarakhand, or Gujarat",
       "hsn": "",
-      "hsn_note": "",
       "list": "National type",
       "cells": {
         "count": {
@@ -4028,7 +3961,6 @@ const SEED: Book = {
       "name": "Agri-tech and farm machinery",
       "place": "One custom-hiring belt — name it before scoring the place",
       "hsn": "",
-      "hsn_note": "",
       "list": "National type",
       "cells": {
         "count": {
@@ -4086,7 +4018,6 @@ const SEED: Book = {
       "name": "AVGC-XR",
       "place": "No single belt — studios are scattered",
       "hsn": "",
-      "hsn_note": "",
       "list": "National type",
       "cells": {
         "count": {
@@ -4144,7 +4075,6 @@ const SEED: Book = {
       "name": "Geospatial and drone services",
       "place": "Scattered service firms — do not merge with drone manufacturing",
       "hsn": "",
-      "hsn_note": "",
       "list": "National type",
       "cells": {
         "count": {
@@ -4202,7 +4132,6 @@ const SEED: Book = {
       "name": "Cybersecurity services",
       "place": "No factory belt",
       "hsn": "",
-      "hsn_note": "",
       "list": "National type",
       "cells": {
         "count": {
@@ -4260,7 +4189,6 @@ const SEED: Book = {
       "name": "Specialty steel conversion",
       "place": "Rerollers — not the melt shop",
       "hsn": "",
-      "hsn_note": "",
       "list": "National type",
       "cells": {
         "count": {
@@ -4318,7 +4246,6 @@ const SEED: Book = {
       "name": "Bulk drugs and APIs",
       "place": "Around one park — name the park",
       "hsn": "",
-      "hsn_note": "",
       "list": "National type",
       "cells": {
         "count": {
@@ -4376,7 +4303,6 @@ const SEED: Book = {
       "name": "Electronics suppliers",
       "place": "Noida–Greater Noida or Sriperumbudur",
       "hsn": "",
-      "hsn_note": "",
       "list": "National type",
       "cells": {
         "count": {
@@ -4434,7 +4360,6 @@ const SEED: Book = {
       "name": "EV and auto components",
       "place": "Pune–Chakan or Hosur–Krishnagiri",
       "hsn": "",
-      "hsn_note": "",
       "list": "National type",
       "cells": {
         "count": {
@@ -4492,7 +4417,6 @@ const SEED: Book = {
       "name": "Solar modules and BOS",
       "place": "Gujarat fabrication, not the Rajasthan project site",
       "hsn": "",
-      "hsn_note": "",
       "list": "National type",
       "cells": {
         "count": {
@@ -4550,7 +4474,6 @@ const SEED: Book = {
       "name": "IT services and GCCs",
       "place": "Bengaluru, Hyderabad, Pune, NCR, Chennai — no factory belt",
       "hsn": "",
-      "hsn_note": "",
       "list": "National type",
       "cells": {
         "count": {
@@ -4608,7 +4531,6 @@ const SEED: Book = {
       "name": "Healthtech",
       "place": "No factory belt — do not site this at AMTZ",
       "hsn": "",
-      "hsn_note": "",
       "list": "National type",
       "cells": {
         "count": {
@@ -4666,7 +4588,6 @@ const SEED: Book = {
       "name": "Edtech and skilling",
       "place": "No belt",
       "hsn": "",
-      "hsn_note": "",
       "list": "National type",
       "cells": {
         "count": {
@@ -4724,7 +4645,6 @@ const SEED: Book = {
       "name": "E-commerce logistics",
       "place": "Bhiwandi, Bilaspur–Gurugram, or Hoskote",
       "hsn": "",
-      "hsn_note": "",
       "list": "National type",
       "cells": {
         "count": {
@@ -4782,7 +4702,6 @@ const SEED: Book = {
       "name": "Fintech and BC networks",
       "place": "No factory belt",
       "hsn": "",
-      "hsn_note": "",
       "list": "National type",
       "cells": {
         "count": {
@@ -4840,7 +4759,6 @@ const SEED: Book = {
       "name": "Drones",
       "place": "Split across many cities — no single belt",
       "hsn": "",
-      "hsn_note": "",
       "list": "National type",
       "cells": {
         "count": {
@@ -4898,7 +4816,6 @@ const SEED: Book = {
       "name": "Defence suppliers",
       "place": "Bengaluru, Hyderabad, Pune, or the TN / UP corridors",
       "hsn": "",
-      "hsn_note": "",
       "list": "National type",
       "cells": {
         "count": {
@@ -4956,7 +4873,6 @@ const SEED: Book = {
       "name": "White goods and furniture",
       "place": "Noida–Hapur annex",
       "hsn": "",
-      "hsn_note": "",
       "list": "National type",
       "cells": {
         "count": {
@@ -5014,7 +4930,6 @@ const SEED: Book = {
       "name": "Food processing",
       "place": "The food-demo belt — name the district, not all 726 ODOP districts",
       "hsn": "",
-      "hsn_note": "",
       "list": "National type",
       "cells": {
         "count": {
