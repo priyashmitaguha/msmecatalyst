@@ -31,8 +31,12 @@ Score 1 is weak. Score 3 is usable. Score 5 is ready. The anchors are on the **H
 
 Desk starting scores, in blue, are only where a published figure maps onto the anchor: how many exist, size mix, export, and government support. Partners, colleges, lenders, marketing companies, and listing are yellow and empty. Nano means own-account or a self-help group. Micro is turnover at or below ₹10 crore. Small is ₹10–100 crore. Medium is ₹100–500 crore. Large, above ₹500 crore, is not the lot a centre enrols.
 
-There are 31 rows and 15 blank rows. If one industry has two places, copy the row. Ambur and Agra are not one score.
+The Scores sheet has two lists. Rows for all 54 local clusters from cluster v4 (30 October 2026) come first. The 31 national types follow, with the desk scores already entered. Fifteen blank rows sit under those, for a place you add yourself. If one industry has two places, copy the row. Ambur and Agra are not one score.
 
-Desk date: 19 November 2026 (Asia/Kolkata).
+Column E is the HSN code. For the 54 local clusters it is the indicative heading from cluster v4. It is not a code for every unit, and it does not enter the mark. A chapter range such as Ch 28/29 is a family, not a four-digit heading. Click the cell note for the product example.
+
+On a cluster v4 row, a published belt count, the Tiruppur export figure, and a facility that is already listed are the only blue scores. A named association, college, or lending product stays yellow until you score it. Partners were not approached in that workbook.
+
+Desk date: 19 November 2026 (Asia/Kolkata). Cluster v4 date: 30 October 2026.
 
 The earlier 16-tool charter brief (`Industry-Types-and-Clusters.docx`) is a separate reading. It is not this score.

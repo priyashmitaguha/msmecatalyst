@@ -7,7 +7,6 @@ import json
 from pathlib import Path
 
 from openpyxl import Workbook
-from openpyxl.chart import BarChart, Reference
 from openpyxl.comments import Comment
 from openpyxl.formatting.rule import FormulaRule
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
@@ -15,7 +14,6 @@ from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.datavalidation import DataValidation
 
 from cluster_fill_score import (
-    CLUSTERS,
     FACTORS,
     READY_AT,
     assert_register,
@@ -49,13 +47,12 @@ FIRST = 5
 
 
 def score_columns():
-    # P is 16. Twelve contiguous score columns.
-    return [16 + index for index in range(len(FACTORS))]
+    # Identity is A–E. Facts are F–Q. Scores are R–AD.
+    return [18 + index for index in range(len(FACTORS))]
 
 
 def fact_columns():
-    # D is 4.
-    return [4 + index for index in range(len(FACTORS))]
+    return [6 + index for index in range(len(FACTORS))]
 
 
 def apply_font(cell, size=10, bold=False, color="1A1A1A", name="Calibri"):
@@ -141,6 +138,8 @@ def write_how(wb):
     apply_font(sheet["A1"], 16, True, NAVY)
     sheet["A2"] = (
         "One row is one place you might work, not a national industry essay. "
+        "The Scores sheet starts with all 54 local clusters from cluster v4 (30 October 2026), then the 31 national types. "
+        "The HSN column is an indicative heading from that workbook. It is not a code for every unit, and it is not a score. "
         "Type the fact, then a score from 1 to 5. Leave the score blank if you do not know. "
         "Blank is not zero. The mark out of 100 is the weighted average of the scores you have entered, divided by 5. "
         "Partners, colleges, lenders, and marketing companies are names of people or firms. "
@@ -152,7 +151,7 @@ def write_how(wb):
     apply_font(sheet["A2"], 11)
     sheet["A2"].alignment = WRAP
     sheet.merge_cells("A2:E2")
-    sheet.row_dimensions[2].height = 78
+    sheet.row_dimensions[2].height = 96
     headers = ("Factor", "Weight", "Score 1", "Score 3", "Score 5")
     for col, text in enumerate(headers, start=1):
         cell = sheet.cell(4, col, text)
@@ -213,25 +212,27 @@ def write_scores(wb):
     apply_font(sheet["A1"], 16, True, NAVY)
     sheet.merge_cells("A1:C1")
     sheet["A2"] = (
+        "Rows 5–58 are the 54 local clusters from cluster v4, 30 October 2026. The national types follow. "
+        "Column E is the indicative HSN heading. It does not enter the mark. "
         "Yellow score cells are empty on purpose. Blue score cells are a desk starting point from a published figure — overwrite them. "
         "Type 1 to 5. Do not type in the Mark column. "
-        f"The tier appears after {READY_AT} factors. Desk date 19 November 2026 (Asia/Kolkata). "
-        "Partners, nearby colleges, lenders, marketing companies, and listing are blank until you name them."
+        f"The tier appears after {READY_AT} factors. A named enquiry route is not scored as a partner. "
+        "Desk date 19 November 2026 (Asia/Kolkata)."
     )
     apply_font(sheet["A2"], 10)
     sheet["A2"].alignment = WRAP
-    sheet.merge_cells("A2:C2")
-    sheet.row_dimensions[2].height = 48
+    sheet.merge_cells("A2:E2")
+    sheet.row_dimensions[2].height = 64
 
-    sheet.cell(3, 15, "Weight")
-    apply_font(sheet.cell(3, 15), 9, True, NAVY)
+    sheet.cell(3, scores[0] - 1, "Weight")
+    apply_font(sheet.cell(3, scores[0] - 1), 9, True, NAVY)
     for index, col in enumerate(scores):
         cell = sheet.cell(3, col, f"=Weights!C{5 + index}")
         apply_font(cell, 10, True, NAVY)
         cell.alignment = CENTER
         fill(cell, PALE)
 
-    headers = ["Id", "Cluster", "Place"]
+    headers = ["Id", "List", "Cluster", "Place", "HSN code"]
     headers += [f"{factor['name']} — fact" for factor in FACTORS]
     headers += [factor["name"] for factor in FACTORS]
     headers += ["Filled", "Mark out of 100", "Tier", "Use it?"]
@@ -241,9 +242,7 @@ def write_scores(wb):
         apply_font(cell, 9, True, "FFFFFF")
         cell.alignment = Alignment(wrap_text=True, vertical="center", horizontal="center")
     sheet.row_dimensions[HEADER_ROW].height = 32
-    sheet.auto_filter.ref = f"A{HEADER_ROW}:{get_column_letter(state_col)}{HEADER_ROW}"
-    sheet.freeze_panes = "D5"
-    sheet.auto_filter.ref = f"A{HEADER_ROW}:{get_column_letter(state_col)}{FIRST + len(CLUSTERS) + EXTRA_ROWS - 1}"
+    sheet.freeze_panes = "F5"
 
     rows = list(book["clusters"])
     for _ in range(EXTRA_ROWS):
@@ -251,6 +250,9 @@ def write_scores(wb):
             "id": "",
             "name": "",
             "place": "",
+            "hsn": "",
+            "hsn_note": "",
+            "list": "",
             "cells": {factor["id"]: {"note": "", "score": ""} for factor in FACTORS},
         })
 
@@ -260,12 +262,17 @@ def write_scores(wb):
         row = FIRST + offset
         zebra = PALE if offset % 2 else "FFFFFF"
         ident = sheet.cell(row, 1, cluster["id"])
-        name = sheet.cell(row, 2, cluster["name"])
-        place = sheet.cell(row, 3, cluster["place"])
-        for cell in (ident, name, place):
+        listed = sheet.cell(row, 2, cluster["list"])
+        name = sheet.cell(row, 3, cluster["name"])
+        place = sheet.cell(row, 4, cluster["place"])
+        hsn = sheet.cell(row, 5, cluster["hsn"] or None)
+        for cell in (ident, listed, name, place, hsn):
             apply_font(cell, 10, cell is name, NAVY if cell is name else "1A1A1A")
             cell.alignment = WRAP
             fill(cell, zebra)
+        if cluster.get("hsn_note"):
+            hsn.comment = Comment(cluster["hsn_note"], "Cluster v4", width=280, height=70)
+        hsn.alignment = Alignment(wrap_text=True, vertical="center", horizontal="left")
         for index, factor in enumerate(FACTORS):
             fact = cluster["cells"][factor["id"]]
             fact_cell = sheet.cell(row, facts[index], fact["note"])
@@ -323,7 +330,7 @@ def write_scores(wb):
             apply_font(cell, 10, cell is mark, NAVY)
             cell.alignment = CENTER
             fill(cell, GREEN)
-        sheet.row_dimensions[row].height = 46
+        sheet.row_dimensions[row].height = 58
 
     last = FIRST + len(rows) - 1
     validation = DataValidation(type="whole", operator="between", formula1="1", formula2="5", allow_blank=True)
@@ -349,30 +356,17 @@ def write_scores(wb):
         FormulaRule(formula=[f"AND({filled_letter}{FIRST}>={READY_AT},{mark_letter}{FIRST}<60)"], fill=PatternFill("solid", fgColor=AMBER)),
     )
 
-    sheet.column_dimensions["A"].width = 16
-    sheet.column_dimensions["B"].width = 28
+    sheet.column_dimensions["A"].width = 22
+    sheet.column_dimensions["B"].width = 16
     sheet.column_dimensions["C"].width = 42
+    sheet.column_dimensions["D"].width = 46
+    sheet.column_dimensions["E"].width = 24
     for col in facts:
         sheet.column_dimensions[get_column_letter(col)].width = 38
     for col in scores:
         sheet.column_dimensions[get_column_letter(col)].width = 14
     for col in (filled_col, mark_col, tier_col, state_col):
         sheet.column_dimensions[get_column_letter(col)].width = 18
-
-    chart = BarChart()
-    chart.type = "bar"
-    chart.title = "Running mark out of 100"
-    chart.y_axis.title = None
-    chart.x_axis.title = None
-    data = Reference(sheet, min_col=mark_col, min_row=HEADER_ROW, max_row=FIRST + len(CLUSTERS) - 1)
-    cats = Reference(sheet, min_col=2, min_row=FIRST, max_row=FIRST + len(CLUSTERS) - 1)
-    chart.add_data(data, titles_from_data=True)
-    chart.set_categories(cats)
-    chart.shape = 4
-    chart.legend = None
-    chart.height = 12
-    chart.width = 18
-    sheet.add_chart(chart, "AB53")
 
     sheet.page_setup.orientation = "landscape"
     sheet.page_setup.fitToPage = True
@@ -410,7 +404,7 @@ type FactorId =
   | "export" | "listing" | "size" | "state" | "central" | "other";
 
 type Cell = { note: string; score: string };
-type Cluster = { id: string; name: string; place: string; cells: Record<FactorId, Cell> };
+type Cluster = { id: string; name: string; place: string; hsn: string; list: string; cells: Record<FactorId, Cell> };
 type Book = { weights: Record<FactorId, string>; clusters: Cluster[] };
 
 const SCORE_OPTIONS = [
@@ -471,26 +465,23 @@ function statTone(tier: string): "success" | "info" | "warning" | "danger" | und
 }
 
 export default function ClusterFillScore() {
-  const [book, setBook] = useCanvasState<Book>("cluster-fill-book", SEED);
-  const [view, setView] = useState<"rank" | "fill" | "weights" | "anchors">("fill");
+  const [book, setBook] = useCanvasState<Book>("cluster-fill-book-v4", SEED);
+  const [view, setView] = useState<"rank" | "fill" | "weights" | "anchors">("rank");
+  const [listFilter, setListFilter] = useState("Cluster v4");
   const [selectedId, setSelectedId] = useState(SEED.clusters[0].id);
   const [addedName, setAddedName] = useState("");
   const [addedPlace, setAddedPlace] = useState("");
   const theme = useHostTheme();
 
   const selected = book.clusters.find((cluster) => cluster.id === selectedId) ?? book.clusters[0];
+  const inList = (cluster: Cluster) => listFilter === "All" || cluster.list === listFilter;
   const current = running(selected, book);
   const ranked = useMemo(() => {
     return book.clusters
-      .map((cluster) => ({ cluster, ...running(cluster, book) }))
-      .filter((row) => row.cluster.name.trim() !== "")
-      .sort((a, b) => {
-        const aReady = a.filled >= 8 ? 1 : 0;
-        const bReady = b.filled >= 8 ? 1 : 0;
-        if (aReady !== bReady) return bReady - aReady;
-        return (b.mark ?? -1) - (a.mark ?? -1);
-      });
-  }, [book]);
+      .map((cluster, index) => ({ cluster, index, ...running(cluster, book) }))
+      .filter((row) => row.cluster.name.trim() !== "" && inList(row.cluster))
+      .sort((a, b) => a.index - b.index);
+  }, [book, listFilter]);
   const chartRows = ranked.filter((row) => row.mark !== null);
 
   function patchCluster(id: string, factor: FactorId, patch: Partial<Cell>) {
@@ -510,7 +501,8 @@ export default function ClusterFillScore() {
     const id = `custom-${Date.now()}`;
     const cells = {} as Record<FactorId, Cell>;
     for (const factor of FACTORS) cells[factor.id] = { note: "", score: "" };
-    setBook((prev) => ({ ...prev, clusters: [...prev.clusters, { id, name, place, cells }] }));
+    setBook((prev) => ({ ...prev, clusters: [...prev.clusters, { id, name, place, hsn: "", list: "Added", cells }] }));
+    setListFilter("Added");
     setSelectedId(id);
     setAddedName("");
     setAddedPlace("");
@@ -522,7 +514,7 @@ export default function ClusterFillScore() {
       <Stack gap={6}>
         <H1>Cluster fill-in score</H1>
         <Text tone="secondary">
-          Type the fact, then pick 1 to 5. The mark moves as soon as a score is entered. A blank factor is dropped. It is not a zero.
+          54 local clusters from cluster v4, 30 October 2026, then the national types. Type the fact, then pick 1 to 5. The mark moves as soon as a score is entered. A blank factor is dropped. It is not a zero. The HSN heading does not enter the mark.
         </Text>
       </Stack>
 
@@ -536,7 +528,7 @@ export default function ClusterFillScore() {
       </div>
 
       <Callout tone={current.filled >= 8 ? "success" : "warning"} title={selected.name}>
-        {selected.place}. {current.filled >= 8
+        {selected.list}. {selected.place}. HSN {selected.hsn || "—"}. {current.filled >= 8
           ? `Tier: ${current.tier}. Eight or more factors are filled, so this cluster can be compared.`
           : `Running score only. Still blank: ${current.missing.join(", ")}.`}
       </Callout>
@@ -547,13 +539,31 @@ export default function ClusterFillScore() {
         <Pill active={view === "weights"} onClick={() => setView("weights")}>Weights</Pill>
         <Pill active={view === "anchors"} onClick={() => setView("anchors")}>What 1 and 5 mean</Pill>
       </Row>
+      <Row gap={8} wrap>
+        {["Cluster v4", "National type", "Added", "All"].map((name) => (
+          <Pill key={name} active={listFilter === name} onClick={() => {
+            setListFilter(name);
+            const next = book.clusters.find((cluster) => cluster.name.trim() !== "" && (name === "All" || cluster.list === name));
+            if (next) setSelectedId(next.id);
+          }}>{name}</Pill>
+        ))}
+      </Row>
 
       {view === "fill" && (
         <Stack gap={12}>
           <Select
             value={selected.id}
             onChange={setSelectedId}
-            options={book.clusters.filter((cluster) => cluster.name.trim() !== "").map((cluster) => ({ value: cluster.id, label: cluster.name }))}
+            options={book.clusters.filter((cluster) => cluster.name.trim() !== "" && inList(cluster)).map((cluster) => ({ value: cluster.id, label: cluster.name }))}
+          />
+          <Text size="small" tone="secondary">HSN code. Indicative heading. It does not enter the mark.</Text>
+          <TextInput
+            value={selected.hsn}
+            onChange={(hsn) => setBook((prev) => ({
+              ...prev,
+              clusters: prev.clusters.map((cluster) => cluster.id === selected.id ? { ...cluster, hsn } : cluster),
+            }))}
+            placeholder="HSN heading"
           />
           {FACTORS.map((factor) => {
             const cell = selected.cells[factor.id];
@@ -586,35 +596,39 @@ export default function ClusterFillScore() {
       {view === "rank" && (
         <Stack gap={12}>
           <Text size="small" tone="secondary">
-            Sorted with ready clusters (8 or more factors) first. A running mark uses only the filled factors. Desk starting scores are already in the count, size, export, and government columns where a published figure existed.
+            Same order as cluster v4, then the national types. A running mark uses only the filled factors. A blue desk score is already entered only where a published figure mapped onto the 1–5 anchor.
           </Text>
+          {ranked.length > 0 && (
           <Table
-            headers={["Cluster", "Place", "Mark", "Filled", "Tier", "Use it?"]}
-            columnAlign={["left", "left", "right", "right", "left", "left"]}
+            headers={["Cluster", "HSN code", "Place", "Mark", "Filled", "Tier", "Use it?"]}
+            columnAlign={["left", "left", "left", "right", "right", "left", "left"]}
             rows={ranked.map((row) => [
               row.cluster.name,
+              row.cluster.hsn || "—",
               row.cluster.place,
               row.mark === null ? "—" : String(row.mark),
               `${row.filled} of 12`,
-              row.tier,
+              row.filled === 0 ? "—" : row.tier,
               row.filled >= 8 ? "Ready to compare" : "Running score",
             ])}
             rowTone={ranked.map((row) => row.filled >= 8 ? toneFor(row.tier) : "neutral")}
             striped
             stickyHeader
           />
+          )}
           {chartRows.length > 0 && (
             <Stack gap={6}>
-              <H2>Running mark by cluster</H2>
+              <H2>Running mark out of 100</H2>
               <BarChart
                 horizontal
                 height={Math.max(320, chartRows.length * 22)}
                 categories={chartRows.map((row) => row.cluster.name)}
                 series={[{ name: "Mark out of 100", data: chartRows.map((row) => row.mark ?? 0) }]}
                 yMax={100}
+                valueSuffix=""
               />
               <Text size="small" tone="tertiary">
-                Mark out of 100. Blank factors are excluded. Source: scores on this canvas, including desk starting scores until you overwrite them. A high bar with fewer than 8 factors is not a decision. 19 November 2026.
+                Mark out of 100 on the filled factors only. Blank factors are excluded. Source: cluster v4, 30 October 2026, and the national desk, 19 November 2026. A bar with fewer than 8 factors is a running score.
               </Text>
             </Stack>
           )}
@@ -715,7 +729,7 @@ const SEED: Book = __SEED__;
         '  | "count" | "growth" | "partners" | "colleges" | "lenders" | "marketing"\n'
         '  | "export" | "listing" | "size" | "state" | "central" | "other";\n\n'
         "type Cell = { note: string; score: string };\n"
-        "type Cluster = { id: string; name: string; place: string; cells: Record<FactorId, Cell> };\n"
+        "type Cluster = { id: string; name: string; place: string; hsn: string; list: string; cells: Record<FactorId, Cell> };\n"
         "type Book = { weights: Record<FactorId, string>; clusters: Cluster[] };\n\n"
         "const FACTORS: { id: FactorId; name: string; weight: number; prompt: string; s1: string; s3: string; s5: string }[] = "
         + json.dumps(factors, ensure_ascii=False, indent=2)
@@ -737,7 +751,8 @@ def main():
     print(f"clusters {len(book['clusters'])}")
     for cluster in book["clusters"]:
         filled, mark = running_score(cluster["cells"], book["weights"])
-        print(f"{mark:3}  {filled:2}/12  {tier_for(filled, mark):<10} {cluster['id']}")
+        mark_text = "  —" if mark is None else f"{mark:3}"
+        print(f"{mark_text}  {filled:2}/12  {tier_for(filled, mark):<10} {cluster['id']}")
     print(f"wrote {XLSX}")
     print(f"wrote {CANVAS}")
 

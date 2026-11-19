@@ -9,6 +9,8 @@ are filled. Weights are relative and editable.
 
 from __future__ import annotations
 
+from cluster_v4 import COUNT_SCORE, EXPORT_SCORE, STATE_SCORE, clusters as v4_clusters
+
 FACTORS = [
     {
         "id": "count",
@@ -123,6 +125,11 @@ FACTORS = [
 READY_AT = 8
 FACTOR_IDS = [factor["id"] for factor in FACTORS]
 WEIGHTS = {factor["id"]: factor["weight"] for factor in FACTORS}
+
+# Only where the national desk note already names the product's own heading.
+NATIONAL_HSN = {
+    "toys": ("9503", "HS 9503, the toys line already used on the national desk. Chapter 95 is a wider basket."),
+}
 
 # Desk facts. A score is filled only where the 1–5 anchor can be applied from a published figure.
 # Partners, colleges, lenders, marketing companies, listing, and "anything else" stay blank.
@@ -455,15 +462,25 @@ def as_cells(row):
     return cells
 
 
+def one_cluster(row, list_name, hsn="", hsn_note=""):
+    return {
+        "id": row["id"],
+        "name": row["name"],
+        "place": row["place"],
+        "hsn": hsn,
+        "hsn_note": hsn_note,
+        "list": list_name,
+        "cells": as_cells(row),
+    }
+
+
 def books():
     clusters = []
+    for row in v4_clusters():
+        clusters.append(one_cluster(row, row["list"], row["hsn"], row["hsn_note"]))
     for row in CLUSTERS:
-        clusters.append({
-            "id": row["id"],
-            "name": row["name"],
-            "place": row["place"],
-            "cells": as_cells(row),
-        })
+        hsn, hsn_note = NATIONAL_HSN.get(row["id"], ("", ""))
+        clusters.append(one_cluster(row, "National type", hsn, hsn_note))
     return {
         "weights": {factor["id"]: str(factor["weight"]) for factor in FACTORS},
         "clusters": clusters,
@@ -509,23 +526,54 @@ def tier_for(filled, score):
 
 
 def assert_register():
+    local = v4_clusters()
     if len(CLUSTERS) != 31:
-        raise SystemExit(f"expected 31 clusters, got {len(CLUSTERS)}")
-    ids = [row["id"] for row in CLUSTERS]
-    if len(set(ids)) != 31:
+        raise SystemExit(f"expected 31 national clusters, got {len(CLUSTERS)}")
+    if len(local) != 54:
+        raise SystemExit(f"expected 54 cluster v4 rows, got {len(local)}")
+    ids = [row["id"] for row in local] + [row["id"] for row in CLUSTERS]
+    if len(set(ids)) != len(ids):
         raise SystemExit("duplicate cluster id")
     if sum(factor["weight"] for factor in FACTORS) != 100:
         raise SystemExit("default weights must sum to 100")
+    for row in local:
+        if not str(row["hsn"]).strip():
+            raise SystemExit(f"{row['id']} is missing an HSN heading")
+        if row["id"] in COUNT_SCORE and row["count"][1] != COUNT_SCORE[row["id"]]:
+            raise SystemExit(f"{row['id']} count score drifted")
+        if row["id"] not in COUNT_SCORE and row["count"][1] is not None:
+            raise SystemExit(f"{row['id']} count should stay blank")
+        if row["id"] in EXPORT_SCORE and row["export"][1] != EXPORT_SCORE[row["id"]]:
+            raise SystemExit(f"{row['id']} export score drifted")
+        if row["id"] not in EXPORT_SCORE and row["export"][1] is not None:
+            raise SystemExit(f"{row['id']} export should stay blank")
+        if row["id"] in STATE_SCORE and row["state"][1] != STATE_SCORE[row["id"]]:
+            raise SystemExit(f"{row['id']} state score drifted")
+        if row["id"] not in STATE_SCORE and row["state"][1] is not None:
+            raise SystemExit(f"{row['id']} state should stay blank")
     book = books()
+    if len(book["clusters"]) != 85:
+        raise SystemExit(f"expected 85 scored rows, got {len(book['clusters'])}")
+    if book["clusters"][0]["list"] != "Cluster v4" or book["clusters"][54]["list"] != "National type":
+        raise SystemExit("cluster v4 rows must come before the national types")
+    tiruppur = next(cluster for cluster in book["clusters"] if cluster["id"] == "T-Tiruppur")
+    if tiruppur["hsn"] != "6109; 6203; 6204" or tiruppur["list"] != "Cluster v4":
+        raise SystemExit("Tiruppur row drifted")
     for cluster in book["clusters"]:
         for factor_id in ("partners", "colleges", "lenders", "marketing", "listing", "other"):
             if cluster["cells"][factor_id]["score"] != "":
                 raise SystemExit(f"{cluster['id']} {factor_id} should be blank until someone fills it")
         filled, score = running_score(cluster["cells"], book["weights"])
-        if filled == 0 or score is None:
+        if cluster["list"] == "National type" and (filled == 0 or score is None):
             raise SystemExit(f"{cluster['id']} has no desk score")
         if filled >= READY_AT:
             raise SystemExit(f"{cluster['id']} is ready before partners are named")
+    filled, score = running_score(tiruppur["cells"], book["weights"])
+    # Count 5 × 12 + export 4 × 10 = 100. Weights 22. 100/22/5×100 = 90.91.
+    if tiruppur["id"] != "T-Tiruppur" or filled != 2 or score != 91:
+        raise SystemExit(f"Tiruppur running score {tiruppur['id']} {filled} {score}")
+    if tier_for(filled, score) != "Not yet":
+        raise SystemExit("two factors must not receive a tier")
     # Worked example. Weights of the filled factors are the default weights.
     example = {factor["id"]: blank() for factor in FACTORS}
     for factor_id, score in (

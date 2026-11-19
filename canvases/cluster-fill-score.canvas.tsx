@@ -7,7 +7,7 @@ type FactorId =
   | "export" | "listing" | "size" | "state" | "central" | "other";
 
 type Cell = { note: string; score: string };
-type Cluster = { id: string; name: string; place: string; cells: Record<FactorId, Cell> };
+type Cluster = { id: string; name: string; place: string; hsn: string; list: string; cells: Record<FactorId, Cell> };
 type Book = { weights: Record<FactorId, string>; clusters: Cluster[] };
 
 const FACTORS: { id: FactorId; name: string; weight: number; prompt: string; s1: string; s3: string; s5: string }[] = [
@@ -138,9 +138,3144 @@ const SEED: Book = {
   },
   "clusters": [
     {
+      "id": "E-Pune",
+      "name": "Pune engineering and auto supplier route",
+      "place": "Maharashtra · Pune · Pimpri–Chinchwad / Bhosari first; Chakan as a later spoke",
+      "hsn": "8708; 8714; 8409",
+      "hsn_note": "Auto components. Vehicle parts, two-wheeler parts and engine parts, respectively; actual part classification governs.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Over 2,000 MSMEs served by Auto Cluster cumulatively; undated institutional page accessed 29 October 2026. Not a current count of operating engineering enterprises. Separately SAMEEEKSHA reports about 50 aluminium casting units (2015–16), including 8 large units; this is a narrow subset, not the whole Pune engineering cluster.",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Credit +11%; DPD 1.3%.",
+          "score": ""
+        },
+        "partners": {
+          "note": "C + MCCIA / Auto Cluster. Cluster v4 records this as an enquiry route. No agreement is recorded.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "COEP / ILS. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: CC/OD; vendor; tooling.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Potential only. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "Named route: MCCIA / Auto Cluster. Cluster v4 does not record a state scheme or park already in place.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Validation shortlist. Comparison-row observation: Credit +11%; DPD 1.3%. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "E-New Delhi",
+      "name": "Delhi general engineering metal cutting and fabrication",
+      "place": "Delhi NCT · Delhi district jurisdiction to validate per unit · Naraina / Mayapuri candidate machining and fabrication belt",
+      "hsn": "7308; 7326; 8466",
+      "hsn_note": "Engineering and metals. Structural steelwork, other iron/steel articles, machine-tool parts. Heading 8466 only if the actual part qualifies; a machining service may need SAC.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Comparable current district–sector enterprise count not verified",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Credit +19%; DPD 0.3%.",
+          "score": ""
+        },
+        "partners": {
+          "note": "C + DSIIDC enquiry. Cluster v4 records this as an enquiry route. No agreement is recorded.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "DTU. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: CC/OD; equipment.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Potential only. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "No state scheme, park, or nodal office is recorded for this belt in cluster v4.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Credit +19%; DPD 0.3%. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "E-Chennai",
+      "name": "Chennai engineering Ambattur fabrication route",
+      "place": "Tamil Nadu · Chennai / Tiruvallur jurisdiction to validate per unit · Ambattur / Thirumullaivoyal engineering route",
+      "hsn": "7308; 7326; 8466",
+      "hsn_note": "Engineering and metals. Structural steelwork, other iron/steel articles, machine-tool parts. Heading 8466 only if the actual part qualifies; a machining service may need SAC.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Comparable current district–sector enterprise count not verified",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Credit +3%; DPD 1%.",
+          "score": ""
+        },
+        "partners": {
+          "note": "C + TAPSTIA CFC. Cluster v4 records this as an enquiry route. No agreement is recorded.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "Anna University. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: CC/OD; equipment.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Potential only. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "No state scheme, park, or nodal office is recorded for this belt in cluster v4.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Validation shortlist. Comparison-row observation: Credit +3%; DPD 1%. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "ADD01",
+      "name": "Pune Hadapsar printing and packaging",
+      "place": "Maharashtra · Pune · Hadapsar printing and packaging",
+      "hsn": "4819; 4821; 4911",
+      "hsn_note": "Printing and packaging. Paper/board packaging, paper labels and other printed matter; contract printing may instead be a service.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Current cluster-specific enterprise count not verified. Historical DC-MSME mapping identifies the cluster.",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Historical cluster listed.",
+          "score": ""
+        },
+        "partners": {
+          "note": "Hadapsar printing cluster / local SPV. Cluster v4 records this as an enquiry route. No agreement is recorded.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "COEP; print specialist NV. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: Paper WC; press loan.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Potential. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "Named route: Hadapsar printing cluster / local SPV. Cluster v4 does not record a state scheme or park already in place.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Historical cluster listed. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "ADD02",
+      "name": "Pune plastics and moulding",
+      "place": "Maharashtra · Pune · Pimpri–Chinchwad / Bhosari plastics and moulding enquiry",
+      "hsn": "3923; 3926; 6305",
+      "hsn_note": "Plastics and polymer products. Plastic packing articles, other plastic articles, textile-material sacks. Woven polymer sacks require material/construction-specific classification.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Current plastics-only enterprise count not verified. Published Pune plastic-products mapping is historical.",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Historical sector mapping.",
+          "score": ""
+        },
+        "partners": {
+          "note": "MCCIA / Auto Cluster. Cluster v4 records this as an enquiry route. No agreement is recorded.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "COEP; CIPET referral. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: Resin WC; mould loan.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Potential. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "Named route: MCCIA / Auto Cluster. Cluster v4 does not record a state scheme or park already in place.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Historical sector mapping. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "ADD03",
+      "name": "Pune defence supplier ecosystem",
+      "place": "Maharashtra · Pune · Pune / Pimpri–Chinchwad defence supplier enquiry",
+      "hsn": "8807; 9305; 7326",
+      "hsn_note": "Defence and aerospace suppliers. Aircraft parts, arms parts and generic steel articles are alternative examples, not automatic classifications for all defence supplies.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Operating eligible defence MSME count not verified; technology-node presence is not a cluster census.",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: RTN launched 2021.",
+          "score": ""
+        },
+        "partners": {
+          "note": "Army RTN / SIDM enquiry. Cluster v4 records this as an enquiry route. No agreement is recorded.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "COEP / ILS. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: Contract WC; metrology.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Controlled potential. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "Named route: Army RTN / SIDM enquiry. Cluster v4 does not record a state scheme or park already in place.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: RTN launched 2021. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "ADD04",
+      "name": "Delhi printing and packaging",
+      "place": "Delhi NCT · Industrial-area district to be confirmed · Naraina printing / Bawana packaging candidate belts",
+      "hsn": "4819; 4821; 4911",
+      "hsn_note": "Printing and packaging. Paper/board packaging, paper labels and other printed matter; contract printing may instead be a service.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Current local enterprise count not verified. DSIIDC historical relocation table has 5,170 printing/paper/packaging entries; not current Bawana stock, not used as size.",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Historical sector evidence.",
+          "score": ""
+        },
+        "partners": {
+          "note": "DSIIDC / printer association enquiry. Cluster v4 records this as an enquiry route. No agreement is recorded.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "DSEU Pusa printing. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: Paper WC; press loan.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Potential. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "Named route: DSIIDC / printer association enquiry. Cluster v4 does not record a state scheme or park already in place.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Historical sector evidence. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "ADD05",
+      "name": "Delhi plastics Bawana Narela enquiry",
+      "place": "Delhi NCT · North / North West Delhi jurisdiction to validate · Bawana first; Narela only as a separately coded spoke",
+      "hsn": "3923; 3926; 6305",
+      "hsn_note": "Plastics and polymer products. Plastic packing articles, other plastic articles, textile-material sacks. Woven polymer sacks require material/construction-specific classification.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Current local enterprise count not verified. DSIIDC relocation table has 4,144 plastic/polymer entries; not current operating Bawana/Narela count.",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Area and cohort to validate.",
+          "score": ""
+        },
+        "partners": {
+          "note": "DSIIDC / plastic association enquiry. Cluster v4 records this as an enquiry route. No agreement is recorded.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "DTU; CIPET Murthal. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: Resin WC; mould loan.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Potential. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "Named route: DSIIDC / plastic association enquiry. Cluster v4 does not record a state scheme or park already in place.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Area and cohort to validate. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "ADD06",
+      "name": "Gurugram Manesar auto components",
+      "place": "Haryana / NCR · Gurugram · IMT Manesar and adjacent supplier estates",
+      "hsn": "8708; 8714; 8409",
+      "hsn_note": "Auto components. Vehicle parts, two-wheeler parts and engine parts, respectively; actual part classification governs.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Named suppliers verified in Haryana register; current active MSME-only total not established. Overlaps broader Gurugram engineering.",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Supplier presence recorded.",
+          "score": ""
+        },
+        "partners": {
+          "note": "ACMA North / supplier associations. Cluster v4 records this as an enquiry route. No agreement is recorded.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "Gurugram University / J C Bose. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: CC/OD; vendor; tooling.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Potential. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "Named route: ACMA North / supplier associations. Cluster v4 does not record a state scheme or park already in place.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Supplier presence recorded. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "ADD07",
+      "name": "Bengaluru Peenya metal cutting and fabrication",
+      "place": "Karnataka · Bengaluru Urban jurisdiction to validate · Peenya industrial area",
+      "hsn": "7308; 7326; 8466",
+      "hsn_note": "Engineering and metals. Structural steelwork, other iron/steel articles, machine-tool parts. Heading 8466 only if the actual part qualifies; a machining service may need SAC.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Historical machine-tools subset: 100 MSMEs plus 6 large units. This is not the total machining/fabrication enterprise count.",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Cluster SPV exists.",
+          "score": ""
+        },
+        "partners": {
+          "note": "MTMA / Peenya Industries Association. Cluster v4 records this as an enquiry route. No agreement is recorded.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "RVCE. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: CC/OD; equipment.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Potential. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "The 100 MSMEs are a historical machine-tool subset, plus 6 large units. That is not a size mix for the fabrication belt.",
+          "score": ""
+        },
+        "state": {
+          "note": "Peenya cluster SPV exists (cluster v4, 30 October 2026). A facility is in place.",
+          "score": "3"
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Validation shortlist. Comparison-row observation: Cluster SPV exists. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "ADD08",
+      "name": "Bengaluru plastics precision moulding",
+      "place": "Karnataka · Bengaluru Urban · Peenya and nearby precision-moulding enquiry",
+      "hsn": "3923; 3926; 6305",
+      "hsn_note": "Plastics and polymer products. Plastic packing articles, other plastic articles, textile-material sacks. Woven polymer sacks require material/construction-specific classification.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Current moulding enterprise count not verified. Technical ecosystem evidence is available; local cohort remains proposed.",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Technical route; cohort NV.",
+          "score": ""
+        },
+        "partners": {
+          "note": "CIPET APDDRL / local convenor enquiry. Cluster v4 records this as an enquiry route. No agreement is recorded.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "RVCE; CIPET APDDRL. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: Resin WC; mould loan.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Potential. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "Named route: CIPET APDDRL / local convenor enquiry. Cluster v4 does not record a state scheme or park already in place.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Technical route; cohort NV. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "ADD09",
+      "name": "Bengaluru aerospace defence suppliers",
+      "place": "Karnataka · Devanahalli district jurisdiction to validate at recruitment · Bengaluru / Devanahalli aerospace supplier ecosystem",
+      "hsn": "8807; 9305; 7326",
+      "hsn_note": "Defence and aerospace suppliers. Aircraft parts, arms parts and generic steel articles are alternative examples, not automatic classifications for all defence supplies.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Active eligible MSME count not verified. Aerospace park area and state export shares are not company counts.",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: State ecosystem identified.",
+          "score": ""
+        },
+        "partners": {
+          "note": "Invest Karnataka / SIDM enquiry. Cluster v4 records this as an enquiry route. No agreement is recorded.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "RVCE. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: Contract WC; metrology.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Controlled potential. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "Named route: Invest Karnataka / SIDM enquiry. Cluster v4 does not record a state scheme or park already in place.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: State ecosystem identified. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "ADD10",
+      "name": "Hosur auto and engineering suppliers",
+      "place": "Tamil Nadu · Krishnagiri · Hosur / adjacent engineering estates",
+      "hsn": "8708; 8714; 8409",
+      "hsn_note": "Auto components. Vehicle parts, two-wheeler parts and engine parts, respectively; actual part classification governs.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Current auto-only enterprise total not verified. Existing engineering CFC is evidence of support infrastructure, not a firm census.",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Engineering CFC listed complete.",
+          "score": ""
+        },
+        "partners": {
+          "note": "Hosur engineering CFC / ACMA enquiry. Cluster v4 records this as an enquiry route. No agreement is recorded.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "RVCE or Anna; travel check. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: CC/OD; vendor; tooling.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Potential. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "Hosur engineering CFC is listed complete (cluster v4, 30 October 2026). A facility is in place.",
+          "score": "3"
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Engineering CFC listed complete. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "ADD11",
+      "name": "Hosur print and pack products",
+      "place": "Tamil Nadu · Krishnagiri · Hosur print and pack products",
+      "hsn": "4819; 4821; 4911",
+      "hsn_note": "Printing and packaging. Paper/board packaging, paper labels and other printed matter; contract printing may instead be a service.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Current active firm count not verified. CFC reported developed in FY2023–24.",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: CFC developed FY2023–24.",
+          "score": ""
+        },
+        "partners": {
+          "note": "Print and Pack CFC / SPV enquiry. Cluster v4 records this as an enquiry route. No agreement is recorded.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "IPT Chennai; travel check. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: Paper WC; press loan.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Potential. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "Hosur Print and Pack CFC is reported developed in FY2023–24 (cluster v4). A facility is in place.",
+          "score": "3"
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: CFC developed FY2023–24. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "ADD12",
+      "name": "Chennai auto components",
+      "place": "Tamil Nadu · Chennai / neighbouring district jurisdiction to validate · Guindy / Ambattur automotive supplier enquiry",
+      "hsn": "8708; 8714; 8409",
+      "hsn_note": "Auto components. Vehicle parts, two-wheeler parts and engine parts, respectively; actual part classification governs.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Current eligible auto-component MSME count not verified. Historical DC-MSME cluster listing establishes sector.",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Historical auto cluster listed.",
+          "score": ""
+        },
+        "partners": {
+          "note": "ACMA South / local supplier bodies. Cluster v4 records this as an enquiry route. No agreement is recorded.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "Anna University. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: CC/OD; vendor; tooling.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Potential. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "Named route: ACMA South / local supplier bodies. Cluster v4 does not record a state scheme or park already in place.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Historical auto cluster listed. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "ADD13",
+      "name": "Chennai Kancheepuram plastic woven sacks",
+      "place": "Tamil Nadu · Kancheepuram · Pillaipakkam / Sriperumbudur plastic woven-sack CFC",
+      "hsn": "3923; 3926; 6305",
+      "hsn_note": "Plastics and polymer products. Plastic packing articles, other plastic articles, textile-material sacks. Woven polymer sacks require material/construction-specific classification.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Current operating enterprise count not verified. Completed plastic woven sacks CFC is listed at Pillaipakkam/Sriperumbudur.",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: CFC listed complete.",
+          "score": ""
+        },
+        "partners": {
+          "note": "Chennai Plastic Sacks Cluster SPV. Cluster v4 records this as an enquiry route. No agreement is recorded.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "CIPET Chennai / Anna. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: Resin WC; mould loan.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Potential. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "Plastic woven-sacks CFC at Pillaipakkam/Sriperumbudur is listed complete (cluster v4). A facility is in place.",
+          "score": "3"
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: CFC listed complete. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "ADD14",
+      "name": "Chennai printing and packaging",
+      "place": "Tamil Nadu · Chennai · Chennai printing and packaging enquiry",
+      "hsn": "4819; 4821; 4911",
+      "hsn_note": "Printing and packaging. Paper/board packaging, paper labels and other printed matter; contract printing may instead be a service.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Current active printing/packaging enterprise count not verified. Historical DC-MSME list identifies Chennai printing.",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Historical printing cluster.",
+          "score": ""
+        },
+        "partners": {
+          "note": "Printing cluster / local SPV enquiry. Cluster v4 records this as an enquiry route. No agreement is recorded.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "IPT Chennai. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: Paper WC; press loan.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Potential. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "Named route: Printing cluster / local SPV enquiry. Cluster v4 does not record a state scheme or park already in place.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Historical printing cluster. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "ADD15",
+      "name": "Chennai Hosur defence corridor suppliers",
+      "place": "Tamil Nadu · Chennai / Krishnagiri; additional plant districts to verify · Chennai–Hosur defence-corridor nodes",
+      "hsn": "8807; 9305; 7326",
+      "hsn_note": "Defence and aerospace suppliers. Aircraft parts, arms parts and generic steel articles are alternative examples, not automatic classifications for all defence supplies.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Eligible supplier cohort size not verified. Two corridor nodes are grouped for comparison; this is not one bounded microcluster.",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Defence corridor nodes.",
+          "score": ""
+        },
+        "partners": {
+          "note": "TIDCO / SIDM enquiry. Cluster v4 records this as an enquiry route. No agreement is recorded.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "Anna University; Hosur travel check. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: Contract WC; metrology.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Controlled potential. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "Named route: TIDCO / SIDM enquiry. Cluster v4 does not record a state scheme or park already in place.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Defence corridor nodes. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "E-Bengaluru",
+      "name": "Bengaluru — Electronics",
+      "place": "Karnataka · Bengaluru Urban · Peenya / Bommasandra electronics production enquiry",
+      "hsn": "8534; 8537; 8542",
+      "hsn_note": "Electronics components and assembly. Examples of printed circuits, control panels and integrated circuits; actual product mix unverified.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Comparable current district–sector enterprise count not verified",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Credit +16%; DPD 1.1%.",
+          "score": ""
+        },
+        "partners": {
+          "note": "No local delivery partner is named. Cluster v4 marks the local route as not verified.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "RVCE. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: Parts WC; assembly capex.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Potential only. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "No state scheme, park, or nodal office is recorded for this belt in cluster v4.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Credit +16%; DPD 1.1%. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "E-Mumbai Suburban",
+      "name": "Mumbai Suburban — Electronics",
+      "place": "Maharashtra · Mumbai Suburban · Andheri / Marol electronics enquiry",
+      "hsn": "8534; 8537; 8542",
+      "hsn_note": "Electronics components and assembly. Examples of printed circuits, control panels and integrated circuits; actual product mix unverified.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Comparable current district–sector enterprise count not verified",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Credit +14%; DPD 1.6%.",
+          "score": ""
+        },
+        "partners": {
+          "note": "No local delivery partner is named. Cluster v4 marks the local route as not verified.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "VJTI. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: Parts WC; assembly capex.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Potential only. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "No state scheme, park, or nodal office is recorded for this belt in cluster v4.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Credit +14%; DPD 1.6%. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "E-Jaipur",
+      "name": "Jaipur — Electronics",
+      "place": "Rajasthan · Jaipur jurisdiction to validate after district changes · Sitapura / Vishwakarma candidate electronics belt",
+      "hsn": "8534; 8537; 8542",
+      "hsn_note": "Electronics components and assembly. Examples of printed circuits, control panels and integrated circuits; actual product mix unverified.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Comparable current district–sector enterprise count not verified",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Credit +21%; DPD 0.6%.",
+          "score": ""
+        },
+        "partners": {
+          "note": "No local delivery partner is named. Cluster v4 marks the local route as not verified.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "MNIT Jaipur. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: Parts WC; assembly capex.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Potential only. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "No state scheme, park, or nodal office is recorded for this belt in cluster v4.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Credit +21%; DPD 0.6%. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "E-Gurugram",
+      "name": "Gurugram — Engineering",
+      "place": "Haryana · Gurugram · Udyog Vihar / Manesar engineering enquiry",
+      "hsn": "7308; 7326; 8466",
+      "hsn_note": "Engineering and metals. Structural steelwork, other iron/steel articles, machine-tool parts. Heading 8466 only if the actual part qualifies; a machining service may need SAC.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Comparable current district–sector enterprise count not verified",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Credit +25%; DPD 0.5%.",
+          "score": ""
+        },
+        "partners": {
+          "note": "No local delivery partner is named. Cluster v4 marks the local route as not verified.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "Gurugram University. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: CC/OD; equipment.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Potential only. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "No state scheme, park, or nodal office is recorded for this belt in cluster v4.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Credit +25%; DPD 0.5%. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "T-Tiruppur",
+      "name": "Tiruppur — Textiles",
+      "place": "Tamil Nadu · Tiruppur · Tiruppur knitwear production and ancillary belt",
+      "hsn": "6109; 6203; 6204",
+      "hsn_note": "Textile footwear and artisan goods. Examples of knitwear and woven apparel; actual fibre, construction and garment type determine the heading.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "TEA publishes approximately 20,000 production and ancillary units across operations; the count table is undated and should not be treated as a deduplicated 2026 company census. Separately TEA reports 1,360 knitwear exporter members as of January 2026. Membership is a subset, not the total cluster. Accessed 29 October 2026.",
+          "score": "5"
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Credit +6%; DPD 1.8%.",
+          "score": ""
+        },
+        "partners": {
+          "note": "C + TEA. Cluster v4 records this as an enquiry route. No agreement is recorded.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "NIFT TEA. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: Seasonal WC; export.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "TEA’s earlier profile reports FY2024–25 knitwear exports ₹44,747 crore and domestic sales ₹27,000 crore. Because the domestic observation year and population match are not established, no combined turnover or export-share arithmetic is published. These are broader ecosystem indicators, not cohort sales.",
+          "score": "4"
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "TEA's unit count does not split nano, micro, small and medium. Turnover bands are not verified.",
+          "score": ""
+        },
+        "state": {
+          "note": "Named route: TEA. Cluster v4 does not record a state scheme or park already in place.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Validation shortlist. Comparison-row observation: Credit +6%; DPD 1.8%. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "T-Mumbai Suburban",
+      "name": "Mumbai Suburban — Apparels",
+      "place": "Maharashtra · Mumbai Suburban · Andheri / Goregaon / Malad apparel enquiry",
+      "hsn": "6109; 6203; 6204",
+      "hsn_note": "Textile footwear and artisan goods. Examples of knitwear and woven apparel; actual fibre, construction and garment type determine the heading.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Comparable current district–sector enterprise count not verified",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Credit +20%; DPD 1.3%.",
+          "score": ""
+        },
+        "partners": {
+          "note": "No local delivery partner is named. Cluster v4 marks the local route as not verified.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "VJTI. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: Seasonal WC; export.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Potential only. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "No state scheme, park, or nodal office is recorded for this belt in cluster v4.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Credit +20%; DPD 1.3%. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "T-Coimbatore",
+      "name": "Coimbatore — Khadi",
+      "place": "Tamil Nadu · Coimbatore · Khadi / weaving enterprise catchment to be mapped",
+      "hsn": "5208; 5209",
+      "hsn_note": "Textile footwear and artisan goods. Examples of woven cotton fabrics; khadi is not one universal HSN.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Comparable current district–sector enterprise count not verified",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Credit -5%; DPD 1.5%.",
+          "score": ""
+        },
+        "partners": {
+          "note": "No local delivery partner is named. Cluster v4 marks the local route as not verified.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "PSG iTech. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: Seasonal WC; export.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Potential only. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "No state scheme, park, or nodal office is recorded for this belt in cluster v4.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Credit -5%; DPD 1.5%. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "T-Panipat",
+      "name": "Panipat — Carpets",
+      "place": "Haryana · Panipat · Panipat carpets / home-textile processing enquiry",
+      "hsn": "5701; 5702; 5703",
+      "hsn_note": "Textile footwear and artisan goods. Examples of knotted, woven and tufted carpets.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "3,095 textile MSMEs in 2015–16; carpet-only company count unverified",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Credit +21%; DPD 0.6%.",
+          "score": ""
+        },
+        "partners": {
+          "note": "No local delivery partner is named. Cluster v4 marks the local route as not verified.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "PIET. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: Seasonal WC; export.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Potential only. SAMEEEKSHA reports ₹950 crore production/turnover for the broader textile profile with data attributed to 2015–16. Carpet-only gross sales, domestic/export split and current cohort sales are not verified; no price or inflation update is reconstructed.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "No state scheme, park, or nodal office is recorded for this belt in cluster v4.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Credit +21%; DPD 0.6%. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "T-Jaipur",
+      "name": "Jaipur — Garments",
+      "place": "Rajasthan · Jaipur jurisdiction to validate · Sitapura / Sanganer garment-production enquiry",
+      "hsn": "6109; 6203; 6204",
+      "hsn_note": "Textile footwear and artisan goods. Examples of knitwear and woven apparel; actual fibre, construction and garment type determine the heading.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Comparable current district–sector enterprise count not verified",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Credit +19%; DPD 1%.",
+          "score": ""
+        },
+        "partners": {
+          "note": "No local delivery partner is named. Cluster v4 marks the local route as not verified.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "MNIT Jaipur. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: Seasonal WC; export.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Potential only. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "No state scheme, park, or nodal office is recorded for this belt in cluster v4.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Credit +19%; DPD 1%. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "T-Kolhapur",
+      "name": "Kolhapur — Footwear",
+      "place": "Maharashtra · Kolhapur · Kolhapuri footwear producer groups; exact workshops to map",
+      "hsn": "6403",
+      "hsn_note": "Textile footwear and artisan goods. Example for leather-upper footwear with qualifying soles; actual Kolhapuri construction governs.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "60 micro enterprises in CFC proposal; 240 women artisans in separate project; neither is whole-cluster total",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Credit +16%; DPD 1.4%.",
+          "score": ""
+        },
+        "partners": {
+          "note": "C + LIDCOM / local artisan groups. Cluster v4 records this as an enquiry route. No agreement is recorded.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "Govt Polytechnic. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: Seasonal WC; export.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Global collaboration. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "60 micro enterprises in a CFC proposal, and 240 women artisans in a separate project. Neither figure is the whole cluster. Turnover bands are not verified.",
+          "score": ""
+        },
+        "state": {
+          "note": "Named route: LIDCOM / local artisan groups. Cluster v4 does not record a state scheme or park already in place.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Growth reserve. Comparison-row observation: Credit +16%; DPD 1.4%. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "T-Gurugram",
+      "name": "Gurugram — Apparels",
+      "place": "Haryana · Gurugram · Udyog Vihar / adjoining apparel factories",
+      "hsn": "6109; 6203; 6204",
+      "hsn_note": "Textile footwear and artisan goods. Examples of knitwear and woven apparel; actual fibre, construction and garment type determine the heading.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Comparable current district–sector enterprise count not verified",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Credit +50%; DPD 1.6%.",
+          "score": ""
+        },
+        "partners": {
+          "note": "No local delivery partner is named. Cluster v4 marks the local route as not verified.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "Gurugram University. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: Seasonal WC; export.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Potential only. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "No state scheme, park, or nodal office is recorded for this belt in cluster v4.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Credit +50%; DPD 1.6%. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "T-Gautam Buddha Nagar",
+      "name": "Gautam Buddha Nagar — Garments",
+      "place": "Uttar Pradesh · Gautam Buddha Nagar · Noida garment-production sector enquiry",
+      "hsn": "6109; 6203; 6204",
+      "hsn_note": "Textile footwear and artisan goods. Examples of knitwear and woven apparel; actual fibre, construction and garment type determine the heading.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Comparable current district–sector enterprise count not verified",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Credit +27%; DPD 0.6%.",
+          "score": ""
+        },
+        "partners": {
+          "note": "No local delivery partner is named. Cluster v4 marks the local route as not verified.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "Amity Noida. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: Seasonal WC; export.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Potential only. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "No state scheme, park, or nodal office is recorded for this belt in cluster v4.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Credit +27%; DPD 0.6%. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "F-Pune",
+      "name": "Pune — Food processing",
+      "place": "Maharashtra · Pune · Pune / Pimpri–Chinchwad food-processing enquiry",
+      "hsn": "1905; 2008; 2106",
+      "hsn_note": "Food and marine processing. Examples of bakery goods, prepared fruit/nuts and food preparations; actual food product must be identified.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Comparable current district–sector enterprise count not verified",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Credit +11%; DPD 2.7%.",
+          "score": ""
+        },
+        "partners": {
+          "note": "No local delivery partner is named. Cluster v4 marks the local route as not verified.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "COEP / ILS. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: Seasonal WC; capex.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Product checks. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "No state scheme, park, or nodal office is recorded for this belt in cluster v4.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Credit +11%; DPD 2.7%. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "F-Bengaluru Urban",
+      "name": "Bengaluru Urban — Food processing",
+      "place": "Karnataka · Bengaluru Urban · Urban food-processing estates enquiry",
+      "hsn": "1905; 2008; 2106",
+      "hsn_note": "Food and marine processing. Examples of bakery goods, prepared fruit/nuts and food preparations; actual food product must be identified.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Comparable current district–sector enterprise count not verified",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Credit +17%; DPD 2.8%.",
+          "score": ""
+        },
+        "partners": {
+          "note": "No local delivery partner is named. Cluster v4 marks the local route as not verified.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "RVCE. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: Seasonal WC; capex.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Product checks. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "No state scheme, park, or nodal office is recorded for this belt in cluster v4.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Credit +17%; DPD 2.8%. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "F-Indore",
+      "name": "Indore — Food processing",
+      "place": "Madhya Pradesh · Indore · Sanwer Road / Palda food-processing enquiry",
+      "hsn": "1905; 2008; 2106",
+      "hsn_note": "Food and marine processing. Examples of bakery goods, prepared fruit/nuts and food preparations; actual food product must be identified.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Comparable current district–sector enterprise count not verified",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Credit +9%; DPD 0.7%.",
+          "score": ""
+        },
+        "partners": {
+          "note": "No local delivery partner is named. Cluster v4 marks the local route as not verified.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "DAVV IMS. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: Seasonal WC; capex.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Product checks. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "No state scheme, park, or nodal office is recorded for this belt in cluster v4.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Credit +9%; DPD 0.7%. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "F-Kolkata",
+      "name": "Kolkata — Marine",
+      "place": "West Bengal · Kolkata · Kolkata marine-export business / processing-site mapping",
+      "hsn": "0306; 1605",
+      "hsn_note": "Food and marine processing. Examples of crustaceans and prepared crustaceans/molluscs; actual species and processing determine heading.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Comparable current district–sector enterprise count not verified",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Credit +1%; DPD 1%.",
+          "score": ""
+        },
+        "partners": {
+          "note": "No local delivery partner is named. Cluster v4 marks the local route as not verified.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "Jadavpur University. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: Seasonal WC; capex.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Product checks. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "No state scheme, park, or nodal office is recorded for this belt in cluster v4.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Credit +1%; DPD 1%. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "F-Nagpur",
+      "name": "Nagpur — Food processing",
+      "place": "Maharashtra · Nagpur · Hingna / Butibori processor enquiry",
+      "hsn": "1905; 2008; 2106",
+      "hsn_note": "Food and marine processing. Examples of bakery goods, prepared fruit/nuts and food preparations; actual food product must be identified.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Comparable current district–sector enterprise count not verified",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Credit +12%; DPD 1%.",
+          "score": ""
+        },
+        "partners": {
+          "note": "No local delivery partner is named. Cluster v4 marks the local route as not verified.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "VNIT. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: Seasonal WC; capex.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Product checks. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "No state scheme, park, or nodal office is recorded for this belt in cluster v4.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Credit +12%; DPD 1%. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "F-Tiruppur",
+      "name": "Tiruppur — Food processing",
+      "place": "Tamil Nadu · Tiruppur · Food-processing catchment to be mapped independently of knitwear",
+      "hsn": "1905; 2008; 2106",
+      "hsn_note": "Food and marine processing. Examples of bakery goods, prepared fruit/nuts and food preparations; actual food product must be identified.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Comparable current district–sector enterprise count not verified",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Credit +21%; DPD 0.2%.",
+          "score": ""
+        },
+        "partners": {
+          "note": "No local delivery partner is named. Cluster v4 marks the local route as not verified.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "NIFT TEA. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: Seasonal WC; capex.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Product checks. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "No state scheme, park, or nodal office is recorded for this belt in cluster v4.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Credit +21%; DPD 0.2%. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "F-Rangareddi",
+      "name": "Rangareddi — Food processing",
+      "place": "Telangana · Rangareddy · Kattedan / Rajendranagar food-processing enquiry",
+      "hsn": "1905; 2008; 2106",
+      "hsn_note": "Food and marine processing. Examples of bakery goods, prepared fruit/nuts and food preparations; actual food product must be identified.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Comparable current district–sector enterprise count not verified",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Credit +12%; DPD 0.6%.",
+          "score": ""
+        },
+        "partners": {
+          "note": "No local delivery partner is named. Cluster v4 marks the local route as not verified.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "CBIT. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: Seasonal WC; capex.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Product checks. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "No state scheme, park, or nodal office is recorded for this belt in cluster v4.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Credit +12%; DPD 0.6%. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "F-Bikaner",
+      "name": "Bikaner — Food processing",
+      "place": "Rajasthan · Bikaner · Bichhwal / Karni industrial-area food enquiry",
+      "hsn": "1905; 2008; 2106",
+      "hsn_note": "Food and marine processing. Examples of bakery goods, prepared fruit/nuts and food preparations; actual food product must be identified.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Comparable current district–sector enterprise count not verified",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Credit +20%; DPD 1.1%.",
+          "score": ""
+        },
+        "partners": {
+          "note": "No local delivery partner is named. Cluster v4 marks the local route as not verified.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "Engineering College. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: Seasonal WC; capex.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Product checks. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "No state scheme, park, or nodal office is recorded for this belt in cluster v4.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Credit +20%; DPD 1.1%. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "F-Bareilly",
+      "name": "Bareilly — Food processing",
+      "place": "Uttar Pradesh · Bareilly · Parsakhera / C B Ganj processor enquiry",
+      "hsn": "1905; 2008; 2106",
+      "hsn_note": "Food and marine processing. Examples of bakery goods, prepared fruit/nuts and food preparations; actual food product must be identified.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Comparable current district–sector enterprise count not verified",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Credit +49%; DPD 0.1%.",
+          "score": ""
+        },
+        "partners": {
+          "note": "No local delivery partner is named. Cluster v4 marks the local route as not verified.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "MJPRU. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: Seasonal WC; capex.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Product checks. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "No state scheme, park, or nodal office is recorded for this belt in cluster v4.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Credit +49%; DPD 0.1%. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "M-Kolkata",
+      "name": "Kolkata — Metals and metal products",
+      "place": "West Bengal · Kolkata · Kolkata metal-business and operating-site enquiry",
+      "hsn": "7325; 7326; 7616",
+      "hsn_note": "Engineering and metals. Examples of iron/steel cast articles, other steel articles and other aluminium articles; actual casting/part function governs.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Comparable current district–sector enterprise count not verified",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Credit -12%; DPD 0.8%.",
+          "score": ""
+        },
+        "partners": {
+          "note": "No local delivery partner is named. Cluster v4 marks the local route as not verified.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "Jadavpur University. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: CC/OD; equipment.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Potential only. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "No state scheme, park, or nodal office is recorded for this belt in cluster v4.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Credit -12%; DPD 0.8%. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "M-Chennai",
+      "name": "Chennai — Metals and metal products",
+      "place": "Tamil Nadu · Chennai / Tiruvallur operating-site jurisdiction to verify · Ambattur / adjacent metal-fabrication enquiry",
+      "hsn": "7325; 7326; 7616",
+      "hsn_note": "Engineering and metals. Examples of iron/steel cast articles, other steel articles and other aluminium articles; actual casting/part function governs.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Comparable current district–sector enterprise count not verified",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Credit +3%; DPD 0.8%.",
+          "score": ""
+        },
+        "partners": {
+          "note": "No local delivery partner is named. Cluster v4 marks the local route as not verified.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "Anna University. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: CC/OD; equipment.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Potential only. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "No state scheme, park, or nodal office is recorded for this belt in cluster v4.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Credit +3%; DPD 0.8%. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "M-Coimbatore",
+      "name": "Coimbatore — Metals and metal products",
+      "place": "Tamil Nadu · Coimbatore · Ganapathy / Peelamedu / SIDCO / Arasur foundry catchment",
+      "hsn": "7325; 7326; 7616",
+      "hsn_note": "Engineering and metals. Examples of iron/steel cast articles, other steel articles and other aluminium articles; actual casting/part function governs.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "BEE SIDHIEE profile lists about 535 foundries; Indian Foundry Association lists about 600. Reference years are not stated on these pages. Different published estimates, not a statistical range or verified current census; includes large and medium units as well as micro/small. Accessed 29 October 2026.",
+          "score": "3"
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Credit +11%; DPD 1.8%.",
+          "score": ""
+        },
+        "partners": {
+          "note": "C + COINDIA. Cluster v4 records this as an enquiry route. No agreement is recorded.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "PSG iTech. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: CC/OD; equipment.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Potential only. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "The foundry lists include large and medium units as well as micro and small. Shares are not published. Turnover bands are not verified.",
+          "score": ""
+        },
+        "state": {
+          "note": "Named route: COINDIA. Cluster v4 does not record a state scheme or park already in place.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Credit +11%; DPD 1.8%. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "M-Faridabad",
+      "name": "Faridabad — Metals and metal products",
+      "place": "Haryana · Faridabad · NIT / DLF / Ballabhgarh engineering-estate enquiry",
+      "hsn": "7325; 7326; 7616",
+      "hsn_note": "Engineering and metals. Examples of iron/steel cast articles, other steel articles and other aluminium articles; actual casting/part function governs.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "12,015 MSME units in the wider mixed engineering cluster: DESL 2012 study, compiled by TERI with July 2014 inputs. Includes auto parts, sheet metal, fabrication and other sectors. Not a metals-only count or a verified 2026 operating census.",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Credit +23%; DPD 0.6%.",
+          "score": ""
+        },
+        "partners": {
+          "note": "C + FIA. Cluster v4 records this as an enquiry route. No agreement is recorded.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "J C Bose YMCA. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: CC/OD; equipment.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Potential only. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "The 12,015 figure is a 2012 mixed engineering cluster, not a metals size mix. Turnover bands are not verified.",
+          "score": ""
+        },
+        "state": {
+          "note": "Named route: FIA. Cluster v4 does not record a state scheme or park already in place.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Validation shortlist. Comparison-row observation: Credit +23%; DPD 0.6%. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "M-Ghaziabad",
+      "name": "Ghaziabad — Metals and metal products",
+      "place": "Uttar Pradesh · Ghaziabad · Bulandshahr Road / Sahibabad metal-processing enquiry",
+      "hsn": "7325; 7326; 7616",
+      "hsn_note": "Engineering and metals. Examples of iron/steel cast articles, other steel articles and other aluminium articles; actual casting/part function governs.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Comparable current district–sector enterprise count not verified",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Credit +17%; DPD 0.8%.",
+          "score": ""
+        },
+        "partners": {
+          "note": "No local delivery partner is named. Cluster v4 marks the local route as not verified.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "KIET. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: CC/OD; equipment.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Potential only. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "No state scheme, park, or nodal office is recorded for this belt in cluster v4.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Credit +17%; DPD 0.8%. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "M-Kolhapur",
+      "name": "Kolhapur — Metals and metal products",
+      "place": "Maharashtra · Kolhapur · Shiroli / Gokul Shirgaon foundry enquiry",
+      "hsn": "7325; 7326; 7616",
+      "hsn_note": "Engineering and metals. Examples of iron/steel cast articles, other steel articles and other aluminium articles; actual casting/part function governs.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "About 250 foundries in wider-area undated profile; includes surrounding areas",
+          "score": "3"
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Credit +20%; DPD 3.5%.",
+          "score": ""
+        },
+        "partners": {
+          "note": "No local delivery partner is named. Cluster v4 marks the local route as not verified.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "Govt Polytechnic. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: CC/OD; equipment.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Potential only. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "No state scheme, park, or nodal office is recorded for this belt in cluster v4.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Credit +20%; DPD 3.5%. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "M-Nashik",
+      "name": "Nashik — Metals and metal products",
+      "place": "Maharashtra · Nashik · Ambad / Satpur metal/engineering enquiry",
+      "hsn": "7325; 7326; 7616",
+      "hsn_note": "Engineering and metals. Examples of iron/steel cast articles, other steel articles and other aluminium articles; actual casting/part function governs.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Comparable current district–sector enterprise count not verified",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Credit +21%; DPD 1.4%.",
+          "score": ""
+        },
+        "partners": {
+          "note": "No local delivery partner is named. Cluster v4 marks the local route as not verified.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "K K Wagh. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: CC/OD; equipment.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Potential only. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "No state scheme, park, or nodal office is recorded for this belt in cluster v4.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Credit +21%; DPD 1.4%. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "C-Bengaluru",
+      "name": "Bengaluru — Chemicals",
+      "place": "Karnataka · Bengaluru Urban; plant jurisdictions to validate · Peenya / Bommasandra chemical-product enquiry",
+      "hsn": "Ch 28/29; 3208; 3402",
+      "hsn_note": "Chemicals. Chemicals span many headings. Chapters 28/29 are broad families, not four-digit codes; 3208 paints and 3402 cleaning/surfactant preparations are examples only; product mix unverified.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Comparable current district–sector enterprise count not verified",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Credit +16%; DPD 1.4%.",
+          "score": ""
+        },
+        "partners": {
+          "note": "No local delivery partner is named. Cluster v4 marks the local route as not verified.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "RVCE. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: WC; upgrade; export.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Product checks. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "No state scheme, park, or nodal office is recorded for this belt in cluster v4.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Credit +16%; DPD 1.4%. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "C-Hyderabad",
+      "name": "Hyderabad — Chemicals",
+      "place": "Telangana · Hyderabad; operating-site jurisdictions to verify · Hyderabad chemical supplier / plant-address mapping",
+      "hsn": "Ch 28/29; 3208; 3402",
+      "hsn_note": "Chemicals. Chemicals span many headings. Chapters 28/29 are broad families, not four-digit codes; 3208 paints and 3402 cleaning/surfactant preparations are examples only; product mix unverified.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Comparable current district–sector enterprise count not verified",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Credit +1%; DPD 3.9%.",
+          "score": ""
+        },
+        "partners": {
+          "note": "No local delivery partner is named. Cluster v4 marks the local route as not verified.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "Osmania University. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: WC; upgrade; export.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Product checks. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "No state scheme, park, or nodal office is recorded for this belt in cluster v4.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Credit +1%; DPD 3.9%. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "C-Chennai",
+      "name": "Chennai — Chemicals",
+      "place": "Tamil Nadu · Chennai; Kancheepuram/Chengalpattu plant boundaries to check · Chennai chemical supplier and operating-site enquiry",
+      "hsn": "Ch 28/29; 3208; 3402",
+      "hsn_note": "Chemicals. Chemicals span many headings. Chapters 28/29 are broad families, not four-digit codes; 3208 paints and 3402 cleaning/surfactant preparations are examples only; product mix unverified.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Comparable current district–sector enterprise count not verified",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Credit +7%; DPD 0.3%.",
+          "score": ""
+        },
+        "partners": {
+          "note": "No local delivery partner is named. Cluster v4 marks the local route as not verified.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "Anna University. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: WC; upgrade; export.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Product checks. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "No state scheme, park, or nodal office is recorded for this belt in cluster v4.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Credit +7%; DPD 0.3%. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "C-Nagpur",
+      "name": "Nagpur — Chemicals",
+      "place": "Maharashtra · Nagpur · Hingna / Butibori chemical-product enquiry",
+      "hsn": "Ch 28/29; 3208; 3402",
+      "hsn_note": "Chemicals. Chemicals span many headings. Chapters 28/29 are broad families, not four-digit codes; 3208 paints and 3402 cleaning/surfactant preparations are examples only; product mix unverified.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Comparable current district–sector enterprise count not verified",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Credit +22%; DPD 0.5%.",
+          "score": ""
+        },
+        "partners": {
+          "note": "No local delivery partner is named. Cluster v4 marks the local route as not verified.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "VNIT. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: WC; upgrade; export.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Product checks. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "No state scheme, park, or nodal office is recorded for this belt in cluster v4.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Credit +22%; DPD 0.5%. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "C-Kanpur",
+      "name": "Kanpur — Chemicals",
+      "place": "Uttar Pradesh · Kanpur Nagar · Dada Nagar / Panki chemical-product enquiry",
+      "hsn": "Ch 28/29; 3208; 3402",
+      "hsn_note": "Chemicals. Chemicals span many headings. Chapters 28/29 are broad families, not four-digit codes; 3208 paints and 3402 cleaning/surfactant preparations are examples only; product mix unverified.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Comparable current district–sector enterprise count not verified",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Credit +36%; DPD 1.1%.",
+          "score": ""
+        },
+        "partners": {
+          "note": "No local delivery partner is named. Cluster v4 marks the local route as not verified.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "HBTU. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: WC; upgrade; export.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Product checks. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "No state scheme, park, or nodal office is recorded for this belt in cluster v4.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Credit +36%; DPD 1.1%. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "C-Madurai",
+      "name": "Madurai — Chemicals",
+      "place": "Tamil Nadu · Madurai · Kappalur chemical-product enquiry",
+      "hsn": "Ch 28/29; 3208; 3402",
+      "hsn_note": "Chemicals. Chemicals span many headings. Chapters 28/29 are broad families, not four-digit codes; 3208 paints and 3402 cleaning/surfactant preparations are examples only; product mix unverified.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Comparable current district–sector enterprise count not verified",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Credit +13%; DPD 0.3%.",
+          "score": ""
+        },
+        "partners": {
+          "note": "No local delivery partner is named. Cluster v4 marks the local route as not verified.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "TCE Madurai. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: WC; upgrade; export.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Product checks. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "No state scheme, park, or nodal office is recorded for this belt in cluster v4.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Credit +13%; DPD 0.3%. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "C-Belagavi",
+      "name": "Belagavi — Chemicals",
+      "place": "Karnataka · Belagavi · Belagavi operating-site mapping; Udyambag/Macche enquiry",
+      "hsn": "Ch 28/29; 3208; 3402",
+      "hsn_note": "Chemicals. Chemicals span many headings. Chapters 28/29 are broad families, not four-digit codes; 3208 paints and 3402 cleaning/surfactant preparations are examples only; product mix unverified.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Comparable current district–sector enterprise count not verified",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Credit +12%; DPD 2.4%.",
+          "score": ""
+        },
+        "partners": {
+          "note": "No local delivery partner is named. Cluster v4 marks the local route as not verified.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "VTU Belagavi. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: WC; upgrade; export.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Product checks. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "No state scheme, park, or nodal office is recorded for this belt in cluster v4.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Credit +12%; DPD 2.4%. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
+      "id": "C-Kancheepuram",
+      "name": "Kancheepuram — Chemicals",
+      "place": "Tamil Nadu · Kancheepuram after district split · Sriperumbudur / Oragadam chemical-product enquiry",
+      "hsn": "Ch 28/29; 3208; 3402",
+      "hsn_note": "Chemicals. Chemicals span many headings. Chapters 28/29 are broad families, not four-digit codes; 3208 paints and 3402 cleaning/surfactant preparations are examples only; product mix unverified.",
+      "list": "Cluster v4",
+      "cells": {
+        "count": {
+          "note": "Comparable current district–sector enterprise count not verified",
+          "score": ""
+        },
+        "growth": {
+          "note": "No published comparison of units, sales or exports for this belt. Comparison-row observation: Credit +25%; DPD 0.4%.",
+          "score": ""
+        },
+        "partners": {
+          "note": "No local delivery partner is named. Cluster v4 marks the local route as not verified.",
+          "score": ""
+        },
+        "colleges": {
+          "note": "SCSVMV. Named in cluster v4 as the academic route. No meeting is recorded.",
+          "score": ""
+        },
+        "lenders": {
+          "note": "No lending company is named. Product types listed in cluster v4: WC; upgrade; export.",
+          "score": ""
+        },
+        "marketing": {
+          "note": "No marketing company is named in cluster v4.",
+          "score": ""
+        },
+        "export": {
+          "note": "Cluster v4 label: Product checks. No local export value is published for this cohort.",
+          "score": ""
+        },
+        "listing": {
+          "note": "No listing candidate is named in cluster v4.",
+          "score": ""
+        },
+        "size": {
+          "note": "Turnover bands are not verified in cluster v4, so the nano, micro, small and medium mix is still open.",
+          "score": ""
+        },
+        "state": {
+          "note": "No state scheme, park, or nodal office is recorded for this belt in cluster v4.",
+          "score": ""
+        },
+        "central": {
+          "note": "Cluster v4 names the same horizontal routes for every belt: SIDBI, CGTMSE, MUDRA, LEAN, ZED and NSIC. It does not show MSMEs in this belt already inside a cluster-specific central scheme.",
+          "score": ""
+        },
+        "other": {
+          "note": "Cluster v4 position: Mapping / evidence first. Comparison-row observation: Credit +25%; DPD 0.4%. Do not add this count to an overlapping row.",
+          "score": ""
+        }
+      }
+    },
+    {
       "id": "medtech",
       "name": "Medical devices",
       "place": "AMTZ Vizag, or Greater Noida / Kanchipuram",
+      "hsn": "",
+      "hsn_note": "",
+      "list": "National type",
       "cells": {
         "count": {
           "note": "About 700 manufacturers (CII/IBEF). About 4,000 CDSCO licensed sites are a second count and are not added. The state split is not published.",
@@ -196,6 +3331,9 @@ const SEED: Book = {
       "id": "semi",
       "name": "Semiconductor ancillaries",
       "place": "Sanand and Dholera, Gujarat",
+      "hsn": "",
+      "hsn_note": "",
+      "list": "National type",
       "cells": {
         "count": {
           "note": "10 approved plants in six states, and 23 design-linked applicants. Ancillary workshops are not a published census.",
@@ -251,6 +3389,9 @@ const SEED: Book = {
       "id": "toys",
       "name": "Toys",
       "place": "Koppal hub, NCR toy park, Channapatna",
+      "hsn": "9503",
+      "hsn_note": "HS 9503, the toys line already used on the national desk. Chapter 95 is a wider basket.",
+      "list": "National type",
       "cells": {
         "count": {
           "note": "DPIIT: 21,000+ Udyam MSMEs, across about 50 clusters. BIS licences are a second count. One belt is not 21,000.",
@@ -306,6 +3447,9 @@ const SEED: Book = {
       "id": "footwear",
       "name": "Footwear",
       "place": "Ambur–Ranipet or Agra — split the row if you work both",
+      "hsn": "",
+      "hsn_note": "",
+      "list": "National type",
       "cells": {
         "count": {
           "note": "About 15,000 footwear units (CLE/IBEF). CLE's 2,868 members are not added. The split between Ambur–Ranipet and Agra is not published.",
@@ -361,6 +3505,9 @@ const SEED: Book = {
       "id": "battery",
       "name": "ACC pack, BMS and recycling",
       "place": "Pune, NCR, and southern pack shops — not the cell plants",
+      "hsn": "",
+      "hsn_note": "",
+      "list": "National type",
       "cells": {
         "count": {
           "note": "A handful of PLI-ACC plants. Pack, BMS and recycling MSMEs are not in that list and are not counted.",
@@ -416,6 +3563,9 @@ const SEED: Book = {
       "id": "ewaste",
       "name": "E-waste",
       "place": "Seelampur (Delhi) and Moradabad",
+      "hsn": "",
+      "hsn_note": "",
+      "list": "National type",
       "cells": {
         "count": {
           "note": "CPCB lists authorised recyclers. Informal units in these two lanes are larger and uncounted. The two lists are not added.",
@@ -471,6 +3621,9 @@ const SEED: Book = {
       "id": "dc-ancillary",
       "name": "Data-centre ancillaries",
       "place": "Navi Mumbai, Chennai, Hyderabad, Noida, Bengaluru",
+      "hsn": "",
+      "hsn_note": "",
+      "list": "National type",
       "cells": {
         "count": {
           "note": "Public counts are of campuses, not of vendors. Vendor population is not published.",
@@ -526,6 +3679,9 @@ const SEED: Book = {
       "id": "charging",
       "name": "EV charging",
       "place": "NCR, Pune, and Gujarat electrical belts",
+      "hsn": "",
+      "hsn_note": "",
+      "list": "National type",
       "cells": {
         "count": {
           "note": "Charger counts are assets, not firms. Electricians and small assemblers are not an official census.",
@@ -581,6 +3737,9 @@ const SEED: Book = {
       "id": "techtex",
       "name": "Technical textiles",
       "place": "Surat, Panipat, or Coimbatore",
+      "hsn": "",
+      "hsn_note": "",
+      "list": "National type",
       "cells": {
         "count": {
           "note": "24 GREAT startups and 30 PLI companies are scheme lists. The mill and converter population is not that list.",
@@ -636,6 +3795,9 @@ const SEED: Book = {
       "id": "space",
       "name": "Space components",
       "place": "Bengaluru and Hyderabad",
+      "hsn": "",
+      "hsn_note": "",
+      "list": "National type",
       "cells": {
         "count": {
           "note": "Private launch and satellite firms are a short list. Component MSMEs are not published. Do not use HS 8802 (aircraft).",
@@ -691,6 +3853,9 @@ const SEED: Book = {
       "id": "ghydrogen",
       "name": "Green hydrogen ancillaries",
       "place": "No MSME belt — plants only",
+      "hsn": "",
+      "hsn_note": "",
+      "list": "National type",
       "cells": {
         "count": {
           "note": "Mission awards are to large sponsors. An ancillary census was not found.",
@@ -746,6 +3911,9 @@ const SEED: Book = {
       "id": "ethanol",
       "name": "Ethanol and feedstock",
       "place": "One belt in UP, Maharashtra, Karnataka, or Bihar",
+      "hsn": "",
+      "hsn_note": "",
+      "list": "National type",
       "cells": {
         "count": {
           "note": "Distilleries are a few hundred large units. FPO and collection points are a different population and are not a belt census.",
@@ -801,6 +3969,9 @@ const SEED: Book = {
       "id": "nutra",
       "name": "Nutraceuticals and AYUSH",
       "place": "Baddi, Uttarakhand, or Gujarat",
+      "hsn": "",
+      "hsn_note": "",
+      "list": "National type",
       "cells": {
         "count": {
           "note": "No single official count combines AYUSH and nutraceutical licences. None is stated.",
@@ -856,6 +4027,9 @@ const SEED: Book = {
       "id": "agritech",
       "name": "Agri-tech and farm machinery",
       "place": "One custom-hiring belt — name it before scoring the place",
+      "hsn": "",
+      "hsn_note": "",
+      "list": "National type",
       "cells": {
         "count": {
           "note": "No belt census. Startup certificates and machinery factories are different lists.",
@@ -911,6 +4085,9 @@ const SEED: Book = {
       "id": "avgc",
       "name": "AVGC-XR",
       "place": "No single belt — studios are scattered",
+      "hsn": "",
+      "hsn_note": "",
+      "list": "National type",
       "cells": {
         "count": {
           "note": "No place-level census of studios. Freelancers are people, not enterprises.",
@@ -966,6 +4143,9 @@ const SEED: Book = {
       "id": "geospatial",
       "name": "Geospatial and drone services",
       "place": "Scattered service firms — do not merge with drone manufacturing",
+      "hsn": "",
+      "hsn_note": "",
+      "list": "National type",
       "cells": {
         "count": {
           "note": "16,000 remote-pilot certificates are people, not firms. Firm census is not published.",
@@ -1021,6 +4201,9 @@ const SEED: Book = {
       "id": "cyber",
       "name": "Cybersecurity services",
       "place": "No factory belt",
+      "hsn": "",
+      "hsn_note": "",
+      "list": "National type",
       "cells": {
         "count": {
           "note": "No cluster count. These are firms you might invite in, not a place.",
@@ -1076,6 +4259,9 @@ const SEED: Book = {
       "id": "specialty-steel",
       "name": "Specialty steel conversion",
       "place": "Rerollers — not the melt shop",
+      "hsn": "",
+      "hsn_note": "",
+      "list": "National type",
       "cells": {
         "count": {
           "note": "PLI beneficiaries are the melt and processing companies. An MSME reroller census was not found.",
@@ -1131,6 +4317,9 @@ const SEED: Book = {
       "id": "api",
       "name": "Bulk drugs and APIs",
       "place": "Around one park — name the park",
+      "hsn": "",
+      "hsn_note": "",
+      "list": "National type",
       "cells": {
         "count": {
           "note": "PLI Bulk Drugs applicants and park plots. Intermediate MSMEs around the park are not a published census.",
@@ -1186,6 +4375,9 @@ const SEED: Book = {
       "id": "electronics",
       "name": "Electronics suppliers",
       "place": "Noida–Greater Noida or Sriperumbudur",
+      "hsn": "",
+      "hsn_note": "",
+      "list": "National type",
       "cells": {
         "count": {
           "note": "32 PLI companies and 300+ mobile units (MeitY). Neither count is the MSME tool room.",
@@ -1241,6 +4433,9 @@ const SEED: Book = {
       "id": "ev",
       "name": "EV and auto components",
       "place": "Pune–Chakan or Hosur–Krishnagiri",
+      "hsn": "",
+      "hsn_note": "",
+      "list": "National type",
       "cells": {
         "count": {
           "note": "82 PLI Auto applicants and 278 units as on 30 November 2025. ACMA's membership is the wider component industry, not an EV census.",
@@ -1296,6 +4491,9 @@ const SEED: Book = {
       "id": "solar",
       "name": "Solar modules and BOS",
       "place": "Gujarat fabrication, not the Rajasthan project site",
+      "hsn": "",
+      "hsn_note": "",
+      "list": "National type",
       "cells": {
         "count": {
           "note": "ALMM: 100 manufacturers and 123 units, up from 21 manufacturers in 2021. Installers and BOS MSMEs are not added.",
@@ -1351,6 +4549,9 @@ const SEED: Book = {
       "id": "it",
       "name": "IT services and GCCs",
       "place": "Bengaluru, Hyderabad, Pune, NCR, Chennai — no factory belt",
+      "hsn": "",
+      "hsn_note": "",
+      "list": "National type",
       "cells": {
         "count": {
           "note": "NASSCOM lists, park tenants, and GCC announcements are three different counts. None is an MSME census.",
@@ -1406,6 +4607,9 @@ const SEED: Book = {
       "id": "healthtech",
       "name": "Healthtech",
       "place": "No factory belt — do not site this at AMTZ",
+      "hsn": "",
+      "hsn_note": "",
+      "list": "National type",
       "cells": {
         "count": {
           "note": "Certificates and empanelled care units are different lists. They are not the 700 device manufacturers.",
@@ -1461,6 +4665,9 @@ const SEED: Book = {
       "id": "edtech",
       "name": "Edtech and skilling",
       "place": "No belt",
+      "hsn": "",
+      "hsn_note": "",
+      "list": "National type",
       "cells": {
         "count": {
           "note": "DPIIT certificates and NSDC training partners are different lists. They are not a place.",
@@ -1516,6 +4723,9 @@ const SEED: Book = {
       "id": "logistics",
       "name": "E-commerce logistics",
       "place": "Bhiwandi, Bilaspur–Gurugram, or Hoskote",
+      "hsn": "",
+      "hsn_note": "",
+      "list": "National type",
       "cells": {
         "count": {
           "note": "Warehouse counts, transporter registrations, and fleet owners are three units. They are not added. No firm census.",
@@ -1571,6 +4781,9 @@ const SEED: Book = {
       "id": "fintech",
       "name": "Fintech and BC networks",
       "place": "No factory belt",
+      "hsn": "",
+      "hsn_note": "",
+      "list": "National type",
       "cells": {
         "count": {
           "note": "Regulated fintechs and BC networks are different lists. Agent headcount is people, not enterprises.",
@@ -1626,6 +4839,9 @@ const SEED: Book = {
       "id": "drones",
       "name": "Drones",
       "place": "Split across many cities — no single belt",
+      "hsn": "",
+      "hsn_note": "",
+      "list": "National type",
       "cells": {
         "count": {
           "note": "PLI list, 6 July 2022: 23 firms. PIB, 26 July 2024: 48 companies with type-certified models. The lists are small and scattered.",
@@ -1681,6 +4897,9 @@ const SEED: Book = {
       "id": "defence",
       "name": "Defence suppliers",
       "place": "Bengaluru, Hyderabad, Pune, or the TN / UP corridors",
+      "hsn": "",
+      "hsn_note": "",
+      "list": "National type",
       "cells": {
         "count": {
           "note": "About 16,000 MSMEs is an ecosystem description. 788 licences to 462 companies, and iDEX's 619 startups, are different counts. They are not added. Density inside one corridor is not published.",
@@ -1736,6 +4955,9 @@ const SEED: Book = {
       "id": "appliances",
       "name": "White goods and furniture",
       "place": "Noida–Hapur annex",
+      "hsn": "",
+      "hsn_note": "",
+      "list": "National type",
       "cells": {
         "count": {
           "note": "The annex is about 4,500 MSMEs. The 84 PLI White Goods companies are not added to that.",
@@ -1791,6 +5013,9 @@ const SEED: Book = {
       "id": "food",
       "name": "Food processing",
       "place": "The food-demo belt — name the district, not all 726 ODOP districts",
+      "hsn": "",
+      "hsn_note": "",
+      "list": "National type",
       "cells": {
         "count": {
           "note": "PMFME, 31 December 2025: 1,72,707 micro enterprises approved and 59,202 formalised, nationally. ASI factories are a third count. The demo belt's own count is not the national number.",
@@ -1903,26 +5128,23 @@ function statTone(tier: string): "success" | "info" | "warning" | "danger" | und
 }
 
 export default function ClusterFillScore() {
-  const [book, setBook] = useCanvasState<Book>("cluster-fill-book", SEED);
-  const [view, setView] = useState<"rank" | "fill" | "weights" | "anchors">("fill");
+  const [book, setBook] = useCanvasState<Book>("cluster-fill-book-v4", SEED);
+  const [view, setView] = useState<"rank" | "fill" | "weights" | "anchors">("rank");
+  const [listFilter, setListFilter] = useState("Cluster v4");
   const [selectedId, setSelectedId] = useState(SEED.clusters[0].id);
   const [addedName, setAddedName] = useState("");
   const [addedPlace, setAddedPlace] = useState("");
   const theme = useHostTheme();
 
   const selected = book.clusters.find((cluster) => cluster.id === selectedId) ?? book.clusters[0];
+  const inList = (cluster: Cluster) => listFilter === "All" || cluster.list === listFilter;
   const current = running(selected, book);
   const ranked = useMemo(() => {
     return book.clusters
-      .map((cluster) => ({ cluster, ...running(cluster, book) }))
-      .filter((row) => row.cluster.name.trim() !== "")
-      .sort((a, b) => {
-        const aReady = a.filled >= 8 ? 1 : 0;
-        const bReady = b.filled >= 8 ? 1 : 0;
-        if (aReady !== bReady) return bReady - aReady;
-        return (b.mark ?? -1) - (a.mark ?? -1);
-      });
-  }, [book]);
+      .map((cluster, index) => ({ cluster, index, ...running(cluster, book) }))
+      .filter((row) => row.cluster.name.trim() !== "" && inList(row.cluster))
+      .sort((a, b) => a.index - b.index);
+  }, [book, listFilter]);
   const chartRows = ranked.filter((row) => row.mark !== null);
 
   function patchCluster(id: string, factor: FactorId, patch: Partial<Cell>) {
@@ -1942,7 +5164,8 @@ export default function ClusterFillScore() {
     const id = `custom-${Date.now()}`;
     const cells = {} as Record<FactorId, Cell>;
     for (const factor of FACTORS) cells[factor.id] = { note: "", score: "" };
-    setBook((prev) => ({ ...prev, clusters: [...prev.clusters, { id, name, place, cells }] }));
+    setBook((prev) => ({ ...prev, clusters: [...prev.clusters, { id, name, place, hsn: "", list: "Added", cells }] }));
+    setListFilter("Added");
     setSelectedId(id);
     setAddedName("");
     setAddedPlace("");
@@ -1954,7 +5177,7 @@ export default function ClusterFillScore() {
       <Stack gap={6}>
         <H1>Cluster fill-in score</H1>
         <Text tone="secondary">
-          Type the fact, then pick 1 to 5. The mark moves as soon as a score is entered. A blank factor is dropped. It is not a zero.
+          54 local clusters from cluster v4, 30 October 2026, then the national types. Type the fact, then pick 1 to 5. The mark moves as soon as a score is entered. A blank factor is dropped. It is not a zero. The HSN heading does not enter the mark.
         </Text>
       </Stack>
 
@@ -1968,7 +5191,7 @@ export default function ClusterFillScore() {
       </div>
 
       <Callout tone={current.filled >= 8 ? "success" : "warning"} title={selected.name}>
-        {selected.place}. {current.filled >= 8
+        {selected.list}. {selected.place}. HSN {selected.hsn || "—"}. {current.filled >= 8
           ? `Tier: ${current.tier}. Eight or more factors are filled, so this cluster can be compared.`
           : `Running score only. Still blank: ${current.missing.join(", ")}.`}
       </Callout>
@@ -1979,13 +5202,31 @@ export default function ClusterFillScore() {
         <Pill active={view === "weights"} onClick={() => setView("weights")}>Weights</Pill>
         <Pill active={view === "anchors"} onClick={() => setView("anchors")}>What 1 and 5 mean</Pill>
       </Row>
+      <Row gap={8} wrap>
+        {["Cluster v4", "National type", "Added", "All"].map((name) => (
+          <Pill key={name} active={listFilter === name} onClick={() => {
+            setListFilter(name);
+            const next = book.clusters.find((cluster) => cluster.name.trim() !== "" && (name === "All" || cluster.list === name));
+            if (next) setSelectedId(next.id);
+          }}>{name}</Pill>
+        ))}
+      </Row>
 
       {view === "fill" && (
         <Stack gap={12}>
           <Select
             value={selected.id}
             onChange={setSelectedId}
-            options={book.clusters.filter((cluster) => cluster.name.trim() !== "").map((cluster) => ({ value: cluster.id, label: cluster.name }))}
+            options={book.clusters.filter((cluster) => cluster.name.trim() !== "" && inList(cluster)).map((cluster) => ({ value: cluster.id, label: cluster.name }))}
+          />
+          <Text size="small" tone="secondary">HSN code. Indicative heading. It does not enter the mark.</Text>
+          <TextInput
+            value={selected.hsn}
+            onChange={(hsn) => setBook((prev) => ({
+              ...prev,
+              clusters: prev.clusters.map((cluster) => cluster.id === selected.id ? { ...cluster, hsn } : cluster),
+            }))}
+            placeholder="HSN heading"
           />
           {FACTORS.map((factor) => {
             const cell = selected.cells[factor.id];
@@ -2018,35 +5259,39 @@ export default function ClusterFillScore() {
       {view === "rank" && (
         <Stack gap={12}>
           <Text size="small" tone="secondary">
-            Sorted with ready clusters (8 or more factors) first. A running mark uses only the filled factors. Desk starting scores are already in the count, size, export, and government columns where a published figure existed.
+            Same order as cluster v4, then the national types. A running mark uses only the filled factors. A blue desk score is already entered only where a published figure mapped onto the 1–5 anchor.
           </Text>
+          {ranked.length > 0 && (
           <Table
-            headers={["Cluster", "Place", "Mark", "Filled", "Tier", "Use it?"]}
-            columnAlign={["left", "left", "right", "right", "left", "left"]}
+            headers={["Cluster", "HSN code", "Place", "Mark", "Filled", "Tier", "Use it?"]}
+            columnAlign={["left", "left", "left", "right", "right", "left", "left"]}
             rows={ranked.map((row) => [
               row.cluster.name,
+              row.cluster.hsn || "—",
               row.cluster.place,
               row.mark === null ? "—" : String(row.mark),
               `${row.filled} of 12`,
-              row.tier,
+              row.filled === 0 ? "—" : row.tier,
               row.filled >= 8 ? "Ready to compare" : "Running score",
             ])}
             rowTone={ranked.map((row) => row.filled >= 8 ? toneFor(row.tier) : "neutral")}
             striped
             stickyHeader
           />
+          )}
           {chartRows.length > 0 && (
             <Stack gap={6}>
-              <H2>Running mark by cluster</H2>
+              <H2>Running mark out of 100</H2>
               <BarChart
                 horizontal
                 height={Math.max(320, chartRows.length * 22)}
                 categories={chartRows.map((row) => row.cluster.name)}
                 series={[{ name: "Mark out of 100", data: chartRows.map((row) => row.mark ?? 0) }]}
                 yMax={100}
+                valueSuffix=""
               />
               <Text size="small" tone="tertiary">
-                Mark out of 100. Blank factors are excluded. Source: scores on this canvas, including desk starting scores until you overwrite them. A high bar with fewer than 8 factors is not a decision. 19 November 2026.
+                Mark out of 100 on the filled factors only. Blank factors are excluded. Source: cluster v4, 30 October 2026, and the national desk, 19 November 2026. A bar with fewer than 8 factors is a running score.
               </Text>
             </Stack>
           )}
