@@ -181,10 +181,11 @@
   function profileCard(it){
     var name=it.name||'—', role=it.role||it.designation||'', org=it.organisation||it.department||'', bio=it.bio||'', li=it.linkedin;
     var photo=firstUrl(it.photo);
-    var head = photo ? '<img src="'+esc(photo)+'" alt="'+esc(name)+'" style="width:100%;height:100%;object-fit:cover" onerror="this.replaceWith(document.createTextNode(\''+initials(name)+'\'))">' : initials(name);
+    var head = photo ? '<img src="'+esc(photo)+'" alt="'+esc(name)+'" loading="lazy">' : esc(initials(name));
+    var more = (org?'<div class="org">'+esc(org)+'</div>':'')+paras(bio,'bio')+(li?'<a class="li" href="'+esc(li)+'" target="_blank" rel="noopener">in · LinkedIn</a>':'');
     return '<article class="profile"><div class="ph">'+head+'</div><div class="pb"><h3>'+esc(name)+'</h3>'+
-      (role?'<div class="role">'+esc(role)+'</div>':'')+(org?'<div class="org">'+esc(org)+'</div>':'')+
-      paras(bio,'bio')+(li?'<a class="li" href="'+esc(li)+'" target="_blank" rel="noopener">in · LinkedIn</a>':'')+'</div></article>';
+      (role?'<div class="role">'+esc(role)+'</div>':'')+
+      (more?'<details><summary>View profile</summary>'+more+'</details>':'')+'</div></article>';
   }
   function rcardCard(it){
     var title=it.title||'Untitled', summary=it.summary||it.description||'', cat=it.category||'', date=it.publish_date||'', author=it.author||it.guest||'';
@@ -295,6 +296,7 @@
     var sortDesc = (sortSpec[1] || 'desc').trim().toLowerCase() !== 'asc';
     fetch('/api/public/collection/'+name).then(function(r){return r.json();}).then(function(d){
       var items = d.items || [];
+      if (render === profileCard) items = items.filter(function(it){ var n = String(it.name || '').trim(); return n && !/^(?:[-—–]+|member to be announced|advisor to be announced|appointment in progress|tbd|tba)$/i.test(n); });
       if (inc.length) items = items.filter(function(it){ return catMatch(it, inc); });
       if (exc.length) items = items.filter(function(it){ return !catMatch(it, exc); });
       if (sortField) {
@@ -305,9 +307,8 @@
           return 0;
         });
       }
-      if (items.length) box.innerHTML = items.map(render).join('');
-      // empty → keep the built-in placeholder cards as a graceful fallback
-    }).catch(function(){ /* static hosting: keep placeholders */ });
+      box.innerHTML = items.length ? items.map(render).join('') : (render === profileCard ? '' : '<p class="muted">No published entries yet.</p>');
+    }).catch(function(){ box.innerHTML = render === profileCard ? '' : '<p class="muted">Content is temporarily unavailable.</p>'; });
   });
   // Click a meeting video poster → load the YouTube player in place (only a
   // validated 11-char id ever builds the embed URL).

@@ -208,9 +208,9 @@ def build(g):
   <div class="center reveal" style="max-width:56ch;margin-inline:auto">
     <span class="kicker" style="justify-content:center">Governance</span>
     <h2 class="h2 mt-s">Governing Council</h2>
-    <p class="muted mt-s">Ten seats representing the ecosystem. Each profile is CMS-managed with photo, name, designation, organisation, biography, LinkedIn and display status.</p>
+  <p data-cms-strip="1"></p>
   </div>
-  <div class="grid g4 mt-l" data-cms-list="council" data-cms-render="profile">{council_cards}</div>
+  <div class="grid g4 mt-l" data-cms-list="council" data-cms-render="profile"></div>
 </div></section>
 
 <section class="section bg-sand" id="advisory" data-section="advisory"><div class="wrap">
@@ -219,7 +219,7 @@ def build(g):
     <h2 class="h2 mt-s">Strategic guidance, clearly bounded</h2>
     <p class="muted mt-s">The Advisory Body is non-executive. It provides strategic guidance and <strong>does not approve lending, select cases or control operations.</strong></p>
   </div>
-  <div class="grid g3 mt-l" data-cms-list="advisory" data-cms-render="profile">{advisory_cards}</div>
+  <div class="grid g3 mt-l" data-cms-list="advisory" data-cms-render="profile"></div>
 </div></section>
 
 <section class="section" id="secretariat" data-section="secretariat"><div class="wrap">
@@ -228,7 +228,7 @@ def build(g):
     <h2 class="h2 mt-s">Secretariat</h2>
     <p class="muted mt-s">The professional team that runs the platform day to day.</p>
   </div>
-  <div class="grid g3 mt-l" data-cms-list="secretariat" data-cms-render="profile">{sec_cards}</div>
+  <div class="grid g3 mt-l" data-cms-list="secretariat" data-cms-render="profile"></div>
 </div></section>
 
 {cta_band()}
@@ -351,8 +351,8 @@ def build(g):
     <button data-filter="writeup">Write-ups</button>
     <button data-filter="document">Documents</button>
   </div>
-  <div class="cm-list mt-l" id="cm-grid" data-cms-list="council_meetings" data-cms-render="meeting" data-cms-sort="meeting_date:desc">{cm_placeholder}</div>
-  <p class="notice mt-l">Each entry is managed in the CMS (Governing Council Meetings collection): title, meeting date, a YouTube recording, written minutes / write-up, an uploaded document, summary, tags and visibility status. The type (video, write-up or document) is detected automatically.</p>
+  <div class="cm-list mt-l" id="cm-grid" data-cms-list="council_meetings" data-cms-render="meeting" data-cms-sort="meeting_date:desc"></div>
+  <p data-cms-strip="1"></p>
 </div></section>
 {cta_band()}
 """
@@ -522,8 +522,8 @@ def build(g):
   <div class="filters reveal" data-filter-group data-target="#rep-grid">
     <button data-filter="all" class="active">All</button>{rep_filters}
   </div>
-  <div class="grid g3 mt-l" id="rep-grid" data-cms-list="reports" data-cms-render="rcard">{rep_items}</div>
-  <p class="notice mt-l">Each item is a CMS entry: title, summary, thumbnail, category, tags, author, publication date, file upload, external link, SEO fields and visibility status.</p>
+  <div class="grid g3 mt-l" id="rep-grid" data-cms-list="reports" data-cms-render="rcard"></div>
+  <p data-cms-strip="1"></p>
 </div></section>
 """
     write("reports.html", doc("Reports & Papers | MSME Catalyst",
@@ -543,8 +543,8 @@ def build(g):
   "Practitioners, institutions and policymakers on what it takes to make MSME support work together.", "Knowledge Hub · Podcasts", key="podcasts")}
 <section class="section"><div class="wrap">
   <div class="crumb" style="margin-bottom:20px"><a href="knowledge.html">← Back to Knowledge Hub</a></div>
-  <div class="grid g3" data-cms-list="podcasts" data-cms-render="rcard">{pod_items}</div>
-  <p class="notice mt-l">Each episode is a CMS entry: cover image, title, guest &amp; organisation, description, audio/video embed, Spotify / YouTube / Apple links, transcript, tags, related reports &amp; blogs and social-share links.</p>
+  <div class="grid g3" data-cms-list="podcasts" data-cms-render="rcard"></div>
+  <p data-cms-strip="1"></p>
 </div></section>
 """
     write("podcasts.html", doc("Podcasts | MSME Catalyst",
@@ -575,28 +575,28 @@ def build(g):
   <div id="flagship" style="scroll-margin-top:90px">
     <h2 class="h2 reveal">Flagship Event</h2>
     <p class="muted reveal" style="margin:6px 0 0">Our marquee annual convening.</p>
-    <div class="grid g3 mt-m" data-cms-list="events" data-cms-filter="flagship" data-cms-render="rcard">{flagship_ph}</div>
+    <div class="grid g3 mt-m" data-cms-list="events" data-cms-filter="flagship" data-cms-render="rcard"></div>
   </div>
 
   <div id="roundtables" style="scroll-margin-top:90px;margin-top:52px">
     <h2 class="h2 reveal">Roundtables</h2>
     <p class="muted reveal" style="margin:6px 0 0">Closed-door working sessions with institutions and practitioners.</p>
-    <div class="grid g3 mt-m" data-cms-list="events" data-cms-filter="roundtable" data-cms-render="rcard">{round_ph}</div>
+    <div class="grid g3 mt-m" data-cms-list="events" data-cms-filter="roundtable" data-cms-render="rcard"></div>
   </div>
 
   <div id="labs" style="scroll-margin-top:90px;margin-top:52px">
     <h2 class="h2 reveal">Working Labs &amp; Convenings</h2>
     <p class="muted reveal" style="margin:6px 0 0">Hands-on labs and other convenings across the ecosystem.</p>
-    <div class="grid g3 mt-m" data-cms-list="events" data-cms-filter-exclude="flagship,roundtable" data-cms-render="rcard">{labs_ph}</div>
+    <div class="grid g3 mt-m" data-cms-list="events" data-cms-filter-exclude="flagship,roundtable" data-cms-render="rcard"></div>
   </div>
 
   <div id="podcasts" data-section="podcasts" style="scroll-margin-top:90px;margin-top:52px">
     <h2 class="h2 reveal">Podcasts</h2>
     <p class="muted reveal" style="margin:6px 0 0">Conversations with practitioners, institutions and policymakers.</p>
-    <div class="grid g3 mt-m" data-cms-list="podcasts" data-cms-render="rcard">{pod_items}</div>
+    <div class="grid g3 mt-m" data-cms-list="podcasts" data-cms-render="rcard"></div>
   </div>
 
-  <p class="notice mt-l">Events are CMS entries (Events &amp; Labs collection) grouped by category — set the category to <strong>Flagship</strong>, <strong>Roundtable</strong> or <strong>Working lab</strong>. Podcasts are managed in the Podcasts collection. Each has title, summary, thumbnail, date, tags, links and visibility status.</p>
+  <p data-cms-strip="1"></p>
 </div></section>
 {cta_band()}
 """
@@ -635,21 +635,16 @@ def build(g):
   "Short, practical writing on convergence, receivables, capability, capital and cluster policy.", "Knowledge Hub · Blogs", key="blogs")}
 <section class="section"><div class="wrap">
   <div class="crumb" style="margin-bottom:20px"><a href="knowledge.html">← Back to Knowledge Hub</a></div>
-  <div class="two-col" style="align-items:stretch">
-    <article class="rcard reveal" style="grid-column:1/-1">
-      <div class="two-col" style="gap:0;align-items:stretch">
-        <div class="thumb" style="min-height:240px"><span class="badge orange tag">Featured</span></div>
-        <div class="rb" style="justify-content:center"><span class="kicker">Featured article</span><h3 style="font-size:1.5rem;margin-top:8px">The featured post headline appears here</h3><p class="muted">Set any article as the featured piece in the CMS. Includes author details, related articles and social sharing.</p><a class="textlink" href="#">Read article</a></div>
-      </div>
-    </article>
-  </div>
+  <h3 data-cms-strip="1"></h3>
+  <p data-cms-strip="1"></p>
+  <a data-cms-strip="1"></a>
   <div class="two-col mt-l" style="align-items:start">
     <div>
       <div class="field" style="max-width:340px"><input class="input" placeholder="Search articles…"></div>
       <div class="filters mt-m" data-filter-group data-target="#blog-grid">
         <button data-filter="all" class="active">All</button>{blog_filters}
       </div>
-      <div class="grid g2 mt-l" id="blog-grid" data-cms-list="blogs" data-cms-render="rcard">{blog_items}</div>
+      <div class="grid g2 mt-l" id="blog-grid" data-cms-list="blogs" data-cms-render="rcard"></div>
     </div>
     <aside class="card reveal">
       <h3>Newsletter</h3>
@@ -659,9 +654,8 @@ def build(g):
         <button class="btn btn-primary" type="submit">Subscribe</button>
         <div class="form-success" style="display:none"><div class="callout">Thanks — you're on the list.</div></div>
       </form>
-      <hr class="divider" style="margin:20px 0">
-      <h3>Editorial workflow</h3>
-      <p class="muted" style="font-size:.9rem">Draft → Review → Published → Archived, managed in the admin CMS with SEO fields and a social-share image.</p>
+      <h3 data-cms-strip="1"></h3>
+  <p data-cms-strip="1"></p>
     </aside>
   </div>
 </div></section>

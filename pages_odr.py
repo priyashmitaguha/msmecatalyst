@@ -235,7 +235,7 @@ def build(g):
       </div>
     </div>
   </div>
-  <p class="notice mt-l" style="max-width:640px;margin-inline:auto">The provider list is a CMS collection (“ODR Providers”): logo, name, description, areas of support, website URL, display order and status. Provider selection is tracked in analytics and the CRM. MSME Catalyst does not imply any recommendation, guarantee or control over the provider's outcome.</p>
+  <p class="notice mt-l" style="max-width:640px;margin-inline:auto">MSME Catalyst does not imply any recommendation, guarantee or control over the provider’s outcome.</p>
 </div></section>
 """
     write("odr/choose-provider.html", doc("Choose an ODR Provider | MSME Catalyst",
@@ -256,7 +256,7 @@ def build(g):
 <section class="section"><div class="wrap">
   <div class="field" style="max-width:360px"><input class="input" placeholder="Search resources…"></div>
   <div class="filters mt-m" data-filter-group data-target="#res-grid"><button data-filter="all" class="active">All</button>{res_filters}</div>
-  <div class="grid g3 mt-l" id="res-grid" data-cms-list="odr_resources" data-cms-render="rcard">{res_items}</div>
+  <div class="grid g3 mt-l" id="res-grid" data-cms-list="odr_resources" data-cms-render="rcard"></div>
   <h2 class="h2 mt-l">Frequently asked questions</h2>
   <div class="mt-m" style="max-width:760px">
     <details class="acc reveal"><summary>What counts as “payment friction”?</summary><div class="ac-body">A delayed receivable, a disputed invoice, or a stalled settlement with a buyer or counterparty — money you've earned that hasn't been paid.</div></details>
